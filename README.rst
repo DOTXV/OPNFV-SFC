@@ -120,12 +120,11 @@ Licenses as listed below (non-exhaustive list, depending on end-user config):
 References
 ==========
 
-For more information on the OPNFV Hunter release, please see:
+For more information on the OPNFV Iruya release, please see:
 
 #. `OPNFV Home Page`_
 #. `OPNFV Documentation`_
 #. `OPNFV Software Downloads`_
-#. `OPNFV Hunter Wiki Page`_
 #. `Mirantis Cloud Platform Documentation`_
 
 .. _`OpenStack`: https://www.openstack.org
