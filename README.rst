@@ -1,6 +1,4 @@
-.. This work is licensed under a Creative Commons Attribution 4.0 International License.
-.. SPDX-License-Identifier: CC-BY-4.0
-.. (c) 2018 Ericsson AB, Mirantis Inc., Enea AB and others.
+.. NTU VOIP lab
 
 ==========
 OPNFV Fuel
@@ -56,15 +54,6 @@ Support
 - `OPNFV Fuel Wiki Page`_
 - `OPNFV Community Support mailing list`_
 - `OPNFV Technical Discussion mailing list`_
-
-LICENSE
-=======
-
-| This document is protected/licensed under the following conditions
-| (c) Jonas Bjurel (Ericsson AB)
-| Licensed under a Creative Commons Attribution 4.0 International License.
-| You should have received a copy of the license along with this work.
-| If not, see <https://creativecommons.org/licenses/by/4.0/>.
 
 Open Platform for NFV Project Software Licence
 ----------------------------------------------
