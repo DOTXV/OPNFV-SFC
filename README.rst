@@ -14,7 +14,7 @@ OPNFV Fuel
 Description
 ===========
 
-This is the OPNFV Hunter release that implements the deploy stage of the
+This is the OPNFV Iruya release that implements the deploy stage of the
 OPNFV CI pipeline via Fuel.
 
 Fuel is based on the `MCP`_ installation tool chain.
