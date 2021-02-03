@@ -1,0 +1,537 @@
+==============
+Apache Formula
+==============
+
+Install and configure Apache webserver
+
+Sample Pillars
+==============
+
+Simple Apache proxy
+
+.. code-block:: yaml
+
+    apache:
+      server:
+        enabled: true
+        bind:
+          address: '0.0.0.0'
+          ports:
+          - 80
+        modules:
+        - proxy
+        - proxy_http
+        - proxy_balancer
+      site:
+        apache_proxy_site:
+          enabled: true
+          type: proxy
+          name: site_name
+          proxy:
+            host: 1.1.1.1
+            port: 8080
+            protocol: http
+            retry: 30
+          host:
+            name: 2.2.2.2
+            port: 9001
+            address: 2.2.2.2
+
+Apache plain static sites (eg. sphinx generated, from git/hg sources)
+
+.. code-block:: yaml
+
+    apache:
+      server:
+        enabled: true
+        bind:
+          listen_default_ports: false
+          address: '0.0.0.0'
+          ports:
+          - 80
+        modules:
+        - rewrite
+        - status
+        site:
+        - enabled: true
+          name: 'sphinxdoc'
+          type: 'static'
+          host:
+            name: 'doc.domain.com'
+            port: 80
+          source:
+            engine: local
+        - enabled: true
+          name: 'impressjs'
+          type: 'static'
+          host:
+            name: 'pres.domain.com'
+            port: 80
+          source:
+            engine: git
+            address: 'git@repo1.domain.cz:impress/billometer.git'
+            revision: 'master'
+
+Tune settings of mpm_prefork
+
+.. code-block:: yaml
+
+    parameters:
+      apache:
+        mpm:
+          prefork:
+            max_clients: 250
+            servers:
+              min: 32
+              max: 64
+              max_requests: 4000
+
+Apache kerberos authentication:
+
+.. code-block:: yaml
+
+    parameters
+      apache:
+        server:
+          site:
+            auth:
+             engine: kerberos
+             name: "Kerberos Authentication"
+             require:
+               - "ldap-attribute memberOf='cn=somegroup,cn=groups,cn=accounts,dc=example,dc=com'"
+
+             kerberos:
+               realms:
+                 - EXAMPLE.COM
+               # Bellow is optional
+               keytab: /etc/apache2/ipa.keytab
+               service: HTTP
+               method:
+                 negotiate: true
+                 k5passwd: true
+
+             ldap:
+               url: "ldaps://idm01.example.com/dc=example,dc=com?krbPrincipalName"
+               # mech is optional
+               mech: GSSAPI
+
+Tune security settings (these are default):
+
+.. code-block:: yaml
+
+    parameters:
+      apache:
+        server:
+          # ServerTokens
+          tokens: Prod
+          # ServerSignature, can be also set per-site
+          signature: false
+          # TraceEnable, can be also set per-site
+          trace: false
+          # Deny access to .git, .svn, .hg directories
+          secure_scm: true
+          # Required for settings bellow
+          modules:
+            - headers
+          # Set X-Content-Type-Options
+          content_type_options: nosniff
+          # Set X-Frame-Options
+          frame_options: sameorigin
+
+Tuned up log configuration.
+
+.. code-block:: yaml
+
+    parameters:
+      apache:
+        server:
+          site:
+            foo:
+              enabled: true
+              type: static
+              log:
+                custom:
+                  enabled: true
+                  file: /var/log/apache2/mylittleponysitecustom.log
+                  format: >-
+                     %{X-Forwarded-For}i %l %u %t \"%r\" %>s %b %D \"%{Referer}i\" \"%{User-Agent}i\"
+                error:
+                  enabled: false
+                  file: /var/log/apache2/foo.error.log
+                  level: notice
+
+Apache wsgi application.
+
+.. code-block:: yaml
+
+    apache:
+      server:
+        enabled: true
+        default_mpm: event
+        site:
+          manila:
+            enabled: false
+            available: true
+            type: wsgi
+            name: manila
+            wsgi:
+              daemon_process: manila-api
+              threads: 2
+              user: manila
+              group: manila
+              display_name: '%{GROUP}'
+              script_alias: '/ /usr/bin/manila-wsgi'
+              application_group: '%{GLOBAL}'
+              authorization: 'On'
+            limits:
+              request_body: 114688
+
+Apache redirect site definition.
+
+.. code-block:: yaml
+
+    apache:
+      server:
+        site:
+          openstack_web_redirect:
+            name: 'openstack_web_redirect'
+            enabled: true
+            type: 'redirect'
+            root: '/var/www/httproot'
+            host:
+              address: ${_param:apache_horizon_api_address}
+              name: ${_param:apache_horizon_api_host}
+              port: 80
+            redirect_mode: rewrite
+            target_url: 'https://%{SERVER_NAME}'
+            listen_address: '0.0.0.0'
+
+Apache ssl cipher management
+
+.. code-block:: yaml
+
+    parameters:
+      apache:
+        server:
+          enabled: true
+          site:
+            example:
+              enabled: true
+              ssl:
+                enabled: true
+                mode: secure
+                ...
+
+.. code-block:: yaml
+
+    parameters:
+      apache:
+        server:
+          enabled: true
+          site:
+            example:
+              enabled: true
+              ssl:
+                enabled: true
+                mode: normal
+                ...
+
+.. code-block:: yaml
+
+    parameters:
+      apache:
+        server:
+          enabled: true
+          site:
+            example:
+              enabled: true
+              ssl:
+                enabled: true
+                mode: strict
+                ciphers:
+                  ECDHE_RSA_AES256_GCM_SHA384:
+                    name: 'ECDHE-RSA-AES256-GCM-SHA384'
+                    enabled: True
+                  ECDHE_ECDSA_AES256_GCM_SHA384:
+                    name: 'ECDHE-ECDSA-AES256-GCM-SHA384'
+                    enabled: True
+                protocols:
+                  TLS1:
+                    name: 'TLSv1'
+                    enabled: True
+                  TLS1_1:
+                    name: 'TLSv1.1'
+                    enabled: True
+                  TLS1_2:
+                    name: 'TLSv1.2'
+                    enabled: False
+                prefer_server_ciphers: 'on'
+                ...
+
+Advanced SSL configuration, more information about SSL options can be found
+at https://httpd.apache.org/docs/2.4/mod/mod_ssl.html
+!Please note that if mode = 'secure' or mode = 'normal' and 'ciphers' or 'protocols' are set - they should have
+type "string", if mode = 'manual', their type should be "dict" (like shown below)
+
+SSL settings on SITE level:
+
+.. code-block:: yaml
+
+    parameters:
+      apache:
+        server:
+          enabled: true
+          site:
+            example:
+              enabled: true
+              ssl:
+                enabled: true
+                engine: salt
+                authority: "${_param:salt_minion_ca_authority}"
+                key_file: "/etc/ssl/private/internal_proxy.key"
+                cert_file: "/etc/ssl/certs/internal_proxy.crt"
+                chain_file: "/etc/ssl/certs/internal_proxy-with-chain.crt"
+                mode: 'strict'
+                session_timeout: '300'
+                protocols:
+                  TLS1:
+                    name: 'TLSv1'
+                    enabled: True
+                  TLS1_1:
+                    name: 'TLSv1.1'
+                    enabled: True
+                  TLS1_2:
+                    name: 'TLSv1.2'
+                    enabled: False
+                ciphers:
+                  ECDHE_RSA_AES256_GCM_SHA384:
+                    name: 'ECDHE-RSA-AES256-GCM-SHA384'
+                    enabled: True
+                  ECDHE_ECDSA_AES256_GCM_SHA384:
+                    name: 'ECDHE-ECDSA-AES256-GCM-SHA384'
+                    enabled: True
+                prefer_server_ciphers: "off"
+                dhparam:
+                  enabled: True
+                  numbits: 2048
+                ecdh_curve:
+                  secp384r1:
+                    name: 'secp384r1'
+                    enabled: False
+                secp521r1:
+                    name: 'secp521r1'
+                    enabled: True
+                ticket_key:
+                  enabled: True
+                  numbytes: 48
+                session_tickets: 'on'
+                stapling: 'off'
+                crl:
+                  file: '/etc/ssl/crl/crl.pem'
+                  path: '/etc/ssl/crl'
+                  value: 'chain'
+                  enabled: False
+                verify_client: 'none'
+                client_certificate:
+                  file: '/etc/ssl/client_cert.pem'
+                  enabled: False
+                compression: 'off'
+                ssl_engine: 'on'
+                insecure_renegotiation: 'off'
+                ocsp:
+                  default_responder: 'http://responder.example.com:8888/responder'
+                  ocsp_enable: 'off'
+                  override_responder: 'off'
+                  responder_timeout: '50'
+                  max_age: '300'
+                  time_skew: '300'
+                  nonce: 'on'
+                  enabled: True
+                conf_cmd:
+                  sessionticket:
+                    command_name: 'Options'
+                    command_value: '-SessionTicket'
+                    enabled: True
+                  serverpreference:
+                    command_name: 'Options'
+                    command_value: '-ServerPreference'
+                    enabled: False
+                ssl_options:
+                  fakebasicauth:
+                    option: '+FakeBasicAuth'
+                    enabled: 'True'
+                  strictrequire:
+                    option: '-StrictRequire'
+                    enabled: True
+                proxy:
+                  ca_cert_file: '/etc/ssl/client_cert.pem'
+                  ca_cert_path: '/etc/ssl/client/'
+                  crl:
+                    file: '/etc/ssl/crl/crl.pem'
+                    path: '/etc/ssl/crl'
+                    value: 'chain'
+                    enabled: False
+                  check_peer_cn: 'off'
+                  check_peer_expire: 'off'
+                  check_peer_name: 'off'
+                  ciphers:
+                    ECDHE_RSA_AES256_GCM_SHA384:
+                      name: 'ECDHE-RSA-AES256-GCM-SHA384'
+                      enabled: True
+                    ECDHE_ECDSA_AES256_GCM_SHA384:
+                      name: 'ECDHE-ECDSA-AES256-GCM-SHA384'
+                      enabled: False
+                  ssl_engine: 'on'
+                  proxy_chain_file: '/etc/ssl/proxy_chain.pem'
+                  proxy_cert_file: '/etc/ssl/proxy.pem'
+                  proxy_cert_path: '/etc/ssl/proxy'
+                  verify: 'none'
+                  verify_depth: '1'
+                  srp_unknown_seed: 'secret_string'
+                  srp_verifier_file: '/path/to/file.srpv'
+                ssl_stapling:
+                  error_cache_timeout: '600'
+                  fake_try_later: 'off'
+                  stapling_responder: 'http://responder.example.com:8888/responder'
+                  responder_timeout: '600'
+                  response_max_age: '300'
+                  response_time_skew: '300'
+                  responder_errors: 'off'
+                  standard_cache_timeout: '600'
+                sniv_host_check: 'off'
+                verify_depth: '1'
+
+SSL settings on SERVER level:
+
+.. code-block:: yaml
+
+  apache:
+    server:
+      ssl:
+        enabled: True
+        crypto_device: 'rdrand'
+        fips: 'off'
+        passphrase: 'builtin'
+        random_seed:
+          seed1:
+            context: 'startup'
+            source: 'file:/dev/urandom 256'
+            enabled: True
+          seed2:
+            context: 'connect'
+            source: 'builtin'
+            enabled: True
+        session_cache: 'none'
+        stapling_cache: 'default'
+        ssl_user_name: 'SSL_CLIENT_S_DN_CN'
+
+
+Roundcube webmail, postfixadmin and mailman
+
+.. code-block:: yaml
+
+    classes:
+    - service.apache.server.single
+    parameters:
+      apache:
+        server:
+          enabled: true
+          modules:
+            - cgi
+            - php
+          site:
+            roundcube:
+              enabled: true
+              type: static
+              name: roundcube
+              root: /usr/share/roundcube
+              locations:
+                - uri: /admin
+                  path: /usr/share/postfixadmin
+                - uri: /mailman
+                  path: /usr/lib/cgi-bin/mailman
+                  script: true
+                - uri: /pipermail
+                  path: /var/lib/mailman/archives/public
+                - uri: /images/mailman
+                  path: /usr/share/images/mailman
+              host:
+                name: mail.example.com
+                aliases:
+                  - mail.example.com
+                  - lists.example.com
+                  - mail01.example.com
+                  - mail01
+
+Logrotate settings which allow you to rotate the logs in
+a random time in a given time interval. Time in seconds
+
+.. code-block:: yaml
+
+  apache:
+    server:
+      logrotate:
+        start_period: 600
+        end_period: 1200
+
+Apache modules management
+
+.. code-block:: yaml
+
+  apache:
+    server:
+      mods:
+        status:
+          enabled: True
+          status: 'disabled'
+
+Apache server-status management
+
+.. code-block:: yaml
+
+  apache:
+    server:
+      mods:
+        status:
+          enabled: True
+          status: 'enabled'
+          host:
+            address: 127.0.0.1
+            port: 80
+            allow:
+              localhost:
+                enabled: True
+                value: '127.0.0.0/255.0.0.0'
+              localhost_ipv6:
+                enabled: True
+                value: '::1/128'
+
+Apache directories and modules management
+
+.. code-block:: yaml
+
+  apache:
+     server:
+       enabled: true
+       site:
+         sitename:
+           directories:
+             dashboard_static:
+               path: /usr/share/openstack-dashboard/static
+               order: 'allow,deny'
+               allow: 'from all'
+               modules:
+                 mod_expires.c:
+                   ExpiresActive: 'On'
+                   ExpiresDefault: '"access 6 month"'
+                 mod_deflate.c:
+                   SetOutputFilter: 'DEFLATE'
+             dashboard_wsgi:
+               path: /usr/share/openstack-dashboard/openstack_dashboard/wsgi
+               order: 'allow,deny'
+               allow: 'from all'
+
+More Information
+================
+
+* https://httpd.apache.org/docs/

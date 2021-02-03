@@ -1,0 +1,130 @@
+
+{% set server = salt['grains.filter_by']({
+    'Debian': {
+        'pkgs': ['apache2', 'openssl'],
+        'service': 'apache2',
+        'mod_wsgi': 'libapache2-mod-wsgi',
+        'mod_php': 'libapache2-mod-php5',
+        'mod_perl': 'libapache2-mod-perl2',
+        'mod_xsendfile': 'libapache2-mod-xsendfile',
+        'mod_auth_kerb': 'libapache2-mod-auth-kerb',
+        'htpasswd_dir': '/etc/apache2',
+        'vhost_dir': '/etc/apache2/sites-available',
+        'conf_dir': '/etc/apache2/conf-available',
+        'conf_ext': '.conf',
+        'log_dir': '/var/log/apache2',
+        'www_dir': '/var/www',
+        'service_user': 'www-data',
+        'service_group': 'www-data',
+        'logrotate': {
+          'start_period': '1',
+          'end_period': '3600',
+        },
+        'enabled': false
+    },
+    'Arch': {
+        'pkgs': ['apache', 'openssl'],
+        'service': 'httpd',
+        'mod_wsgi': 'wsgi-apache',
+        'mod_php': 'php-apache',
+        'vhost_dir': '/etc/httpd/conf/extra',
+        'htpasswd_dir': '/etc/httpd',
+        'conf_dir': '/etc/httpd/conf',
+        'conf_ext': '.conf',
+        'log_dir': '/var/log/httpd',
+        'www_dir': '/var/www',
+        'service_user': 'apache',
+        'service_group': 'apache',
+        'enabled': false
+    },
+    'RedHat': {
+        'pkgs': ['httpd', 'openssl'],
+        'service': 'httpd',
+        'mod_wsgi': 'mod_wsgi',
+        'vhost_dir': '/etc/httpd/conf.d',
+        'htpasswd_dir': '/etc/httpd',
+        'conf_dir': '/etc/httpd/conf.d',
+        'conf_ext': '.conf',
+        'log_dir': '/var/log/httpd',
+        'www_dir': '/var/www',
+        'service_user': 'apache',
+        'service_group': 'apache',
+        'enabled': false
+    },
+    'FreeBSD': {
+        'pkgs': ['apache22', 'openssl'],
+        'service': 'apache22',
+        'mod_wsgi': 'ap22-mod_wsgi3',
+        'vhost_dir': '/usr/local/etc/apache22/Includes',
+        'htpasswd_dir': '/usr/local/etc/apache22',
+        'conf_dir': '/usr/local/etc/apache22/Includes',
+        'conf_ext': '',
+        'log_dir': '/var/log/',
+        'www_dir': '/usr/local/www/apache22/',
+        'service_user': 'apache',
+        'service_group': 'apache',
+        'enabled': false
+    },
+}, merge=salt['grains.filter_by']({
+    'trusty': {
+        'pkgs': ['apache2', 'apache2-utils', 'openssl'],
+        'service': 'apache2',
+        'mod_wsgi': 'libapache2-mod-wsgi',
+        'mod_php': 'libapache2-mod-php5',
+        'module_php': 'php5',
+        'mod_perl': 'libapache2-mod-perl2',
+        'mod_xsendfile': 'libapache2-mod-xsendfile',
+        'mod_auth_kerb': 'libapache2-mod-auth-kerb',
+        'htpasswd_dir': '/etc/apache2',
+        'vhost_dir': '/etc/apache2/sites-available',
+        'conf_dir': '/etc/apache2/conf-available',
+        'conf_ext': '.conf',
+        'log_dir': '/var/log/apache2',
+        'www_dir': '/var/www',
+        'service_user': 'www-data',
+        'service_group': 'www-data',
+        'logrotate': {
+          'start_period': '1',
+          'end_period': '3600',
+        },
+        'enabled': false
+    },
+    'xenial': {
+        'pkgs': ['apache2', 'openssl'],
+        'service': 'apache2',
+        'mod_wsgi': 'libapache2-mod-wsgi',
+        'mod_php': 'libapache2-mod-php7.0',
+        'module_php': 'php7.0',
+        'mod_perl': 'libapache2-mod-perl2',
+        'mod_xsendfile': 'libapache2-mod-xsendfile',
+        'mod_auth_kerb': 'libapache2-mod-auth-kerb',
+        'htpasswd_dir': '/etc/apache2',
+        'vhost_dir': '/etc/apache2/sites-available',
+        'conf_dir': '/etc/apache2/conf-available',
+        'conf_ext': '.conf',
+        'log_dir': '/var/log/apache2',
+        'www_dir': '/var/www',
+        'service_user': 'www-data',
+        'service_group': 'www-data',
+        'logrotate': {
+          'start_period': '1',
+          'end_period': '3600',
+        },
+        'enabled': false
+    },
+}, grain='oscodename', merge=salt['pillar.get']('apache:server'))) %}
+
+{%- set listen_ports = {} %}
+{%- if server.site is defined %}
+{%- for site_name, site in server.site.iteritems() %}
+{# TODO: move away from managing listen in ports.conf, instead add this directive #}
+{# to specific service config. Currently it conflits with horizon formula, that manage #}
+{# port.conf by theirown, it leads to races when applying horizon/apache states. #}
+{%- if site.get('type', '') not in ['wsgi', 'proxy', 'static'] %}
+{%- if site.host.get('port', 80) %}
+{%- do listen_ports.update({site.host.get('port', 80): None}) %}
+{%- endif %}
+{%- endif %}
+
+{%- endfor %}
+{%- endif %}

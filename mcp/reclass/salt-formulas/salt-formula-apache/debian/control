@@ -1,0 +1,15 @@
+Source: salt-formula-apache
+Maintainer: Mirantis Dev <dev@mirantis.com>
+Section: admin
+Priority: optional
+Build-Depends: salt-master, python, python-yaml, debhelper (>= 9)
+Standards-Version: 3.9.6
+Homepage: https://www.mirantis.com
+Vcs-Browser: https://gerrit.mcp.mirantis.com/#/admin/projects/salt-formulas/apache
+Vcs-Git: https://gerrit.mcp.mirantis.com/salt-formulas/apache.git
+
+Package: salt-formula-apache
+Architecture: all
+Depends: ${misc:Depends}
+Description: Apache Salt formula
+ Install and configure Apache webserver.
