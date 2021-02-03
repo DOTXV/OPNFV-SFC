@@ -35,7 +35,7 @@ Installation
 - Installation instruction:
     $ sudo mkdir -p -m 777 tmpdir (Create the folder your want to install opnfv)
     
-    $ git clone ....
+    $ git clone https://github.com/DOTXV/OPNFV-Stable-Iruya.git
     
     $ cd ~/fuel
     
