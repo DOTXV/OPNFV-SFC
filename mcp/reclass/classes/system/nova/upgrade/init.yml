@@ -1,0 +1,6 @@
+parameters:
+  nova:
+    upgrade:
+      enabled: ${_param:nova_upgrade_enabled}
+      old_release: ${_param:nova_old_version}
+      new_release: ${_param:nova_version}

@@ -1,0 +1,6 @@
+classes:
+- service.ntp.client.single
+parameters:
+  ntp:
+    client:
+      mode7: true

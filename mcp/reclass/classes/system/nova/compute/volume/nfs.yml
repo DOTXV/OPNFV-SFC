@@ -1,0 +1,13 @@
+# (ohryhorov): the class is created to be included in favour of creating
+# user cinder and add user nova to group cinder in all nova-compute nodes
+# if nfs backend is used.
+# PROD-22772
+classes:
+- system.linux.system.users.cinder
+parameters:
+  nova:
+    compute:
+      user:
+        groups:
+          - cinder
+          - libvirtd

@@ -1,0 +1,22 @@
+classes:
+- system.salt.minion.cert.libvirtd
+parameters:
+  _param:
+    nova_compute_libvirt_allowed_dn_list:
+      all:
+        enabled: true
+        value: '*CN=cmp*'
+  nova:
+    compute:
+      libvirt:
+        uri: qemu+tls://${linux:system:name}.${_param:cluster_domain}/system
+        tls:
+          enabled: True
+          key_file: ${_param:libvirtd_server_ssl_key_file}
+          cert_file: ${_param:libvirtd_server_ssl_cert_file}
+          ca_file: ${_param:libvirtd_ssl_ca_file}
+          allowed_dn_list: ${_param:nova_compute_libvirt_allowed_dn_list}
+          priority: "SECURE256:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-RSA:+ECDHE-ECDSA:-CIPHER-ALL:+AES-256-GCM:+AES-256-CBC:-MAC-ALL:+AEAD:+SHA384"
+          client:
+            key_file: ${_param:libvirtd_client_ssl_key_file}
+            cert_file: ${_param:libvirtd_client_ssl_cert_file}
