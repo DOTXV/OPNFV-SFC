@@ -1,5 +1,0 @@
-orchestration:
-  upgrade:
-    applications:
-      aodh:
-        priority: 2000

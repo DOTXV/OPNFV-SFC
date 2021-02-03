@@ -1,3 +1,0 @@
-name: "apache"
-version: "0.2"
-source: "https://gerrit.mcp.mirantis.com/salt-formulas/apache"
