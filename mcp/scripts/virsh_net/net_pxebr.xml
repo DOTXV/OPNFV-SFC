@@ -1,0 +1,18 @@
+<!--
+ Copyright (c) 2018 Mirantis Inc., Enea AB and others.
+
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Apache License, Version 2.0
+ which accompanies this distribution, and is available at
+ http://www.apache.org/licenses/LICENSE-2.0
+-->
+<network>
+  <name>pxebr</name>
+  <forward mode="nat"/>
+  <bridge name="pxebr"/>
+  <ip address="192.168.11.3" netmask="255.255.255.0">
+    <dhcp>
+      <range start="192.168.11.38" end="192.168.11.254"/>
+    </dhcp>
+  </ip>
+</network>

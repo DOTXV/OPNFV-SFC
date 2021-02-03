@@ -1,0 +1,117 @@
+#!/bin/bash -e
+# shellcheck disable=SC2034
+##############################################################################
+# Copyright (c) 2018 Mirantis Inc., Enea AB and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+#
+# Data derived from XDF (PDF/IDF/SDF/etc), used as input in deploy.sh
+#
+
+{%- import 'net_map.j2' as nm with context -%}
+{%- set cluster_states = conf.cluster.states if conf.MCP_NO_DEPLOY_ENVIRONMENT < 2 else [] -%}
+{%- set arch = conf[conf.MCP_JUMP_ARCH] -%}
+{%- set V = conf.virtual -%}
+{%- set section_map = {
+  'control': nm.ctl01.idx,
+  'compute': nm.cmp001.idx
+} -%}
+
+{%- macro bash_arr(_l) -%}
+  ({%- for n in _l -%}'{{ n }}' {% endfor -%})
+{%- endmacro -%}
+
+{#- Pack list as `sep`-separated string, replacing spaces with '|' -#}
+{%- macro pack(x = [], sep = ',') -%}
+  {{ x | join(sep) | replace(' ', '|') }}
+{%- endmacro -%}
+
+{#- Pack all vnode data as string -#}
+{%- macro serialize_vnodes() -%}
+  {%- set arr = [] -%}
+  {%- for section in section_map -%}
+    {%- for n in V.nodes[section] or [] -%}
+      {%- if ( section_map[section] < conf.nodes | length and
+               conf.nodes[section_map[section] + loop.index0].node.type == 'virtual' ) -%}
+        {%- if n not in V -%}{%- do V.update({n: {}}) -%}{%- endif -%}
+        {%- set cpu_topo = 'cpu_topology' in V[n] and not conf.MCP_CMP_SS -%}
+        {%- if 'numa' in V[n] and cpu_topo -%}
+          {%- for k, v in V[n].numa.items() -%}
+            {%- set c = pack([k, v.memory, v.cpus]) -%}
+            {%- do V[n].update({'s_numa': c if 's_numa' not in V[n] else pack([c, V[n].s_numa])}) -%}
+          {%- endfor -%}
+        {%- endif -%}
+        {%- do arr.append(pack([n, V[n].disks or arch.default.disks,
+                                   V[n].ram or arch.default.ram,
+                                   V[n].vcpus or arch.default.vcpus,
+                                   '' if not cpu_topo else pack([
+                                       V[n].cpu_topology.sockets,
+                                       V[n].cpu_topology.cores,
+                                       V[n].cpu_topology.threads,
+                                       '' if 's_numa' not in V[n] else V[n].s_numa])])) -%}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endfor -%}
+  '{{ pack(arr, '|') }}'
+{%- endmacro -%}
+
+{#- Return a bash array of node names or a Salt query, optionally filtered by type #}
+{%- macro filter_nodes(type, output_as_query = False, sections = section_map) -%}
+  {%- set arr = [] -%}
+  {%- for section in sections -%}
+    {%- for n in V.nodes[section] or [] -%}
+      {%- if ( section_map[section] < conf.nodes | length and
+               conf.nodes[section_map[section] + loop.index0].node.type in type ) -%}
+        {%- do arr.append(n) -%}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endfor -%}
+  {%- if output_as_query -%}
+  '{{ arr | join('* or ') }}*'
+  {%- else -%}
+  {{ bash_arr(arr) }}
+  {%- endif -%}
+{%- endmacro -%}
+
+{#- Pack repo_pkg data as string -#}
+{%- macro serialize_repo_pkg() -%}
+  {%- set arr = [] -%}
+  {%- set sections = [arch[conf.MCP_OS].common] -%}
+  {%- if conf.MCP_VCP or '-vcp-' in conf.MCP_DEPLOY_SCENARIO -%}
+    {%- do sections.append(arch[conf.MCP_OS].control) -%}
+  {%- endif -%}
+  {%- for c in sections -%}
+    {%- do arr.append(pack([pack(c.repo['keys']), pack(c.repo.repos),
+                            pack(c.pkg.install), pack(c.pkg.remove)], '^')) -%}
+  {%- endfor -%}
+  '{{ pack(arr, '^') }}'
+{%- endmacro -%}
+
+{%- set bridges = conf.idf.fuel.jumphost.bridges %}
+# Determine bridge names based on IDF, where all bridges are now mandatory
+OPNFV_BRIDGES=(
+  '{{ bridges.admin or "pxebr" }}'
+  '{{ bridges.mgmt or "mgmt" }}'
+  '{{ bridges.private or "internal" }}'
+  '{{ bridges.public or "public" }}'
+)
+
+export CLUSTER_DOMAIN={{ conf.cluster.domain }}
+dns_public={{ nm.dns_public[0] }}
+cluster_states={{ bash_arr(arch.default.cluster.states + cluster_states) }}
+virtual_nodes={{ filter_nodes('virtual') }}
+control_nodes_query={{ filter_nodes(['baremetal', 'virtual'], True, ['control']) }}
+base_image={{ arch[conf.MCP_OS].base_image }}
+
+# Serialize vnode data as:
+#   <name0>,<ram0>,<vcpu0>[,<sockets0>,<cores0>,<threads0>[,<cell0name0>,<cell0memory0>,
+#   <cell0cpus0>,<cell1name0>,<cell1memory0>,<cell1cpus0>]]|<name1>,...'
+virtual_nodes_data={{ serialize_vnodes() }}
+
+# Serialize repos, packages to (pre-)install/remove for:
+# - foundation node VM base image (virtual: all VMs, baremetal: cfg01|mas01)
+# - virtualized control plane VM base image (only when VCP is used)
+virtual_repos_pkgs={{ serialize_repo_pkg() }}

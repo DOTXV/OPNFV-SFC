@@ -1,0 +1,49 @@
+##############################################################################
+# Copyright (c) 2018 Mirantis Inc., Enea AB and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+---
+build:
+  # Common pkgs required for all builds, no matter the type, arch etc.
+  common:
+    - git
+    - make
+    - python3-pip
+deploy:
+  # Common pkgs required for all deploys, no matter the type, arch etc.
+  common:
+    - bc
+    - bridge-utils
+    - cloud-utils-growpart
+    - curl
+    - docker-compose
+    - elfutils-libelf-devel
+    - e2fsprogs
+    - genisoimage
+    - gcc
+    - gdisk
+    - git
+    - kpartx
+    - libvirt
+    - make
+    - openssl-devel
+    - qemu-kvm
+    - rpm-build
+    - rsync
+    - util-linux
+    - virt-install
+    - wget
+    # For python is indirectly required for PDF parsing
+    - python3
+    - python3-jinja2
+    - python3-yaml
+    - python3-jsonschema
+  # Optional, arch-specific requirements, matched by key name = $(uname -m)
+  aarch64:
+    # AArch64 VMs use AAVMF (guest UEFI)
+    - AAVMF
+    # AArch64 CentOS cloud image is archived with xz
+    - xz
