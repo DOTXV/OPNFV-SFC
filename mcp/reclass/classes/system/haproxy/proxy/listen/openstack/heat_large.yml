@@ -1,0 +1,90 @@
+parameters:
+  _param:
+    haproxy_heat_cloudwatch_api_check_params: check inter 10s fastinter 2s downinter 3s rise 3 fall 3
+    haproxy_heat_api_check_params: check inter 10s fastinter 2s downinter 3s rise 3 fall 3
+    haproxy_heat_cfn_api_check_params: check inter 10s fastinter 2s downinter 3s rise 3 fall 3
+  haproxy:
+    proxy:
+      listen:
+        heat_cloudwatch_api:
+          type: openstack-service
+          service_name: heat
+          enabled: ${_param:openstack_heat_cloudwatch_api_enabled}
+          binds:
+          - address: ${_param:cluster_vip_address}
+            port: 8003
+          servers:
+          - name: ${_param:cluster_node01_hostname}
+            host: ${_param:cluster_node01_address}
+            port: 8003
+            params: ${_param:haproxy_heat_cloudwatch_api_check_params}
+          - name: ${_param:cluster_node02_hostname}
+            host: ${_param:cluster_node02_address}
+            port: 8003
+            params: ${_param:haproxy_heat_cloudwatch_api_check_params}
+          - name: ${_param:cluster_node03_hostname}
+            host: ${_param:cluster_node03_address}
+            port: 8003
+            params: ${_param:haproxy_heat_cloudwatch_api_check_params}
+          - name: ${_param:cluster_node04_hostname}
+            host: ${_param:cluster_node04_address}
+            port: 8003
+            params: ${_param:haproxy_heat_cloudwatch_api_check_params}
+          - name: ${_param:cluster_node05_hostname}
+            host: ${_param:cluster_node05_address}
+            port: 8003
+            params: ${_param:haproxy_heat_cloudwatch_api_check_params}
+        heat_api:
+          type: openstack-service
+          service_name: heat
+          binds:
+          - address: ${_param:cluster_vip_address}
+            port: 8004
+          servers:
+          - name: ${_param:cluster_node01_hostname}
+            host: ${_param:cluster_node01_address}
+            port: 8004
+            params: ${_param:haproxy_heat_api_check_params}
+          - name: ${_param:cluster_node02_hostname}
+            host: ${_param:cluster_node02_address}
+            port: 8004
+            params: ${_param:haproxy_heat_api_check_params}
+          - name: ${_param:cluster_node03_hostname}
+            host: ${_param:cluster_node03_address}
+            port: 8004
+            params: ${_param:haproxy_heat_api_check_params}
+          - name: ${_param:cluster_node04_hostname}
+            host: ${_param:cluster_node04_address}
+            port: 8004
+            params: ${_param:haproxy_heat_api_check_params}
+          - name: ${_param:cluster_node05_hostname}
+            host: ${_param:cluster_node05_address}
+            port: 8004
+            params: ${_param:haproxy_heat_api_check_params}
+        heat_cfn_api:
+          type: openstack-service
+          service_name: heat
+          binds:
+          - address: ${_param:cluster_vip_address}
+            port: 8000
+          servers:
+          - name: ${_param:cluster_node01_hostname}
+            host: ${_param:cluster_node01_address}
+            port: 8000
+            params: ${_param:haproxy_heat_cfn_api_check_params}
+          - name: ${_param:cluster_node02_hostname}
+            host: ${_param:cluster_node02_address}
+            port: 8000
+            params: ${_param:haproxy_heat_cfn_api_check_params}
+          - name: ${_param:cluster_node03_hostname}
+            host: ${_param:cluster_node03_address}
+            port: 8000
+            params: ${_param:haproxy_heat_cfn_api_check_params}
+          - name: ${_param:cluster_node04_hostname}
+            host: ${_param:cluster_node04_address}
+            port: 8000
+            params: ${_param:haproxy_heat_cfn_api_check_params}
+          - name: ${_param:cluster_node05_hostname}
+            host: ${_param:cluster_node05_address}
+            port: 8000
+            params: ${_param:haproxy_heat_cfn_api_check_params}

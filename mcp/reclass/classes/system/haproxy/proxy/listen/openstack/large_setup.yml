@@ -1,0 +1,11 @@
+classes:
+- system.haproxy.proxy.listen.openstack.aodh_large
+- system.haproxy.proxy.listen.openstack.ceilometer_large
+- system.haproxy.proxy.listen.openstack.cinder_large
+- system.haproxy.proxy.listen.openstack.glance_large
+- system.haproxy.proxy.listen.openstack.glare_large
+- system.haproxy.proxy.listen.openstack.heat_large
+- system.haproxy.proxy.listen.openstack.keystone.large
+- system.haproxy.proxy.listen.openstack.neutron_large
+- system.haproxy.proxy.listen.openstack.nova_large
+- system.haproxy.proxy.listen.openstack.novanc_large

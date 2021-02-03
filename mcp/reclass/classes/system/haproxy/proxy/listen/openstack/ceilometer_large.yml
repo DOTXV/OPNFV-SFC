@@ -1,0 +1,33 @@
+parameters:
+  _param:
+    haproxy_ceilometer_api_check_params: check
+  haproxy:
+    proxy:
+      listen:
+        ceilometer_api:
+          type: general-service
+          check: false
+          binds:
+          - address: ${_param:cluster_vip_address}
+            port: 8777
+          servers:
+          - name: ${_param:cluster_node01_hostname}
+            host: ${_param:cluster_node01_address}
+            port: 8777
+            params: ${_param:haproxy_ceilometer_api_check_params}
+          - name: ${_param:cluster_node02_hostname}
+            host: ${_param:cluster_node02_address}
+            port: 8777
+            params: ${_param:haproxy_ceilometer_api_check_params}
+          - name: ${_param:cluster_node03_hostname}
+            host: ${_param:cluster_node03_address}
+            port: 8777
+            params: ${_param:haproxy_ceilometer_api_check_params}
+          - name: ${_param:cluster_node04_hostname}
+            host: ${_param:cluster_node04_address}
+            port: 8777
+            params: ${_param:haproxy_ceilometer_api_check_params}
+          - name: ${_param:cluster_node05_hostname}
+            host: ${_param:cluster_node05_address}
+            port: 8777
+            params: ${_param:haproxy_ceilometer_api_check_params}

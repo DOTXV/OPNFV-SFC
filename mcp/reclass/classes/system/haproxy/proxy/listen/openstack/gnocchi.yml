@@ -1,0 +1,25 @@
+parameters:
+  _param:
+    haproxy_gnocchi_api_check_params: check
+  haproxy:
+    proxy:
+      listen:
+        gnocchi_api:
+          type: openstack-service
+          service_name: gnocchi
+          binds:
+          - address: ${_param:cluster_vip_address}
+            port: 8041
+          servers:
+          - name: ${_param:cluster_node01_hostname}
+            host: ${_param:cluster_node01_address}
+            port: 8041
+            params: ${_param:haproxy_gnocchi_api_check_params}
+          - name: ${_param:cluster_node02_hostname}
+            host: ${_param:cluster_node02_address}
+            port: 8041
+            params: ${_param:haproxy_gnocchi_api_check_params}
+          - name: ${_param:cluster_node03_hostname}
+            host: ${_param:cluster_node03_address}
+            port: 8041
+            params: ${_param:haproxy_gnocchi_api_check_params}

@@ -1,0 +1,22 @@
+parameters:
+  _param:
+    haproxy_openstack_web_check_params: check
+  haproxy:
+    proxy:
+      listen:
+        openstack_web:
+          type: custom
+          check: false
+          sticks: ${_param:haproxy_openstack_web_sticks_params}
+          binds:
+          - address: ${_param:cluster_vip_address}
+            port: ${_param:haproxy_openstack_web_bind_port}
+          servers:
+          - name: ${_param:cluster_node01_hostname}
+            host: ${_param:cluster_node01_address}
+            port: 8078
+            params: ${_param:haproxy_openstack_web_check_params}
+          - name: ${_param:cluster_node02_hostname}
+            host: ${_param:cluster_node02_address}
+            port: 8078
+            params: ${_param:haproxy_openstack_web_check_params}

@@ -1,0 +1,39 @@
+# Starting with Nova (17.0.0) Queens - accessing to / of placement service
+# returns 200 with version data instead of 401 as it was before.
+# Also OPTIONS default haproxy check method is no longer allowed starting from Queens.
+# This file should be included for nova/placement higher than Queens.
+parameters:
+  _param:
+    haproxy_placement_api_check_params: check inter 10s fastinter 2s downinter 3s rise 3 fall 3
+  haproxy:
+    proxy:
+      listen:
+        # Nova placement API returns 401 when doing GET to root URL, while
+        # other services normally returns 200 and API versions data.
+        placement_api:
+          service_name: placement
+          mode: http
+          options:
+            - httpclose
+            - httplog
+            - httpchk GET /
+          health-check:
+            http:
+              options:
+              - expect rstatus (401|200)
+          binds:
+          - address: ${_param:cluster_vip_address}
+            port: 8778
+          servers:
+          - name: ${_param:cluster_node01_hostname}
+            host: ${_param:cluster_node01_address}
+            port: 8778
+            params: ${_param:haproxy_placement_api_check_params}
+          - name: ${_param:cluster_node02_hostname}
+            host: ${_param:cluster_node02_address}
+            port: 8778
+            params: ${_param:haproxy_placement_api_check_params}
+          - name: ${_param:cluster_node03_hostname}
+            host: ${_param:cluster_node03_address}
+            port: 8778
+            params: ${_param:haproxy_placement_api_check_params}
