@@ -1,0 +1,5 @@
+parameters:
+  _param:
+    backupninja_engine: rsync
+    backupninja_backup_host: 127.0.0.1
+    backupninja_public_key: no-key-provided

@@ -1,0 +1,5 @@
+parameters:
+  _param:
+    xtrabackup_qpress_source: pkg
+    xtrabackup_qpress_source_name: qpress
+    xtrabackup_public_key: no-key-provided

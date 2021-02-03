@@ -1,0 +1,5 @@
+parameters:
+  _param:
+    # ELK stack versions
+    elasticsearch_version: 5
+    kibana_version: 5

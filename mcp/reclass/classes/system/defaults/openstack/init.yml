@@ -1,0 +1,213 @@
+parameters:
+  _param:
+    # Enable barbican integration in other services nova,glance,cinder
+    barbican_integration_enabled: False
+    # General
+    cluster_public_protocol: https
+    cluster_internal_protocol: http
+    openstack_service_hostname: os-ctl-vip
+    openstack_share_service_hostname: os-share-vip
+    openstack_kmn_service_hostname: os-kmn-vip
+    openstack_telemetry_service_hostname: os-telemetry-vip
+    openstack_service_host: ${_param:openstack_service_hostname}.${linux:system:domain}
+    openstack_share_service_host: ${_param:openstack_share_service_hostname}.${linux:system:domain}
+    openstack_kmn_service_host: ${_param:openstack_kmn_service_hostname}.${linux:system:domain}
+    openstack_telemetry_service_host: ${_param:openstack_telemetry_service_hostname}.${linux:system:domain}
+    openstack_service_user_enabled: True
+    openstack_telemetry_redis_db: '0'
+    openstack_telemetry_redis_sentinel_mastername: 'master_1'
+    # SSL
+    ceilometer_agent_ssl_enabled: False
+    openstack_mysql_x509_enabled: False
+    # for non-ssl use 5672 / for ssl 5671
+    openstack_rabbitmq_port: 5672
+    openstack_rabbitmq_x509_enabled: False
+    # Openstack memcache
+    openstack_memcached_server_bind_address: 0.0.0.0
+    openstack_memcache_security_enabled: False
+    openstack_memcache_security_strategy: 'ENCRYPT'
+    openstack_memcached_proto_tcp_enabled: True
+    openstack_memcached_proto_udp_enabled: False
+    openstack_version: queens
+    openstack_old_version: ${_param:openstack_version}
+    openstack_upgrade_enabled: False
+    # Security compliance user options
+    openstack_service_user_options:
+      ignore_change_password_upon_first_use: True
+      ignore_password_expiry: True
+      ignore_lockout_failure_attempts: False
+      lock_password: False
+    # Cinder
+    cinder_memcache_security_enabled: ${_param:openstack_memcache_security_enabled}
+    cinder_memcache_secret_key: ''
+    cinder_old_version: ${_param:openstack_old_version}
+    cinder_version: ${_param:openstack_version}
+    cinder_upgrade_enabled: ${_param:openstack_upgrade_enabled}
+    cinder_service_user_enabled: ${_param:openstack_service_user_enabled}
+    # Nova
+    nova_memcache_security_enabled: ${_param:openstack_memcache_security_enabled}
+    nova_memcache_secret_key: ''
+    nova_old_version: ${_param:openstack_old_version}
+    nova_version: ${_param:openstack_version}
+    nova_upgrade_enabled: ${_param:openstack_upgrade_enabled}
+    nova_instance_build_timeout: 3600
+    nova_service_user_enabled: ${_param:openstack_service_user_enabled}
+    # Glance
+    glance_memcache_security_enabled: ${_param:openstack_memcache_security_enabled}
+    glance_memcache_secret_key: ''
+    glance_old_version: ${_param:openstack_old_version}
+    glance_version: ${_param:openstack_version}
+    glance_upgrade_enabled: ${_param:openstack_upgrade_enabled}
+    # Allow CORS from horizon, needed for direct upload
+    glance_cors_allowed_origin: '${_param:horizon_public_protocol}://${_param:horizon_public_host}'
+    # Heat
+    heat_memcache_security_enabled: ${_param:openstack_memcache_security_enabled}
+    heat_memcache_secret_key: ''
+    heat_old_version: ${_param:openstack_old_version}
+    heat_version: ${_param:openstack_version}
+    heat_upgrade_enabled: ${_param:openstack_upgrade_enabled}
+    # Aodh
+    aodh_memcache_security_enabled: ${_param:openstack_memcache_security_enabled}
+    aodh_memcache_secret_key: ''
+    aodh_old_version: ${_param:openstack_old_version}
+    aodh_version: ${_param:openstack_version}
+    aodh_upgrade_enabled: ${_param:openstack_upgrade_enabled}
+    aodh_redis_db: ${_param:openstack_telemetry_redis_db}
+    aodh_redis_sentinel_mastername: ${_param:openstack_telemetry_redis_sentinel_mastername}
+    # Ceilometer
+    ceilometer_old_version: ${_param:openstack_old_version}
+    ceilometer_version: ${_param:openstack_version}
+    ceilometer_upgrade_enabled: ${_param:openstack_upgrade_enabled}
+    ceilometer_gnocchi_archive_policy: default
+    ceilometer_redis_db: ${_param:openstack_telemetry_redis_db}
+    ceilometer_redis_sentinel_mastername: ${_param:openstack_telemetry_redis_sentinel_mastername}
+    # Gnocchi
+    gnocchi_memcache_security_enabled: ${_param:openstack_memcache_security_enabled}
+    gnocchi_memcache_secret_key: ''
+    gnocchi_version: 4.0
+    gnocchi_old_version: ${_param:gnocchi_version}
+    gnocchi_upgrade_enabled: ${_param:openstack_upgrade_enabled}
+    gnocchi_redis_db: ${_param:openstack_telemetry_redis_db}
+    gnocchi_redis_sentinel_mastername: ${_param:openstack_telemetry_redis_sentinel_mastername}
+    # Panko
+    panko_memcache_security_enabled: ${_param:openstack_memcache_security_enabled}
+    panko_memcache_secret_key: ''
+    panko_old_version: ${_param:openstack_old_version}
+    panko_version: ${_param:openstack_version}
+    panko_upgrade_enabled: ${_param:openstack_upgrade_enabled}
+    # Barbican
+    barbican_memcache_security_enabled: ${_param:openstack_memcache_security_enabled}
+    barbican_memcache_secret_key: ''
+    barbican_old_version: ${_param:openstack_old_version}
+    barbican_version: ${_param:openstack_version}
+    barbican_upgrade_enabled: ${_param:openstack_upgrade_enabled}
+    # Designate
+    designate_old_version: ${_param:openstack_old_version}
+    designate_version: ${_param:openstack_version}
+    designate_upgrade_enabled: ${_param:openstack_upgrade_enabled}
+    # Ironic
+    ironic_memcache_security_enabled: ${_param:openstack_memcache_security_enabled}
+    ironic_memcache_secret_key: ''
+    ironic_console_enabled: true
+    ironic_old_version: ${_param:openstack_old_version}
+    ironic_version: ${_param:openstack_version}
+    ironic_upgrade_enabled: ${_param:openstack_upgrade_enabled}
+    # Keystone
+    keystone_old_version: ${_param:openstack_old_version}
+    keystone_version: ${_param:openstack_version}
+    keystone_upgrade_enabled: ${_param:openstack_upgrade_enabled}
+    # (obryndzii) Rotating keys too frequently, or with ``[fernet_tokens] max_active_keys``
+    # set too low, will cause tokens to become invalid prior to their expiration.
+    # As tokens may be fetched beyond their initial expiration period (nova live migration,
+    # cider volume backup), keys should not be fully rotated within the period of
+    # ``[token] expiration``+``[token] allow_expired_window`` seconds to prevent the tokens
+    # becoming unavailable.
+    # The max_active_keys default value was adjusted according to the following defaults:
+    # [token]/allow_expired_window = 172800 (48 hours)
+    # [token]/expiration = 3600 (1 hour)
+    # rotation_frequency = 1 hour (keystone_fernet_rotate_rsync_minute/hour 0 *)
+    # max_active_keys = (allow_expired_window + expiration)/rotation_frequency + 2
+    # In case of changing those defaults the keystone_tokens_max_active_keys value should be
+    # calculated according to the definition above.
+    keystone_tokens_expiration: 3600
+    keystone_tokens_max_active_keys: 51
+    keystone_tokens_allow_expired_window: 172800
+    keystone_fernet_rotate_rsync_minute: 0
+    keystone_fernet_rotate_rsync_hour: '*'
+    # Manila
+    manila_old_version: ${_param:openstack_old_version}
+    manila_version: ${_param:openstack_version}
+    manila_upgrade_enabled: ${_param:openstack_upgrade_enabled}
+    # Neutron
+    neutron_old_version: ${_param:openstack_old_version}
+    neutron_version: ${_param:openstack_version}
+    neutron_upgrade_enabled: ${_param:openstack_upgrade_enabled}
+    # Apache mods defaults
+    # Stacklight uses /server-status endpoint to monitor apache
+    apache_mods_status_enabled: True
+    apache_mods_status_status: 'enabled'
+    apache_mods_status_host_address: '127.0.0.1'
+    apache_mods_status_host_port: 80
+    apache_horizon_listen_address: '0.0.0.0'
+    # Apache proxies for openstack aren't used as HA proxies, they are
+    # simply ssl terminators in case of setup of ssl on internal endpoints
+    # for services which don't support running under apache and wsgi.
+    # So retry parameter is set 0, to eliminate maintenance mode for backend
+    # which is 60 seconds  by default.
+    apache_proxy_openstack_api_retry: 0
+    apache_proxy_openstack_cinder_retry: ${_param:apache_proxy_openstack_api_retry}
+    apache_proxy_openstack_designate_retry: ${_param:apache_proxy_openstack_api_retry}
+    apache_proxy_openstack_glance_retry: ${_param:apache_proxy_openstack_api_retry}
+    apache_proxy_openstack_heat_retry: ${_param:apache_proxy_openstack_api_retry}
+    apache_proxy_openstack_ironic_retry: ${_param:apache_proxy_openstack_api_retry}
+    apache_proxy_openstack_nova_retry: ${_param:apache_proxy_openstack_api_retry}
+    apache_proxy_openstack_neutron_retry: ${_param:apache_proxy_openstack_api_retry}
+    apache_proxy_openstack_aodh_retry: ${_param:apache_proxy_openstack_api_retry}
+    apache_proxy_openstack_placement_retry: ${_param:apache_proxy_openstack_api_retry}
+    apache_proxy_openstack_octavia_retry: ${_param:apache_proxy_openstack_api_retry}
+    # Formats for logs for openstack apache sites
+    apache_site_openstack_api_log_format: >-
+      %v:%p %h %l %u %t \"%r\" %>s %D %O \"%{Referer}i\" \"%{User-Agent}i\"
+    apache_site_openstack_aodh_log_format: ${_param:apache_site_openstack_api_log_format}
+    apache_site_openstack_barbican_log_format: ${_param:apache_site_openstack_api_log_format}
+    apache_site_openstack_cinder_log_format: ${_param:apache_site_openstack_api_log_format}
+    apache_site_openstack_gnocchi_log_format: ${_param:apache_site_openstack_api_log_format}
+    apache_site_openstack_horizon_log_format: >-
+      %v:%p %{X-Forwarded-For}i %h %l %u %t \"%r\" %>s %D %O \"%{Referer}i\" \"%{User-Agent}i\"
+    apache_site_openstack_manila_log_format: ${_param:apache_site_openstack_api_log_format}
+    apache_site_openstack_placement_log_format: ${_param:apache_site_openstack_api_log_format}
+    apache_site_openstack_panko_log_format: ${_param:apache_site_openstack_api_log_format}
+    # Horizon
+    # 'direct' mode will require cors on glance side to be enabled.
+    horizon_images_upload_mode: 'direct'
+    # TODO (vsaineko): switch to openstack_cluster_public_host
+    horizon_public_host: ${_param:cluster_public_host}
+    horizon_public_port: 443
+    horizon_public_protocol: https
+    horizon_server_bind_address: ${_param:single_address}
+    horizon_old_version: ${_param:openstack_old_version}
+    horizon_version: ${_param:openstack_version}
+    horizon_upgrade_enabled: ${_param:openstack_upgrade_enabled}
+    # Octavia
+    octavia_health_manager_node01_address: 192.168.10.10
+    octavia_health_manager_node02_address: 192.168.10.11
+    octavia_health_manager_node03_address: 192.168.10.12
+    #
+    amphora_image_name: amphora-x64-haproxy
+    amphora_image_url: ${_param:mcp_static_images_url}/octavia/amphora-x64-haproxy-${_param:openstack_version}-${_param:mcp_version}.qcow2
+    # HAproxy
+    haproxy_openstack_web_bind_port: ${_param:horizon_public_port}
+    #
+    # haproxy_openstack_web_sticks_params is defined for SSL by default
+    # if cluster_protocolr HTTP is going to be used then haproxy_openstack_web_sticks_params
+    # should be redefined peroperly. For example empty list.
+    #
+    haproxy_openstack_web_sticks_params:
+      - stick-table type binary len 32 size 30k expire 30m
+      - acl clienthello req_ssl_hello_type 1
+      - acl serverhello rep_ssl_hello_type 2
+      - tcp-request inspect-delay 5s
+      - tcp-request content accept if clienthello
+      - tcp-response content accept if serverhello
+      - stick on payload_lv(43,1) if clienthello
+      - stick store-response payload_lv(43,1) if serverhello

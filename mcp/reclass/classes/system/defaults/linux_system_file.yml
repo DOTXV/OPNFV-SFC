@@ -1,0 +1,35 @@
+parameters:
+  _param:
+    # List of files, to be placed into offline image, during separate image build process
+    # By default, will be avaible http_server
+    # WARNING: file path and names - must be exactly same as in any other place in reclass-system!
+    default_local_mirrror_content:
+      linux_system_file:
+        ubuntu-16-04-x64.qcow2:
+          name: /srv/http/images.mirantis.com/ubuntu-16-04-x64-mcp${_param:mcp_version}.qcow2
+          source: ${_param:mcp_static_images_url}/ubuntu-16-04-x64-mcp${_param:mcp_version}.qcow2
+          hash: ${_param:mcp_static_images_url}/ubuntu-16-04-x64-mcp${_param:mcp_version}.qcow2.md5
+        ubuntu-16-04-x64.qcow2.md5:
+          name: /srv/http/images.mirantis.com/ubuntu-16-04-x64-mcp${_param:mcp_version}.qcow2.md5
+          source: ${_param:mcp_static_images_url}/ubuntu-16-04-x64-mcp${_param:mcp_version}.qcow2.md5
+        amphora-x64-haproxy-pike.qcow2:
+          name: /srv/http/images.mirantis.com/octavia/amphora-x64-haproxy-pike-${_param:mcp_version}.qcow2
+          source: ${_param:mcp_static_images_url}/octavia/amphora-x64-haproxy-pike-${_param:mcp_version}.qcow2
+          hash: ${_param:mcp_static_images_url}/octavia/amphora-x64-haproxy-pike-${_param:mcp_version}.qcow2.md5
+        amphora-x64-haproxy-pike.qcow2.md5:
+          name: /srv/http/images.mirantis.com/octavia/amphora-x64-haproxy-pike-${_param:mcp_version}.qcow2.md5
+          source: ${_param:mcp_static_images_url}/octavia/amphora-x64-haproxy-pike-${_param:mcp_version}.qcow2.md5
+        amphora-x64-haproxy-queens.qcow2:
+          name: /srv/http/images.mirantis.com/octavia/amphora-x64-haproxy-queens-${_param:mcp_version}.qcow2
+          source: ${_param:mcp_static_images_url}/octavia/amphora-x64-haproxy-queens-${_param:mcp_version}.qcow2
+          hash: ${_param:mcp_static_images_url}/octavia/amphora-x64-haproxy-queens-${_param:mcp_version}.qcow2.md5
+        amphora-x64-haproxy-queens.qcow2.md5:
+          name: /srv/http/images.mirantis.com/octavia/amphora-x64-haproxy-queens-${_param:mcp_version}.qcow2.md5
+          source: ${_param:mcp_static_images_url}/octavia/amphora-x64-haproxy-queens-${_param:mcp_version}.qcow2.md5
+        amphora-x64-haproxy-rocky.qcow2:
+          name: /srv/http/images.mirantis.com/octavia/amphora-x64-haproxy-rocky-${_param:mcp_version}.qcow2
+          source: ${_param:mcp_static_images_url}/octavia/amphora-x64-haproxy-rocky-${_param:mcp_version}.qcow2
+          hash: ${_param:mcp_static_images_url}/octavia/amphora-x64-haproxy-rocky-${_param:mcp_version}.qcow2.md5
+        amphora-x64-haproxy-rocky.qcow2.md5:
+          name: /srv/http/images.mirantis.com/octavia/amphora-x64-haproxy-rocky-${_param:mcp_version}.qcow2.md5
+          source: ${_param:mcp_static_images_url}/octavia/amphora-x64-haproxy-rocky-${_param:mcp_version}.qcow2.md5

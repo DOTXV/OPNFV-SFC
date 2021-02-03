@@ -1,0 +1,59 @@
+parameters:
+  _param:
+    salt_control_size_image_layout_default:
+      root:
+        size: '30%VG'
+      home:
+        size: '1G'
+      var_log:
+        size: '11%VG'
+      var_log_audit:
+        size: '5G'
+      var_tmp:
+        size: '11%VG'
+      tmp:
+        size: '5G'
+    salt_control_size_image_layout_ceph_mon: ${_param:salt_control_size_image_layout_default}
+    salt_control_size_image_layout_ceph_rgw: ${_param:salt_control_size_image_layout_default}
+    salt_control_size_image_layout_cicd_control: ${_param:salt_control_size_image_layout_default}
+    salt_control_size_image_layout_kdt: ${_param:salt_control_size_image_layout_default}
+    salt_control_size_image_layout_infra_idm: ${_param:salt_control_size_image_layout_default}
+    salt_control_size_image_layout_infra_integration: ${_param:salt_control_size_image_layout_default}
+    salt_control_size_image_layout_infra_maas: ${_param:salt_control_size_image_layout_default}
+    salt_control_size_image_layout_infra_proxy: ${_param:salt_control_size_image_layout_default}
+    salt_control_size_image_layout_infra_rsyslog: ${_param:salt_control_size_image_layout_default}
+    salt_control_size_image_layout_infra_storage: ${_param:salt_control_size_image_layout_default}
+    salt_control_size_image_layout_infra_version_control: ${_param:salt_control_size_image_layout_default}
+    salt_control_size_image_layout_kubernetes_control: ${_param:salt_control_size_image_layout_default}
+    salt_control_size_image_layout_kubernetes_proxy: ${_param:salt_control_size_image_layout_default}
+    salt_control_size_image_layout_opencontrail_analytics: ${_param:salt_control_size_image_layout_default}
+    salt_control_size_image_layout_opencontrail_control: ${_param:salt_control_size_image_layout_default}
+    salt_control_size_image_layout_openstack_barbican: ${_param:salt_control_size_image_layout_default}
+    salt_control_size_image_layout_openstack_baremetal: ${_param:salt_control_size_image_layout_default}
+    salt_control_size_image_layout_openstack_benchmark: ${_param:salt_control_size_image_layout_default}
+    salt_control_size_image_layout_openstack_billing: ${_param:salt_control_size_image_layout_default}
+    salt_control_size_image_layout_openstack_control: ${_param:salt_control_size_image_layout_default}
+    salt_control_size_image_layout_openstack_database: ${_param:salt_control_size_image_layout_default}
+    salt_control_size_image_layout_openstack_dns: ${_param:salt_control_size_image_layout_default}
+    salt_control_size_image_layout_openstack_gateway: ${_param:salt_control_size_image_layout_default}
+    salt_control_size_image_layout_openstack_manila: ${_param:salt_control_size_image_layout_default}
+    salt_control_size_image_layout_openstack_message_queue: ${_param:salt_control_size_image_layout_default}
+    salt_control_size_image_layout_openstack_proxy: ${_param:salt_control_size_image_layout_default}
+    salt_control_size_image_layout_openstack_share: ${_param:salt_control_size_image_layout_default}
+    salt_control_size_image_layout_openstack_telemetry: ${_param:salt_control_size_image_layout_default}
+    salt_control_size_image_layout_openstack_upgrade: ${_param:salt_control_size_image_layout_default}
+    salt_control_size_image_layout_stacklight_log: ${_param:salt_control_size_image_layout_default}
+    salt_control_size_image_layout_stacklight_server: ${_param:salt_control_size_image_layout_default}
+    salt_control_size_image_layout_stacklight_telemetry: ${_param:salt_control_size_image_layout_default}
+
+    salt_control_trusty_image: ${_param:mcp_static_images_url}/ubuntu-14-04-x64-mcp${_param:mcp_version}.qcow2
+    salt_control_xenial_image: ${_param:mcp_static_images_url}/ubuntu-16-04-x64-mcp${_param:mcp_version}.qcow2
+
+    salt_master_api_permissions:
+    - '.*'
+    - '@local'
+    - '@wheel'   # to allow access to all wheel modules
+    - '@runner'  # to allow access to all runner modules
+    - '@jobs'    # to allow access to the jobs runner and/or wheel mo
+
+    salt_minion_ca_authority: salt_master_ca

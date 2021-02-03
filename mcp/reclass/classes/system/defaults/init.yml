@@ -1,0 +1,57 @@
+# This is list of all default soft params, across reclass-system lvl.
+# Please always include those 'init.yml', and don't use direct sub-lvls.
+# Some rules approach:
+# - Always use uniq names, which exactly identify key
+# - Avoid any component intersection's
+# - No if\else\whatever logic allowed.
+
+classes:
+- system.defaults.linux_system_repo
+- system.defaults.linux_system_file
+- system.defaults.backupninja
+- system.defaults.git
+- system.defaults.jenkins
+- system.defaults.postgresql
+- system.defaults.maas
+- system.defaults.openstack
+- system.defaults.galera
+- system.defaults.rabbitmq
+- system.defaults.debmirror
+- system.defaults.docker_images
+- system.defaults.gerrit
+- system.defaults.keepalived
+- system.defaults.salt
+- system.defaults.secrets
+- system.defaults.stacklight
+- system.defaults.xtrabackup
+- system.defaults.backup
+# k8s
+- system.defaults.etcd
+parameters:
+  _param:
+    mcp_version: stable
+    # Temporary link to mcp_version.
+    # 'apt_mk_version' will be removed in q4
+    apt_mk_version: ${_param:mcp_version}
+    linux_system_architecture: amd64
+    # linux globals
+    banner_company_name: COMPANY_NAME
+    motd_company_name: "${_param:banner_company_name}"
+    ssh_banner_company_name: "${_param:banner_company_name}"
+    # Docker artifact globals
+    mcp_docker_registry: 'docker-prod-local.artifactory.mirantis.com'
+    mcp_binary_registry: "https://${_param:mcp_docker_registry}/artifactory/binary-prod-local"
+    mcp_static_images_url: "http://images.mirantis.com"
+    # Opencontrail globals
+    opencontrail_version: 4.0
+    # Other
+    salt_control_xenial_image_backend: /var/lib/libvirt/images/backends/xenial.qcow2
+    salt_control_trusty_image_backend: /var/lib/libvirt/images/backends/trusty.qcow2
+    salt_master_api_port: 6969
+    salt_master_worker_threads: 40
+    salt_minion_ca_host: cfg01.${_param:cluster_domain}
+    # Make sure this global variable is defined everywhere, where used it is already set on cluster level
+    cluster_public_host: '127.0.0.1'
+    single_address: '127.0.0.1'
+    # Cloudwatch api removed from Queens
+    openstack_heat_cloudwatch_api_enabled: True

@@ -1,0 +1,17 @@
+classes:
+- system.debmirror.mirror_mirantis_com.cassandra.xenial
+- system.debmirror.mirror_mirantis_com.ceph-luminous.xenial
+- system.debmirror.mirror_mirantis_com.docker.xenial
+- system.debmirror.mirror_mirantis_com.elasticsearch-5.x.xenial
+- system.debmirror.mirror_mirantis_com.elasticsearch-6.x.xenial
+- system.debmirror.mirror_mirantis_com.elasticsearch-curator-5.xenial
+- system.debmirror.mirror_mirantis_com.extra.xenial
+- system.debmirror.mirror_mirantis_com.glusterfs-3.8.xenial
+- system.debmirror.mirror_mirantis_com.maas.xenial
+- system.debmirror.mirror_mirantis_com.openstack-pike.xenial
+- system.debmirror.mirror_mirantis_com.openstack-queens.xenial
+- system.debmirror.mirror_mirantis_com.percona.xenial
+- system.debmirror.mirror_mirantis_com.salt-formulas.xenial
+- system.debmirror.mirror_mirantis_com.saltstack-2017.7.xenial
+- system.debmirror.mirror_mirantis_com.td-agent.xenial
+- system.debmirror.mirror_mirantis_com.ubuntu.xenial

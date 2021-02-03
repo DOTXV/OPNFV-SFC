@@ -1,0 +1,161 @@
+parameters:
+  _param:
+    # CI\CD
+    docker_image_compose:    "${_param:mcp_docker_registry}/mirantis/external/docker/compose:1.17.1"
+    # 2.6.2 version, from 12/18/2108, differ from latest 2.6.2 upstream - update next cycle
+    docker_image_registry:   "${_param:mcp_docker_registry}/mirantis/external/registry:${_param:mcp_version}"
+    docker_image_visualizer: "${_param:mcp_docker_registry}/mirantis/external/visualizer:${_param:mcp_version}"
+    docker_image_openldap: "${_param:mcp_docker_registry}/mirantis/external/osixia/openldap:1.2.2"
+    docker_image_postgresql: "${_param:mcp_docker_registry}/mirantis/external/library/postgres:9.6.10"
+    # 3.4.13, from Feb 15, differ from 3.4.13 upstream verison, from March 14 - update next cycle
+    docker_image_mongodb: "${_param:mcp_docker_registry}/mirantis/external/library/mongo:${_param:mcp_version}"
+    ###
+    # phpldapadmin:0.6.12
+    docker_image_phpldapadmin: "${_param:mcp_docker_registry}/mirantis/cicd/phpldapadmin:${_param:mcp_version}"
+    # gerrit:2.13.6
+    docker_image_gerrit: "${_param:mcp_docker_registry}/mirantis/cicd/gerrit:${_param:mcp_version}"
+    # mysql:5.6
+    docker_image_mysql: "${_param:mcp_docker_registry}/mirantis/cicd/mysql:${_param:mcp_version}"
+    # jenkins:2.150.3
+    docker_image_jenkins: "${_param:mcp_docker_registry}/mirantis/cicd/jenkins:${_param:mcp_version}"
+    docker_image_jenkins_slave: "${_param:mcp_docker_registry}/mirantis/cicd/jnlp-slave:${_param:mcp_version}"
+    # model-generator
+    docker_image_operations_api: "${_param:mcp_docker_registry}/mirantis/model-generator/operations-api:${_param:mcp_version}"
+    docker_image_operations_ui: "${_param:mcp_docker_registry}/mirantis/model-generator/operations-ui:${_param:mcp_version}"
+    # OpenContrail
+    opencontrail_docker_image_tag: "${_param:mcp_version}"
+    # stacklight
+    # 6.5.0 version, from 11/29/2018, differ from latest upstream 6.5.0 - update next cycle
+    docker_image_alerta: "${_param:mcp_docker_registry}/mirantis/external/alerta-web:${_param:mcp_version}"
+    docker_image_alertmanager: "${_param:mcp_docker_registry}/openstack-docker/alertmanager:${_param:mcp_version}"
+    docker_image_grafana: "${_param:mcp_docker_registry}/openstack-docker/grafana:${_param:mcp_version}"
+    docker_image_prometheus_es_exporter: "${_param:mcp_docker_registry}/openstack-docker/prometheus-es-exporter:0.5.1-mcp0"
+    docker_image_prometheus: "${_param:mcp_docker_registry}/openstack-docker/prometheus:${_param:mcp_version}"
+    docker_image_prometheus_gainsight: "${_param:mcp_docker_registry}/openstack-docker/gainsight:${_param:mcp_version}"
+    docker_image_prometheus_gainsight_elasticsearch: "${_param:mcp_docker_registry}/openstack-docker/gainsight_elasticsearch:${_param:mcp_version}"
+    docker_image_prometheus_relay: "${_param:mcp_docker_registry}/openstack-docker/prometheus_relay:${_param:mcp_version}"
+    docker_image_pushgateway: "${_param:mcp_docker_registry}/openstack-docker/pushgateway:${_param:mcp_version}"
+    docker_image_remote_agent: "${_param:mcp_docker_registry}/openstack-docker/telegraf:${_param:mcp_version}"
+    docker_image_remote_collector: "${_param:mcp_docker_registry}/openstack-docker/heka:${_param:mcp_version}"
+    docker_image_remote_storage_adapter: "${_param:mcp_docker_registry}/openstack-docker/remote_storage_adapter:${_param:mcp_version}"
+    docker_image_sf_notifier: "${_param:mcp_docker_registry}/openstack-docker/sf_notifier:0.2-mcp0"
+    ##
+    docker_image_cockroachdb: "${_param:mcp_docker_registry}/mirantis/external/cockroach/cockroach:v2.1.1"
+    # keycloak
+    docker_image_keycloak_server: "${_param:mcp_docker_registry}/mirantis/external/jboss/keycloak:4.5.0.Final"
+    docker_image_keycloak_proxy: "${_param:mcp_docker_registry}/mirantis/external/jboss/keycloak:3.4.2.Final"
+    # CVP
+    docker_image_cvp_sanity_checks: ${_param:mcp_docker_registry}/mirantis/cvp/cvp-sanity-checks:${_param:mcp_version}
+    docker_image_cvp_shaker_checks: ${_param:mcp_docker_registry}/mirantis/cvp/cvp-shaker:${_param:mcp_version}
+    # aptly
+    docker_image_aptly:
+      base: "${_param:mcp_docker_registry}/mirantis/cicd/aptly:${_param:mcp_version}"
+      public: "${_param:mcp_docker_registry}/mirantis/cicd/aptly-public:${_param:mcp_version}"
+      publisher: "${_param:mcp_docker_registry}/mirantis/cicd/aptly-publisher:${_param:mcp_version}"
+
+    # List of images, to be placed into offline image, during separate image build process
+    # WARNING: registry|target_registry and names - must be exactly same as list above!
+    default_local_mirrror_content:
+      # Stub parameter, to render target local_registry_mirror_image_list
+      docker_client_registry_target_registry: "apt:5000"
+      docker_client_registry_image:
+         # CI/CD
+        - registry: ${_param:mcp_docker_registry}/mirantis/external
+          target_registry: ${_param:default_local_mirrror_content:docker_client_registry_target_registry}/mirantis/external
+          name: registry:${_param:mcp_version}
+        - registry: ${_param:mcp_docker_registry}/mirantis/external
+          target_registry: ${_param:default_local_mirrror_content:docker_client_registry_target_registry}/mirantis/external
+          name: visualizer:${_param:mcp_version}
+        - registry: ${_param:mcp_docker_registry}/mirantis/external/docker
+          target_registry: ${_param:default_local_mirrror_content:docker_client_registry_target_registry}/mirantis/external/docker
+          name: compose:1.17.1
+        - registry: ${_param:mcp_docker_registry}/mirantis/external/osixia
+          target_registry: ${_param:default_local_mirrror_content:docker_client_registry_target_registry}/mirantis/external/osixia
+          name: openldap:1.2.2
+        - registry: ${_param:mcp_docker_registry}/mirantis/external/library
+          target_registry: ${_param:default_local_mirrror_content:docker_client_registry_target_registry}/mirantis/external/library
+          name: postgres:9.6.10
+        - registry: ${_param:mcp_docker_registry}/mirantis/cicd
+          target_registry: ${_param:default_local_mirrror_content:docker_client_registry_target_registry}/mirantis/cicd
+          name: phpldapadmin:${_param:mcp_version}
+
+        - registry: ${_param:mcp_docker_registry}/mirantis/cicd
+          target_registry: ${_param:default_local_mirrror_content:docker_client_registry_target_registry}/mirantis/cicd
+          name: aptly:${_param:mcp_version}
+        - registry: ${_param:mcp_docker_registry}/mirantis/cicd
+          target_registry: ${_param:default_local_mirrror_content:docker_client_registry_target_registry}/mirantis/cicd
+          name: aptly-public:${_param:mcp_version}
+        - registry: ${_param:mcp_docker_registry}/mirantis/cicd
+          target_registry: ${_param:default_local_mirrror_content:docker_client_registry_target_registry}/mirantis/cicd
+          name: aptly-publisher:${_param:mcp_version}
+
+        - registry: ${_param:mcp_docker_registry}/mirantis/cicd
+          target_registry: ${_param:default_local_mirrror_content:docker_client_registry_target_registry}/mirantis/cicd
+          name: jnlp-slave:${_param:mcp_version}
+        - registry: ${_param:mcp_docker_registry}/mirantis/cicd
+          target_registry: ${_param:default_local_mirrror_content:docker_client_registry_target_registry}/mirantis/cicd
+          name: jenkins:${_param:mcp_version}
+        - registry: ${_param:mcp_docker_registry}/mirantis/cicd
+          target_registry: ${_param:default_local_mirrror_content:docker_client_registry_target_registry}/mirantis/cicd
+          name: gerrit:${_param:mcp_version}
+          # stacklight
+        - registry: ${_param:mcp_docker_registry}/openstack-docker
+          target_registry: ${_param:default_local_mirrror_content:docker_client_registry_target_registry}/openstack-docker
+          name: alertmanager:${_param:mcp_version}
+        - registry: ${_param:mcp_docker_registry}/mirantis/external
+          target_registry: ${_param:default_local_mirrror_content:docker_client_registry_target_registry}/mirantis/external
+          name: alerta-web:${_param:mcp_version}
+        - registry: ${_param:mcp_docker_registry}/openstack-docker
+          target_registry: ${_param:default_local_mirrror_content:docker_client_registry_target_registry}/openstack-docker
+          name: pushgateway:${_param:mcp_version}
+        - registry: ${_param:mcp_docker_registry}/openstack-docker
+          target_registry: ${_param:default_local_mirrror_content:docker_client_registry_target_registry}/openstack-docker
+          name: prometheus:${_param:mcp_version}
+        - registry: ${_param:mcp_docker_registry}/openstack-docker
+          target_registry: ${_param:default_local_mirrror_content:docker_client_registry_target_registry}/openstack-docker
+          name: gainsight:${_param:mcp_version}
+        - registry: ${_param:mcp_docker_registry}/openstack-docker
+          target_registry: ${_param:default_local_mirrror_content:docker_client_registry_target_registry}/openstack-docker
+          name: telegraf:${_param:mcp_version}
+        - registry: ${_param:mcp_docker_registry}/openstack-docker
+          target_registry: ${_param:default_local_mirrror_content:docker_client_registry_target_registry}/openstack-docker
+          name: remote_storage_adapter:${_param:mcp_version}
+        - registry: ${_param:mcp_docker_registry}/openstack-docker
+          target_registry: ${_param:default_local_mirrror_content:docker_client_registry_target_registry}/openstack-docker
+          name: prometheus_relay:${_param:mcp_version}
+        - registry: ${_param:mcp_docker_registry}/openstack-docker
+          target_registry: ${_param:default_local_mirrror_content:docker_client_registry_target_registry}/openstack-docker
+          name: grafana:${_param:mcp_version}
+        - registry: ${_param:mcp_docker_registry}/openstack-docker
+          target_registry: ${_param:default_local_mirrror_content:docker_client_registry_target_registry}/openstack-docker
+          name: heka:${_param:mcp_version}
+        - registry: ${_param:mcp_docker_registry}/mirantis/external
+          target_registry: ${_param:default_local_mirrror_content:docker_client_registry_target_registry}/mirantis/external
+          name: elasticsearch:${_param:mcp_version}
+        - registry: ${_param:mcp_docker_registry}/openstack-docker
+          target_registry: ${_param:default_local_mirrror_content:docker_client_registry_target_registry}/openstack-docker
+          name: sf_notifier:${_param:mcp_version}
+        - registry: ${_param:mcp_docker_registry}/openstack-docker
+          target_registry: ${_param:default_local_mirrror_content:docker_client_registry_target_registry}/openstack-docker
+          name: gainsight_elasticsearch:${_param:mcp_version}
+        - registry: ${_param:mcp_docker_registry}/mirantis/external/braedon
+          target_registry: ${_param:default_local_mirrror_content:docker_client_registry_target_registry}/mirantis/external/braedon
+          name: prometheus-es-exporter:0.5.1
+
+        # QA\CVP tool-set's
+        - registry: ${_param:mcp_docker_registry}/mirantis/oss
+          target_registry: ${_param:default_local_mirrror_content:docker_client_registry_target_registry}/mirantis/oss
+          name: qa-tools:${_param:mcp_version}
+        - registry: ${_param:mcp_docker_registry}/mirantis/cvp
+          target_registry: ${_param:default_local_mirrror_content:docker_client_registry_target_registry}/mirantis/cvp
+          name: cvp-rally:${_param:mcp_version}
+        - registry: ${_param:mcp_docker_registry}/mirantis/cvp
+          target_registry: ${_param:default_local_mirrror_content:docker_client_registry_target_registry}/mirantis/cvp
+          name: cvp-spt:${_param:mcp_version}
+        - registry: ${_param:mcp_docker_registry}/mirantis/cvp
+          target_registry: ${_param:default_local_mirrror_content:docker_client_registry_target_registry}/mirantis/cvp
+          name: cvp-sanity-checks:${_param:mcp_version}
+          #
+        - registry: ${_param:mcp_docker_registry}/mirantis/cicd
+          target_registry: ${_param:default_local_mirrror_content:docker_client_registry_target_registry}/mirantis/cicd
+          name: mysql:${_param:mcp_version}

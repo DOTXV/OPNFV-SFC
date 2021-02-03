@@ -1,0 +1,7 @@
+parameters:
+  _param:
+    backup_min: "0"
+    backup_hour: "*/12"
+    backup_day_of_month: "*"
+    backup_month: "*"
+    backup_day_of_week: "*"

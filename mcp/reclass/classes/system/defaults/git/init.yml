@@ -1,0 +1,21 @@
+parameters:
+  _param:
+    # List of repos, to be placed into offline image, during separate image build process
+    # By default, will be avaible http_server
+    # WARNING: file path and names - must be exactly same as in any other place in reclass-system or model!
+    default_local_mirrror_content:
+      git_server_repos:
+       - name: mk-pipelines
+         url: https://github.com/Mirantis/mk-pipelines.git
+       - name: pipeline-library
+         url: https://github.com/Mirantis/pipeline-library.git
+       - name: cvp-sanity-checks
+         url: https://github.com/Mirantis/cvp-sanity-checks.git
+       - name: cvp-spt
+         url: https://github.com/Mirantis/cvp-spt.git
+       - name: stacklight-pytest
+         url: https://github.com/Mirantis/stacklight-pytest
+       - name: cvp-configuration
+         url: https://github.com/Mirantis/cvp-configuration.git
+       - name: rundeck-cis-jobs
+         url: https://github.com/Mirantis/rundeck-cis-jobs.git

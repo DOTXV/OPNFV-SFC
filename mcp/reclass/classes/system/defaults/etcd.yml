@@ -1,0 +1,6 @@
+parameters:
+  _param:
+    docker_image_etcd: quay.io/coreos/etcd:v3.3.12
+    kubernetes_etcd_repo: https://github.com/etcd-io/etcd/releases/download
+    kubernetes_etcd_source: ${_param:kubernetes_etcd_repo}/v3.3.12/etcd-v3.3.12-linux-amd64.tar.gz
+    kubernetes_etcd_source_hash: md5=079af00546443b686df31e7ec605135e

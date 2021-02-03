@@ -1,0 +1,21 @@
+parameters:
+  debmirror:
+    client:
+      enabled: true
+      mirrors:
+        mirror_mirantis_com_elasticsearch_5_x_xenial:
+          enabled: true
+          force: ${_param:mirror_mirantis_com_elasticsearch_5_x_xenial_force}
+          lock_target: True
+          extra_flags: [ '--verbose', '--progress', '--nosource', '--no-check-gpg', '--rsync-extra=none' ]
+          method: "rsync"
+          arch: [ 'amd64' ]
+          mirror_host: "mirror.mirantis.com"
+          mirror_root: ":mirror/${_param:mcp_version}/elasticsearch-5.x/xenial/"
+          target_dir: "${_param:debmirror_mirrors_base_target_dir}/elasticsearch-5.x/xenial/"
+          log_file: "/var/log/debmirror/mirror_mirantis_com_elasticsearch_5_x_xenial.log"
+          dist: [ stable ]
+          section: [ main ]
+          filter:
+            # drop all versions below 5.6.12
+            001: --exclude='(_|-)5\.([0-5]\.|6\.([0-9]|10|11)(-|\.))'

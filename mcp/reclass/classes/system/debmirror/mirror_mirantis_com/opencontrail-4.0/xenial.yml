@@ -1,0 +1,19 @@
+parameters:
+  debmirror:
+    client:
+      enabled: true
+      mirrors:
+        mirror_mirantis_com_oc40_xenial:
+          force: ${_param:mirror_mirantis_com_oc40_xenial_force}
+          lock_target: True
+          extra_flags: [ '--verbose', '--progress', '--nosource', '--no-check-gpg', '--rsync-extra=none' ]
+          method: "rsync"
+          arch: [ 'amd64' ]
+          mirror_host: "mirror.mirantis.com"
+          mirror_root: ":mirror/${_param:mcp_version}/opencontrail-4.0/xenial/"
+          target_dir: "${_param:debmirror_mirrors_base_target_dir}/opencontrail-4.0/xenial/"
+          log_file: "/var/log/debmirror/mirror_mirantis_com_oc40_xenial.log"
+          dist: [ xenial ]
+          section: [ main ]
+          filter:
+            001: "--exclude='(-dbg_|-dbg-)'"

@@ -1,0 +1,22 @@
+parameters:
+  debmirror:
+    client:
+      enabled: true
+      mirrors:
+        mirror_mirantis_com_docker_xenial:
+          force: ${_param:mirror_mirantis_com_docker_xenial_force}
+          lock_target: True
+          extra_flags: [ '--verbose', '--progress', '--nosource', '--no-check-gpg', '--rsync-extra=none' ]
+          method: "rsync"
+          arch: [ 'amd64' ]
+          mirror_host: "mirror.mirantis.com"
+          mirror_root: ":mirror/${_param:mcp_version}/docker/xenial/"
+          target_dir: "${_param:debmirror_mirrors_base_target_dir}/docker/xenial/"
+          log_file: "/var/log/debmirror/mirror_mirantis_com_docker_xenial.log"
+          dist: [ xenial ]
+          section: [ stable ]
+          filter:
+            # conteinerD - forked at 'extra' repo.
+            001: --exclude='(docker-ce_17|containerd.io_1.2.0~(beta|rc))'
+            # Drop docker-ce <= 18.09
+            002: --exclude='(docker-ce(-|_)18.0[0-8])'

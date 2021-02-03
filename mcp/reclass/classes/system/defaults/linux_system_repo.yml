@@ -1,0 +1,79 @@
+parameters:
+  _param:
+    # Global
+    linux_repo_refresh_db: true
+    linux_system_repo_url: https://mirror.mirantis.com/${_param:mcp_version}/
+    # Global-updates
+    linux_system_repo_update_url: https://mirror.mirantis.com/update/${_param:mcp_version}/
+    # Global-hotfix
+    linux_system_repo_hotfix_url: https://mirror.mirantis.com/hotfix/${_param:mcp_version}/
+    # Per repos
+    linux_system_repo_mcp_cassandra_url: ${_param:linux_system_repo_url}/cassandra/
+    linux_system_repo_mcp_glusterfs_url: ${_param:linux_system_repo_url}/glusterfs-${_param:linux_system_repo_mcp_glusterfs_version_number}/
+    linux_system_repo_mcp_influxdb_url: ${_param:linux_system_repo_url}/influxdb/
+    linux_system_repo_mcp_maas_url: ${_param:linux_system_repo_url}/maas/
+    #
+    linux_system_repo_mcp_elasticsearch_curator_url: ${_param:linux_system_repo_url}/elasticsearch-curator-5/
+    linux_system_repo_mcp_update_elasticsearch_curator_url: ${_param:linux_system_repo_update_url}/elasticsearch-curator-5/
+    linux_system_repo_mcp_hotfix_elasticsearch_curator_url: ${_param:linux_system_repo_hotfix_url}/elasticsearch-curator-5/
+    #
+    linux_system_repo_mcp_elasticsearch_url: ${_param:linux_system_repo_url}/elasticsearch-${_param:elasticsearch_version}.x/
+    linux_system_repo_mcp_update_elasticsearch_url: ${_param:linux_system_repo_update_url}/elasticsearch-${_param:elasticsearch_version}.x/
+    linux_system_repo_mcp_hotfix_elasticsearch_url: ${_param:linux_system_repo_hotfix_url}/elasticsearch-${_param:elasticsearch_version}.x/
+    #
+    linux_system_repo_mcp_fluentd_url: ${_param:linux_system_repo_url}/td-agent/
+    linux_system_repo_mcp_update_fluentd_url: ${_param:linux_system_repo_update_url}/td-agent/
+    linux_system_repo_mcp_hotfix_fluentd_url: ${_param:linux_system_repo_hotfix_url}/td-agent/
+    #
+    linux_system_repo_mcp_docker_url: ${_param:linux_system_repo_url}/docker/
+    linux_system_repo_update_mcp_docker_url: ${_param:linux_system_repo_update_url}/docker/
+    linux_system_repo_hotfix_mcp_docker_url: ${_param:linux_system_repo_hotfix_url}/docker/
+    #
+    linux_system_repo_mcp_ceph_url: ${_param:linux_system_repo_url}/ceph-${_param:linux_system_repo_mcp_ceph_codename}/
+    linux_system_repo_update_mcp_ceph_url: ${_param:linux_system_repo_update_url}/ceph-${_param:linux_system_repo_mcp_ceph_codename}/
+    linux_system_repo_hotfix_mcp_ceph_url: ${_param:linux_system_repo_hotfix_url}/ceph-${_param:linux_system_repo_mcp_ceph_codename}/
+    #
+    linux_system_repo_mcp_percona_url: ${_param:linux_system_repo_url}/percona/
+    linux_system_repo_update_mcp_percona_url: ${_param:linux_system_repo_update_url}/percona/
+    linux_system_repo_hotfix_mcp_percona_url: ${_param:linux_system_repo_hotfix_url}/percona/
+    #
+    linux_system_repo_mcp_saltstack_url: ${_param:linux_system_repo_url}/saltstack-${_param:linux_system_repo_mcp_saltstack_version_number}/
+    linux_system_repo_update_mcp_saltstack_url: ${_param:linux_system_repo_update_url}/saltstack-${_param:linux_system_repo_mcp_saltstack_version_number}/
+    linux_system_repo_hotfix_mcp_saltstack_url: ${_param:linux_system_repo_hotfix_url}/saltstack-${_param:linux_system_repo_mcp_saltstack_version_number}/
+    #
+    linux_system_repo_mcp_extra_url: ${_param:linux_system_repo_url}/extra/
+    linux_system_repo_update_mcp_extra_url: ${_param:linux_system_repo_update_url}/extra/
+    linux_system_repo_hotfix_mcp_extra_url: ${_param:linux_system_repo_hotfix_url}/extra/
+    #
+    linux_system_repo_mcp_kubernetes_extra_url: ${_param:linux_system_repo_url}/kubernetes-extra
+    linux_system_repo_update_mcp_kubernetes_extra_url: ${_param:linux_system_repo_update_url}/kubernetes-extra
+    linux_system_repo_hotfix_mcp_kubernetes_extra_url: ${_param:linux_system_repo_hotfix_url}/kubernetes-extra
+    #
+    linux_system_repo_mcp_salt_url: ${_param:linux_system_repo_url}/salt-formulas/
+    linux_system_repo_update_mcp_salt_url: ${_param:linux_system_repo_update_url}/salt-formulas/
+    linux_system_repo_hotfix_mcp_salt_url: ${_param:linux_system_repo_hotfix_url}/salt-formulas/
+    #
+    linux_system_repo_mirantis_openstack_url: ${_param:linux_system_repo_url}/openstack-${_param:openstack_version}/
+    linux_system_repo_update_mirantis_openstack_url: ${_param:linux_system_repo_update_url}/openstack-${_param:openstack_version}/
+    linux_system_repo_hotfix_mirantis_openstack_url: ${_param:linux_system_repo_hotfix_url}/openstack-${_param:openstack_version}/
+    #
+    linux_system_repo_opencontrail_url: ${_param:linux_system_repo_url}/opencontrail-${_param:opencontrail_version}/
+    linux_system_repo_update_opencontrail_url: ${_param:linux_system_repo_update_url}/opencontrail-${_param:opencontrail_version}/
+    linux_system_repo_hotfix_opencontrail_url: ${_param:linux_system_repo_hotfix_url}/opencontrail-${_param:opencontrail_version}/
+    #
+    linux_system_repo_ubuntu_url: ${_param:linux_system_repo_url}/ubuntu/
+    linux_system_repo_update_ubuntu_url: ${_param:linux_system_repo_update_url}/ubuntu/
+    linux_system_repo_hotfix_ubuntu_url: ${_param:linux_system_repo_hotfix_url}/ubuntu/
+
+    # Repo-component versions (if applicable)
+    salt_version: 2017.7 # TODO should be deprecated variable after 2018.q4
+    linux_system_repo_mcp_cassandra_version: '21x'
+    linux_system_repo_mcp_glusterfs_version_number: "5"
+    linux_system_repo_mcp_saltstack_version_number: "${_param:salt_version}"
+    linux_system_repo_mcp_ceph_codename: luminous
+    linux_repo_contrail_component: oc40
+
+    # Deprecated since 2018.11.
+    linux_system_repo_mcp_aptly_url: ${_param:linux_system_repo_url}/aptly/
+    linux_system_repo_mcp_jenkins_url: ${_param:linux_system_repo_url}/jenkins/
+    linux_system_repo_mcp_docker_legacy_url: ${_param:linux_system_repo_url}/docker-1.x/

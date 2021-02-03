@@ -1,0 +1,9 @@
+parameters:
+  _param:
+    postgresql_server: localhost
+    postgresql_exposed_port: 5432
+    postgresql_admin_user: postgres
+    postgresql_glusterfs_volume_name: postgresql-data
+    postgresql_data_mountpoint: /var/lib/postgresql/data
+    postgresql_data_directory: ${_param:postgresql_data_mountpoint}/pgdata
+

@@ -1,0 +1,24 @@
+parameters:
+  _param:
+    # Global
+    debmirror_mirrors_base_target_dir: "/srv/volumes/aptly/public/${_param:mcp_version}/"
+    # Per repo modificators
+    mirror_mirantis_com_cassandra_xenial_force: False
+    mirror_mirantis_com_ceph_luminous_xenial_force: False
+    mirror_mirantis_com_docker_xenial_force: False
+    mirror_mirantis_com_elasticsearch_5_x_xenial_force: False
+    mirror_mirantis_com_elasticsearch_6_x_xenial_force: False
+    mirror_mirantis_com_elasticsearch_curator_5_xenial_force: False
+    mirror_mirantis_com_extra_xenial_force: False
+    mirror_mirantis_com_glusterfs_3_8_xenial_force: False
+    mirror_mirantis_com_maas_xenial_force: False
+    mirror_mirantis_com_oc40_xenial_force: False
+    mirror_mirantis_com_oc41_xenial_force: False
+    mirror_mirantis_com_openstack_pike_xenial_force: False
+    mirror_mirantis_com_openstack_queens_xenial_force: False
+    mirror_mirantis_com_percona_xenial_force: False
+    mirror_mirantis_com_salt-formulas_xenial_force: True
+    mirror_mirantis_com_saltstack_2016_3_xenial_force: False
+    mirror_mirantis_com_saltstack_2017_7_xenial_force: False
+    mirror_mirantis_com_td_agent_xenial_force: False
+    mirror_mirantis_com_ubuntu_xenial_force: False
