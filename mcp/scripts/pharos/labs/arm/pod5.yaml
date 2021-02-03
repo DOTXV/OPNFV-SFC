@@ -1,0 +1,191 @@
+##############################################################################
+# Copyright (c) 2018 Enea AB and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+---
+### Enea ARM POD 5 descriptor file ###
+
+version: 1.0
+details:
+  pod_owner: ENEA AB
+  contact: dan.lilliehorn@enea.com
+  lab: ENEA lab
+  location: Stockholm, Sweden
+  type: production
+  link: https://wiki.opnfv.org/display/pharos/Enea+Hosting
+##############################################################################
+jumphost:
+  name: jenkins-slave-arm-pod5
+  node:
+    type: baremetal
+    vendor: Cavium
+    model: ThunderX
+    arch: aarch64
+    cpus: 1
+    cpu_cflags: fp asimd evtstrm aes pmull sha1 sha2 crc32
+    cores: 48
+    memory: 128G
+  disks:
+    - name: disk1
+      disk_capacity: 500G
+      disk_type: hdd
+      disk_interface: sata
+      disk_rotation: 7200
+  os: ubuntu-16.04
+  remote_params: &remote_params
+    type: ipmi
+    versions:
+      - 2.0
+    user: admin
+    pass: admin
+  remote_management:
+    <<: *remote_params
+    address: 10.0.1.32
+    mac_address: "40:8D:5C:BA:B9:6A"
+  interfaces:
+    # Connected, used only for admin/PXE
+    - mac_address: "68:05:ca:34:60:e3"
+      address: 192.168.11.1
+      speed: 1gb
+      features: ''
+      name: 'nic1'
+    # Not connected for now
+    - mac_address: "00:0f:b7:04:00:c1"
+      speed: 40gb
+      features: 'dpdk|sriov'
+      name: 'nic2'
+    # Not connected for now
+    - mac_address: "00:0f:b7:04:00:c2"
+      speed: 40gb
+      features: 'dpdk|sriov'
+      name: 'nic3'
+    # Connected, trunk for all other VLANs
+    - mac_address: "00:0f:b7:04:00:c0"
+      speed: 10gb
+      features: ''
+      name: 'nic4'
+##############################################################################
+nodes:
+  - name: softiron-3
+    node: &nodeparams
+      type: baremetal
+      vendor: Softiron
+      model: Overdrive 3000
+      arch: aarch64
+      cpus: 1
+      cpu_cflags: fp asimd evtstrm aes pmull sha1 sha2 crc32
+      cores: 8
+      memory: 32G
+    disks: &disks
+      - name: 'disk1'
+        disk_capacity: 128G
+        disk_type: ssd
+        disk_interface: sata
+        disk_rotation: 0
+      - name: 'disk2'
+        disk_capacity: 2048G
+        disk_type: hdd
+        disk_interface: sata
+        disk_rotation: 7200
+    remote_management:
+      <<: *remote_params
+      address: 10.0.8.3
+      mac_address: "e0:ff:f7:00:04:99"
+    interfaces:
+      # Connected, used only for admin/PXE
+      - mac_address: "e0:ff:f7:00:08:ae"
+        speed: 10gb
+        features: ''
+        name: 'nic1'
+      # Connected, trunk for all other VLANs
+      - mac_address: "e0:ff:f7:00:08:af"
+        speed: 10gb
+        features: ''
+        name: 'nic2'
+  ############################################################################
+  - name: softiron-4
+    node: *nodeparams
+    disks: *disks
+    remote_management:
+      <<: *remote_params
+      address: 10.0.8.4
+      mac_address: "e0:ff:f7:00:05:00"
+    interfaces:
+      - mac_address: "e0:ff:f7:00:08:b1"
+        speed: 10gb
+        features: ''
+        name: 'nic1'
+      - mac_address: "e0:ff:f7:00:08:b2"
+        speed: 10gb
+        features: ''
+        name: 'nic2'
+  ############################################################################
+  - name: softiron-5
+    node: *nodeparams
+    disks: *disks
+    remote_management:
+      <<: *remote_params
+      address: 10.0.8.5
+      mac_address: "e0:ff:f7:00:04:a9"
+    interfaces:
+      - mac_address: "e0:ff:f7:00:08:bd"
+        speed: 10gb
+        features: ''
+        name: 'nic1'
+      - mac_address: "e0:ff:f7:00:08:be"
+        speed: 10gb
+        features: ''
+        name: 'nic2'
+  ############################################################################
+  - name: softiron-6
+    node: *nodeparams
+    disks: *disks
+    remote_management:
+      <<: *remote_params
+      address: 10.0.8.6
+      mac_address: "e0:ff:f7:00:04:78"
+    interfaces:
+      - mac_address: "e0:ff:f7:00:08:c6"
+        speed: 10gb
+        features: ''
+        name: 'nic1'
+      - mac_address: "e0:ff:f7:00:08:c7"
+        speed: 10gb
+        features: ''
+        name: 'nic2'
+      - mac_address: "ac:1f:6b:8a:82:84"
+        speed: 10gb
+        features: 'dpdk|sriov'
+        name: 'nic3'
+      - mac_address: "ac:1f:6b:8a:82:85"
+        speed: 10gb
+        features: 'dpdk|sriov'
+        name: 'nic4'
+  ############################################################################
+  - name: softiron-7
+    node: *nodeparams
+    disks: *disks
+    remote_management:
+      <<: *remote_params
+      address: 10.0.8.7
+      mac_address: "e0:ff:f7:00:05:19"
+    interfaces:
+      - mac_address: "e0:ff:f7:00:08:cf"
+        speed: 10gb
+        features: ''
+        name: 'nic1'
+      - mac_address: "e0:ff:f7:00:08:d0"
+        speed: 10gb
+        features: ''
+        name: 'nic2'
+      - mac_address: "ac:1f:6b:8a:82:a0"
+        speed: 10gb
+        features: 'dpdk|sriov'
+        name: 'nic3'
+      - mac_address: "ac:1f:6b:8a:82:a1"
+        speed: 10gb
+        features: 'dpdk|sriov'
+        name: 'nic4'

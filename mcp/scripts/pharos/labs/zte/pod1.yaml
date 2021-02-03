@@ -1,0 +1,241 @@
+##############################################################################
+# Copyright (c) 2018 ZTE, Mirantis Inc., Enea AB and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+---
+### ZTE POD 1 descriptor file ###
+# refering to https://gerrit.opnfv.org/gerrit/#/c/23727/9/config/pod1.yaml
+
+version: 1.0
+details:
+  pod_owner: Alex Yang
+  contact: yangyang1@zte.com.cn
+  lab: ZTE Pharos Lab
+  location: Shanghai, China
+  type: production
+  link: https://wiki.opnfv.org/display/pharos/ZTE+SH+Testlab
+##############################################################################
+jumphost:
+  name: pod1-jump
+  node:
+    type: baremetal
+    vendor: ZTE
+    model: R5300
+    arch: x86_64
+    cpus: 2
+    cpu_cflags: haswell
+    cores: 12
+    memory: 128G
+  disks:
+    - name: 'disk1'
+      disk_capacity: 600G
+      disk_type: hdd
+      disk_interface: sas
+      disk_rotation: 10000
+    - name: 'disk2'
+      disk_capacity: 600G
+      disk_type: hdd
+      disk_interface: sas
+      disk_rotation: 10000
+    - name: 'disk3'
+      disk_capacity: 600G
+      disk_type: hdd
+      disk_interface: sas
+      disk_rotation: 10000
+  os: CentOS-7
+  remote_params: &remote_params
+    type: ipmi
+    versions:
+      - 2.0
+    user: >
+      ENC[PKCS7,MIIBeQYJKoZIhvcNAQcDoIIBajCCAWYCAQAxggEhMIIBHQIBADAFMAACAQEw
+      DQYJKoZIhvcNAQEBBQAEggEAV6BaFHBOwnf4GkZaHcoBjUi97U+68ossDNM1
+      fRRvw+whiNZ/UMkEheasAW2/sP//W+B8cIMLrFpA6vqYpn5wzFSWOsnXRDOW
+      hz1746p600c9TjsGbpMPtbNGgi68t3nB8VQoW7e57bM+yWVvJzLSI2my8bEw
+      a6FNuICymRAeXeyZjXSJ7w71F1XA8stuDSXm4/kAvigNTmS4kdvm6NYSNSZ9
+      +DtNJjcVQtXBpzNIB8sf+y9yTt1d58ZaSBtCLBIRoG+vSpFzJjUyPOdv01rP
+      pMleQ7IJHrucl8p35/pQ2nUOErrSBwNLq+XMIusIRySW1gAbxFn/I+d1aYsK
+      Txv0nDA8BgkqhkiG9w0BBwEwHQYJYIZIAWUDBAEqBBAq1Y9d1AWsRxLIGNXE
+      1zJGgBCXqWtf5xcL5n9/YtpHtmA0]
+    pass: >
+      ENC[PKCS7,MIIBeQYJKoZIhvcNAQcDoIIBajCCAWYCAQAxggEhMIIBHQIBADAFMAACAQEw
+      DQYJKoZIhvcNAQEBBQAEggEAhnPH8p1YJQDJ3wS/0+KZemgS4oTX2gNKMJsf
+      TDmJzQNAcGnuORSEoowdTGUq65QFlb3yUi5B7mHaer2mN/4v12rEKc7TYRfB
+      PBNzpudCwB1UtMJTDBjrKtpVv4iWclAKZmreV4VKCFAFWHeQEzQhBQGBoykk
+      UKRdNCKcuBhoNa5d9QEjgpTse5PtEgPZxPQsKFh4RDQJRpL+JUHw05Cs8rv0
+      PR6UAnvrbd/pcYnUZUkNZc9x7bfedG6274A88DQ6sGFAbLjH2YvnJrNbUvy5
+      Le7bUT5G1V1ymtVpxg30ECDaSX4zKMeFgcHdU+dPAqSHfCkD1wLI7Cn5o7j2
+      uZZORTA8BgkqhkiG9w0BBwEwHQYJYIZIAWUDBAEqBBAGF9iDD5dBZN8p2qbS
+      4IoqgBAYdFlBw90sTOBqrhoHmRbr]
+  remote_management:
+    <<: *remote_params
+    # Not used, fill in with dummy values
+    address: 0.0.0.0
+    mac_address: "00:00:00:00:00:00"
+  interfaces:
+    - mac_address: "74:4a:a4:00:91:b3"
+      speed: 1gb
+      address: 10.20.6.1
+      name: 'nic1'
+nodes:
+  - name: pod1-node1
+    node: &nodeparas
+      type: baremetal
+      vendor: ZTE
+      model: E9000
+      arch: x86_64
+      cpus: 2
+      cpu_cflags: haswell
+      cores: 10
+      memory: 128G
+    disks: &disks
+      - name: 'disk1'
+        disk_capacity: 600G
+        disk_type: hdd
+        disk_interface: sas
+        disk_rotation: 10000
+      - name: 'disk2'
+        disk_capacity: 600G
+        disk_type: hdd
+        disk_interface: sas
+        disk_rotation: 10000
+    remote_management:
+      <<: *remote_params
+      address: 192.168.1.101
+      mac_address: "74:4a:a4:00:cf:d9"
+    interfaces:
+      - mac_address: "74:4a:a4:00:cf:dc"
+        speed: 1gb
+        features: null
+        name: 'nic1'
+      - mac_address: "74:4a:a4:00:b0:e1"
+        speed: 10gb
+        features: dpdk|sriov
+        name: 'nic2'
+      - mac_address: "74:4a:a4:00:b0:e2"
+        speed: 10gb
+        features: dpdk|sriov
+        name: 'nic3'
+      - mac_address: "74:4a:a4:00:b0:dd"
+        speed: 10gb
+        features: dpdk|sriov
+        name: 'nic4'
+      - mac_address: "74:4a:a4:00:b0:de"
+        speed: 10gb
+        features: dpdk|sriov
+        name: 'nic5'
+  - name: pod1-node2
+    node: *nodeparas
+    disks: *disks
+    remote_management:
+      <<: *remote_params
+      address: 192.168.1.102
+      mac_address: "74:4a:a4:00:ce:cb"
+    interfaces:
+      - mac_address: "74:4a:a4:00:ce:ce"
+        speed: 1gb
+        features: null
+        name: 'nic1'
+      - mac_address: "74:4a:a4:00:d6:ad"
+        speed: 10gb
+        features: dpdk|sriov
+        name: 'nic2'
+      - mac_address: "74:4a:a4:00:d6:ae"
+        speed: 10gb
+        features: dpdk|sriov
+        name: 'nic3'
+      - mac_address: "74:4a:a4:00:d6:a9"
+        speed: 10gb
+        features: dpdk|sriov
+        name: 'nic4'
+      - mac_address: "74:4a:a4:00:d6:aa"
+        speed: 10gb
+        features: dpdk|sriov
+        name: 'nic5'
+  - name: pod1-node3
+    node: *nodeparas
+    disks: *disks
+    remote_management:
+      <<: *remote_params
+      address: 192.168.1.103
+      mac_address: "74:4a:a4:00:cf:55"
+    interfaces:
+      - mac_address: "74:4a:a4:00:cf:58"
+        speed: 1gb
+        features: null
+        name: 'nic1'
+      - mac_address: "74:4a:a4:00:d6:ab"
+        speed: 10gb
+        features: dpdk|sriov
+        name: 'nic2'
+      - mac_address: "74:4a:a4:00:d6:ac"
+        speed: 10gb
+        features: dpdk|sriov
+        name: 'nic3'
+      - mac_address: "74:4a:a4:00:d6:af"
+        speed: 10gb
+        features: dpdk|sriov
+        name: 'nic4'
+      - mac_address: "74:4a:a4:00:d6:b0"
+        speed: 10gb
+        features: dpdk|sriov
+        name: 'nic5'
+  - name: pod1-node4
+    node: *nodeparas
+    disks: *disks
+    remote_management:
+      <<: *remote_params
+      address: 192.168.1.104
+      mac_address: "74:4a:a4:00:49:81"
+    interfaces:
+      - mac_address: "74:4a:a4:00:49:84"
+        speed: 1gb
+        features: null
+        name: 'nic1'
+      - mac_address: "74:4a:a4:00:b1:a5"
+        speed: 10gb
+        features: dpdk|sriov
+        name: 'nic2'
+      - mac_address: "74:4a:a4:00:b1:a6"
+        speed: 10gb
+        features: dpdk|sriov
+        name: 'nic3'
+      - mac_address: "74:4a:a4:00:b1:b1"
+        speed: 10gb
+        features: dpdk|sriov
+        name: 'nic4'
+      - mac_address: "74:4a:a4:00:b1:b2"
+        speed: 10gb
+        features: dpdk|sriov
+        name: 'nic5'
+  - name: pod1-node5
+    node: *nodeparas
+    disks: *disks
+    remote_management:
+      <<: *remote_params
+      address: 192.168.1.105
+      mac_address: "74:4a:a4:00:ce:bf"
+    interfaces:
+      - mac_address: "74:4a:a4:00:ce:c2"
+        speed: 1gb
+        features: null
+        name: 'nic1'
+      - mac_address: "74:4a:a4:00:d6:8d"
+        speed: 10gb
+        features: dpdk|sriov
+        name: 'nic2'
+      - mac_address: "74:4a:a4:00:d6:8e"
+        speed: 10gb
+        features: dpdk|sriov
+        name: 'nic3'
+      - mac_address: "74:4a:a4:00:d6:9b"
+        speed: 10gb
+        features: dpdk|sriov
+        name: 'nic4'
+      - mac_address: "74:4a:a4:00:d6:9c"
+        speed: 10gb
+        features: dpdk|sriov
+        name: 'nic5'

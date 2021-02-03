@@ -1,0 +1,275 @@
+##############################################################################
+# Copyright (c) 2018 Ericsson AB, Mirantis Inc., Enea AB and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+---
+### POD descriptor file ###
+
+version: 1.0
+details:
+  pod_owner: Jose Lausuch
+  contact: jose.lausuch@ericsson.com
+  lab: Ericsson
+  location: Rosersberg, Sweden
+  type: production
+  link: https://wiki.opnfv.org/display/pharos/CI-ERICSSON-POD1
+##############################################################################
+jumphost:
+  name: CI-POD1-HOST
+  node: &nodeparams
+    type: baremetal
+    vendor: HP
+    model: ProLiant BL460c Gen8
+    arch: x86_64
+    cpus: 2
+    cpu_cflags: ivybridge
+    cores: 10
+    memory: 64G
+  disks: &disks
+    - name: 'disk1'
+      disk_capacity: 800G
+      disk_type: hdd
+      disk_interface: scsi
+      disk_rotation: 15000
+  os: ubuntu-16.04
+  remote_params: &remoteparas
+    type: ipmi
+    versions:
+      - 1.0
+      - 2.0
+    user: >
+      ENC[PKCS7,MIIBeQYJKoZIhvcNAQcDoIIBajCCAWYCAQAxggEhMIIBHQIBADAFMAACAQEw
+      DQYJKoZIhvcNAQEBBQAEggEAuQkYMXyWaXfQQUhqa1uKr3idY/TDnYF+fMyb
+      uuI1EFGnqXyJyY5C6CxyR61sTBrni49LPh/EmuLWzv0SLclJYnIfSOQrCbO5
+      Sy4IFen6eMGd4x8OLLN0cQBSRnpxFRnmGnnqdLjcZYDYSfvP8U0vE46cRFM+
+      PWRBMJm9+2iz/+wPY8z1aqQ03YycSgKo7R7hEXlarqjJexr/mnP+WLXnz/yN
+      qi0/E9q93X8e0JnQnxRG69K/AOih4pjW4kW8T53JbFmSq5whTdF7SpGAsUqt
+      +5pr5Bs/9yMk9g00XqDmhiCNlNO8ADSDKW1YWQXWHQFMazwZI4GipQA9P/I6
+      CXRrKTA8BgkqhkiG9w0BBwEwHQYJYIZIAWUDBAEqBBCtE4yYqripA3lKyuS4
+      O7T2gBBL83JWGyHgxbluxLakRfZx]
+    pass: >
+      ENC[PKCS7,MIIBeQYJKoZIhvcNAQcDoIIBajCCAWYCAQAxggEhMIIBHQIBADAFMAACAQEw
+      DQYJKoZIhvcNAQEBBQAEggEAcNPG79QTsU1TDQZBWMENe+jI9rOfqabAiXJb
+      K+fbSVRY9gUTis2Bxaq/fWq4VGycPDfeZIKfGK5lgwaxd+yWbfHpHU2Itfav
+      L5s7zoH8yCk6vvfdTGEa+rM/CupqMRF0l/N/bFHMjf1TpUycw37KfaEcpV8T
+      /+ZJdpNCt+C5n67liLWr/fIGtcZB7HVFlIJOfniVoF9EfSwrNkKAJ5vYSAGe
+      KYhqgbQ1EFWf9/dJdAq0A4HuKixiMpc6qOX/moNTLTRPd6jN2veT7t4blqZM
+      cQU8Y3avbnAurd6Bu5i52d9kGebkUfYqUnkNCzyObi6WU5ZuJ8oxdzcQghb3
+      sIRM3jA8BgkqhkiG9w0BBwEwHQYJYIZIAWUDBAEqBBDA0e139hbToTK8gZ1/
+      UoEfgBDHho1xQ2fi5kh1g0FyFTpw]
+  remote_management:
+    <<: *remoteparas
+    address: 172.16.1.21/24
+    mac_address: "9C:B6:54:8E:C5:76"
+  interfaces:
+    - name: 'nic1'
+      speed: 10gb
+      features: 'dpdk|sriov'
+      address: 100.64.200.5/24
+      mac_address: "38:ea:a7:8f:53:00"
+      vlan: 80
+    - name: 'nic2'
+      speed: 10gb
+      features: 'dpdk|sriov'
+      mac_address: "38:ea:a7:8f:53:01"
+      vlan: native
+    - name: 'nic3'
+      speed: 10gb
+      features: 'dpdk|sriov'
+      address: 172.16.0.250/16
+      mac_address: "38:ea:a7:8f:06:00"
+      vlan: native
+    - name: 'nic4'
+      speed: 10gb
+      features: 'dpdk|sriov'
+      mac_address: "38:ea:a7:8f:06:01"
+      vlan: native
+    - name: 'nic5'
+      speed: 10gb
+      features: 'dpdk|sriov'
+      mac_address: "9c:b6:54:8a:05:70"
+      vlan: native
+    - name: 'nic6'
+      speed: 10gb
+      features: 'dpdk|sriov'
+      mac_address: "9c:b6:54:8a:05:74"
+      vlan: native
+##############################################################################
+nodes:
+  - name: CI-ERICSSON-POD1-NODE1
+    node: *nodeparams
+    disks: *disks
+    remote_management:
+      <<: *remoteparas
+      address: 172.16.1.16/24
+      mac_address: "14:58:D0:5D:AB:6A"
+    interfaces:
+      - name: 'nic1'
+        speed: 10gb
+        features: 'dpdk|sriov'
+        mac_address: "38:ea:a7:17:6b:98"
+      - name: 'nic2'
+        speed: 10gb
+        features: 'dpdk|sriov'
+        mac_address: "38:ea:a7:17:6b:99"
+      - name: 'nic3'
+        speed: 10gb
+        features: 'dpdk|sriov'
+        mac_address: "38:ea:a7:17:6b:84"
+      - name: 'nic4'
+        speed: 10gb
+        features: 'dpdk|sriov'
+        mac_address: "38:ea:a7:17:6b:85"
+      - name: 'nic5'
+        speed: 10gb
+        features: 'dpdk|sriov'
+        mac_address: "14:58:d0:54:e7:88"
+        vlan: native
+      - name: 'nic6'
+        speed: 10gb
+        features: 'dpdk|sriov'
+        mac_address: "00:00:00:00:00:00"
+        vlan: native
+  ############################################################################
+  - name: CI-ERICSSON-POD1-NODE2
+    node: *nodeparams
+    disks: *disks
+    remote_management:
+      <<: *remoteparas
+      address: 172.16.1.17/24
+      mac_address: "14:58:D0:5D:AB:4D"
+    interfaces:
+      - name: 'nic1'
+        speed: 10gb
+        features: 'dpdk|sriov'
+        mac_address: "38:ea:a7:17:6b:7c"
+      - name: 'nic2'
+        speed: 10gb
+        features: 'dpdk|sriov'
+        mac_address: "38:ea:a7:17:6b:7d"
+      - name: 'nic3'
+        speed: 10gb
+        features: 'dpdk|sriov'
+        mac_address: "38:ea:a7:17:6b:6c"
+      - name: 'nic4'
+        speed: 10gb
+        features: 'dpdk|sriov'
+        mac_address: "38:ea:a7:17:6b:6d"
+      - name: 'nic5'
+        speed: 10gb
+        features: 'dpdk|sriov'
+        mac_address: "14:58:d0:54:6a:60"
+        vlan: native
+      - name: 'nic6'
+        speed: 10gb
+        features: 'dpdk|sriov'
+        mac_address: "00:00:00:00:00:00"
+        vlan: native
+  ############################################################################
+  - name: CI-ERICSSON-POD1-NODE3
+    node: *nodeparams
+    disks: *disks
+    remote_management:
+      <<: *remoteparas
+      address: 172.16.1.18/24
+      mac_address: "14:58:D0:5D:AB:F2"
+    interfaces:
+      - name: 'nic1'
+        speed: 10gb
+        features: 'dpdk|sriov'
+        mac_address: "38:ea:a7:17:6a:38"
+      - name: 'nic2'
+        speed: 10gb
+        features: 'dpdk|sriov'
+        mac_address: "38:ea:a7:17:6a:39"
+      - name: 'nic3'
+        speed: 10gb
+        features: 'dpdk|sriov'
+        mac_address: "38:ea:a7:17:6a:3c"
+      - name: 'nic4'
+        speed: 10gb
+        features: 'dpdk|sriov'
+        mac_address: "38:ea:a7:17:6a:3d"
+      - name: 'nic5'
+        speed: 10gb
+        features: 'dpdk|sriov'
+        mac_address: "14:58:d0:54:7a:28"
+        vlan: native
+      - name: 'nic6'
+        speed: 10gb
+        features: 'dpdk|sriov'
+        mac_address: "00:00:00:00:00:00"
+        vlan: native
+  ############################################################################
+  - name: CI-ERICSSON-POD1-NODE4
+    node: *nodeparams
+    disks: *disks
+    remote_management:
+      <<: *remoteparas
+      address: 172.16.1.19/24
+      mac_address: "FC:15:B4:12:97:64"
+    interfaces:
+      - name: 'nic1'
+        speed: 10gb
+        features: 'dpdk|sriov'
+        mac_address: "38:ea:a7:8f:1f:d4"
+      - name: 'nic2'
+        speed: 10gb
+        features: 'dpdk|sriov'
+        mac_address: "38:ea:a7:8f:1f:d5"
+      - name: 'nic3'
+        speed: 10gb
+        features: 'dpdk|sriov'
+        mac_address: "38:ea:a7:8f:52:cc"
+      - name: 'nic4'
+        speed: 10gb
+        features: 'dpdk|sriov'
+        mac_address: "38:ea:a7:8f:52:cd"
+      - name: 'nic5'
+        speed: 10gb
+        features: 'dpdk|sriov'
+        mac_address: "9c:b6:54:8a:95:a0"
+        vlan: native
+      - name: 'nic6'
+        speed: 10gb
+        features: 'dpdk|sriov'
+        mac_address: "00:00:00:00:00:00"
+        vlan: native
+  ############################################################################
+  - name: CI-ERICSSON-POD1-NODE5
+    node: *nodeparams
+    disks: *disks
+    remote_management:
+      <<: *remoteparas
+      address: 172.16.1.20/24
+      mac_address: "9C:B6:54:8E:C5:74"
+    interfaces:
+      - name: 'nic1'
+        speed: 10gb
+        features: 'dpdk|sriov'
+        mac_address: "38:ea:a7:8f:07:50"
+      - name: 'nic2'
+        speed: 10gb
+        features: 'dpdk|sriov'
+        mac_address: "38:ea:a7:8f:07:51"
+      - name: 'nic3'
+        speed: 10gb
+        features: 'dpdk|sriov'
+        mac_address: "38:ea:a7:8f:12:48"
+      - name: 'nic4'
+        speed: 10gb
+        features: 'dpdk|sriov'
+        mac_address: "38:ea:a7:8f:12:49"
+      - name: 'nic5'
+        speed: 10gb
+        features: 'dpdk|sriov'
+        mac_address: "9c:b6:54:8a:10:18"
+        vlan: native
+      - name: 'nic6'
+        speed: 10gb
+        features: 'dpdk|sriov'
+        mac_address: "00:00:00:00:00:00"
+        vlan: native
