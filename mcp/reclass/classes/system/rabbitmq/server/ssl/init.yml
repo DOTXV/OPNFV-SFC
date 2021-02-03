@@ -1,0 +1,10 @@
+classes:
+- system.salt.minion.cert.rabbitmq_server
+- service.rabbitmq.server.ssl
+parameters:
+  rabbitmq:
+    server:
+      ssl:
+        enabled: ${_param:rabbitmq_ssl_enabled}
+      x509:
+        enabled: ${_param:openstack_rabbitmq_x509_enabled}

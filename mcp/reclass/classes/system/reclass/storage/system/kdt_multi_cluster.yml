@@ -1,0 +1,28 @@
+classes:
+  - system.reclass.storage.system.kdt_single_cluster
+parameters:
+  reclass:
+    storage:
+      node:
+        kdt_node02:
+          name: kdt02
+          domain: ${_param:cluster_domain}
+          classes:
+            - cluster.${_param:cluster_name}.kdt.control
+          params:
+            salt_master_host: ${_param:reclass_config_master}
+            linux_system_codename: ${_param:kdt_system_codename}
+            single_address: ${_param:kdt_node02_address}
+            keepalived_vip_priority: 102
+            glusterfs_node_role: secondary
+        kdt_node03:
+          name: kdt03
+          domain: ${_param:cluster_domain}
+          classes:
+            - cluster.${_param:cluster_name}.kdt.control
+          params:
+            salt_master_host: ${_param:reclass_config_master}
+            linux_system_codename: ${_param:kdt_system_codename}
+            single_address: ${_param:kdt_node03_address}
+            keepalived_vip_priority: 101
+            glusterfs_node_role: secondary

@@ -1,0 +1,19 @@
+parameters:
+  reclass:
+    storage:
+      node:
+        openstack_gateway_node01:
+          classes:
+          - cluster.${_param:cluster_name}.openstack.octavia_manager
+          params:
+            octavia_hm_bind_ip: ${_param:octavia_health_manager_node01_address}
+        openstack_gateway_node02:
+          classes:
+            - cluster.${_param:cluster_name}.openstack.octavia_manager
+          params:
+            octavia_hm_bind_ip: ${_param:octavia_health_manager_node02_address}
+        openstack_gateway_node03:
+          classes:
+            - cluster.${_param:cluster_name}.openstack.octavia_manager
+          params:
+            octavia_hm_bind_ip: ${_param:octavia_health_manager_node03_address}
