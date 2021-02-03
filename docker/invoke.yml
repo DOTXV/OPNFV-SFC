@@ -1,0 +1,76 @@
+# vim: ft=yaml ts=2 sts=2 sw=2
+
+matrix:
+  dist:
+    ubuntu:
+    - xenial
+    - bionic
+    debian:
+    - stretch
+    centos:
+    - 7
+  salt:
+    - stable
+    - stable 2017.7
+    #- develop
+  salt-formulas:
+    - master
+    # tag: stable-2018.3
+
+# NOTE, make sure target names don't conflict with DockerMake target names
+target:
+  # Clean upstream Saltstack salt (no salt-master daemon)
+  saltstack:
+    matrix:
+      - dist
+      - salt
+    require:
+      - salt
+  # Upstream salt with pre installed formulas and wheelhouse
+  # https://github.com/epcim/wheelhouse
+  #wheelhouse:
+  #  matrix:
+  #    - dist
+  #    - salt-formulas
+  #    - salt
+  #  require:
+  #    - salt-formulas
+  #    - salt
+  #    - wheel
+  # Pure salt-master with tini/salt-master entrypoint.
+  # (no formulas, so use volumes to mount env/formulas/pillars)
+  saltmaster:
+    matrix:
+      - dist
+      - salt
+    require:
+      - salt
+      - tini-saltmaster
+  # Ready to use salt-master with pre installed reclass and github.com/salt-formulas
+  saltmaster-reclass:
+    matrix:
+      - dist
+      - salt-formulas
+      - salt
+    require:
+      - reclass
+  # Ready to use salt-master with github.com/salt-formulas
+  #saltmaster-saltclass:
+  #  matrix:
+  #    - dist
+  #    - salt-formulas
+  #    - salt
+  #  require:
+  #    - saltclass
+  saltminion-maas:
+    matrix:
+      - dist
+    require:
+      - maas
+
+dockermake:
+  destination: 'images'
+  repository:  'docker.io/opnfv/fuel'
+  # options: '--no-cache'
+  # options: '--bust-cache reclass'
+  # options: '--registry-user epcim'

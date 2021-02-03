@@ -1,0 +1,182 @@
+# vim: sts=2 ts=2 sw=2 ft=yaml
+
+# RHEL family
+
+# LAYERS
+base:
+  ignore: |
+    *.pyc
+    *~
+    *.tmp
+  build: |
+    MAINTAINER Petr Michalec "<epcim@apealive.net>"
+    ENV LC_ALL C
+    ENV LANG C.UTF-8
+    ENV LANGUAGE $LANG
+    ENV TZ Etc/UTC
+    ENV LAYER_PKGUPDT "yum update -y"
+    ENV LAYER_INSTALL "yum install -y"
+    ENV LAYER_CLEANUP "yum clean all && rm -rf /tmp/* /var/tmp/* /root/.cache /home/*/.cache"
+
+
+
+common-cleanup:
+  build: |
+    RUN echo "Layer common cleanup" \
+      && eval ${LAYER_CLEANUP}
+
+
+common:
+  build: |
+    RUN echo "Layer with common packages" \
+      && eval ${LAYER_PKGUPDT} \
+      && yum upgrade -y \
+      && ${LAYER_INSTALL} \
+           curl \
+           git \
+           rsync \
+           sudo \
+           vim-tiny \
+           wget \
+            \
+           ca-certificates \
+           netcat \
+           tzdata \
+           gnupg2 \
+           zlib1g-dev \
+      && eval ${LAYER_CLEANUP}
+
+
+salt:
+  requires:
+  - python
+  build: |
+    ARG SALT_VERSION="stable"
+    ARG SALT_BOOTSTRAP_PKGS="-p gcc -p python-pip -p python-setuptools -p python-wheel -p python-dev"
+    ARG SALT_BOOTSTRAP_OPTS="-PdX ${SALT_VERSION}"
+    RUN echo "Layer salt" \
+      && eval ${LAYER_PKGUPDT} \
+      && mkdir -p /var/run/salt /var/cache/salt /var/log/salt /etc/salt/pki/master/minions /srv/salt/scripts /srv/salt/formulas /srv/salt/env \
+      && curl -qL https://bootstrap.saltstack.com | $SUDO sh -s --  ${SALT_BOOTSTRAP_PKGS} -M -A localhost ${SALT_BOOTSTRAP_OPTS} \
+      && if ! getent passwd salt > /dev/null;then useradd --system salt; fi \
+      && chown -R salt:salt /etc/salt /var/cache/salt /var/log/salt /var/run/salt \
+      && eval ${LAYER_CLEANUP}
+
+
+python:
+  build: |
+    ARG PYTHON_VERSION="3"
+    RUN echo "Layer python and dev/prerequisites" \
+      && eval ${LAYER_PKGUPDT} \
+      && ${LAYER_INSTALL} \
+         gcc \
+         openssl-libs \
+         python${PYTHON_VERSION}-libs \
+         python${PYTHON_VERSION} \
+         python${PYTHON_VERSION}-pip \
+         python${PYTHON_VERSION}-setuptools \
+      && eval ${LAYER_CLEANUP}
+
+
+salt-formulas:
+  requires:
+  - python
+  build: |
+    ARG SALT_FORMULA_VERSION="master"
+    ARG SALT_FORMULA_SOURCES="https://github.com/salt-formulas https://github.com/saltstack-formulas"
+    ARG SALT_FORMULAS_BASE="/srv/salt/formulas"
+    ARG SALT_ENV_PATH_="/srv/salt/env/prd"
+    ARG RECLASS_BASE="/srv/salt/reclass"
+    RUN echo "Layer python/salt module prerequisites, formulas" \
+      && mkdir -p /srv/salt/scripts \
+      && curl -sSqL https://raw.githubusercontent.com/salt-formulas/salt-formulas-scripts/develop/formula-fetch.sh -o /srv/salt/scripts/formula-fetch.sh \
+      && bash -c 'source /srv/salt/scripts/formula-fetch.sh && setupPyEnv && fetchAll' \
+      && eval ${LAYER_CLEANUP}
+    #
+    # FIXME, use formula-fetch.sh from master once available
+
+
+wheel:
+  requires:
+    - base
+    - python
+  build: |
+    ARG WHEELHOUSE_VERSION="master"
+    # NOTE, wheelhouse requires at least ruamel v0.15.x (debian:stretch has 0.13.x as of 2018.2)
+    # python-ruamel.yaml \
+    # FIXME, use pipenv --system to install dependencies
+    RUN echo "Layer wheelhouse" \
+      && git clone https://github.com/epcim/wheelhouse.git /wh \
+      && cd /wh && git checkout origin/$WHEELHOUSE_VERSION \
+      && LANG=C LC_ALL=C pip install -r /wh/requirements.txt
+
+
+# TODO, change reclass revision @develop to @master once merged
+reclass:
+  requires:
+  - salt
+  - salt-formulas
+  - tini-saltmaster
+  build: |
+    ARG SALT_EXT_PILLAR="reclass"
+    ARG RECLASS_VERSION="develop"
+    ARG SALT_ENV_PATH_="/srv/salt/env/prd"
+    ARG RECLASS_BASE="/srv/salt/reclass"
+    # VOLUME ["/etc/salt/pki" "/srv/salt/env" "/srv/salt/pillar" "$RECLASS_BASE"]
+    RUN echo "Layer reclass" \
+      && mkdir -p /etc/reclass $RECLASS_BASE/classes/system \
+      && git clone https://github.com/Mirantis/reclass-system-salt-model $RECLASS_BASE/classes/system \
+      && pip install --install-option="--prefix=/usr/local" -I \
+           "git+https://github.com/salt-formulas/reclass.git@$RECLASS_VERSION"
+      # NOTE, to consider --upgrade --force-reinstall
+
+saltclass:
+  requires:
+  - salt
+  - salt-formulas
+  - tini-saltmaster
+  build: |
+    ARG SALT_EXT_PILLAR="saltclass"
+    ARG SALT_ENV_PATH_="/srv/salt/env/prd"
+    ARG SALTCLASS_BASE="/srv/salt/saltclass"
+    # VOLUME ["/etc/salt/pki" "/srv/salt/env" "/srv/salt/pillar" "$SALTCLASS_BASE"]
+    RUN echo "Layer saltclass" \
+      && mkdir -p mkdir $SALTCLASS_BASE/classes/system \
+      && git clone https://github.com/epcim/saltclass-system $SALTCLASS_BASE/classes/system \
+      && for i in $(grep -r -e '^applications:' -e '^parameters:' -l $SALTCLASS_BASE); do \
+           sed -i 's/applications:/states:/g;s/parameters:/pillars:/g' $i; \
+         done
+
+tini:
+  build: |
+    ENV TINI_VERSION 0.16.1
+    ENV TINI_SHA 5e01734c8b2e6429a1ebcc67e2d86d3bb0c4574dd7819a0aff2dca784580e040
+    RUN curl -s -S -L "https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini-static-amd64" -o /bin/tini && chmod +x /bin/tini \
+      && echo "$TINI_SHA  /bin/tini" | sha256sum -c -
+    #COPY files/entrypoint.sh /entrypoint.sh
+    #ENTRYPOINT ["/bin/tini", "--", "/entrypoint.sh"]
+
+tini-saltmaster:
+  build_directory: .
+  requires:
+  - tini
+  build: |
+    ARG RECLASS_BASE="/srv/salt/reclass"
+    ARG SALTCLASS_BASE="/srv/salt/saltclass"
+    VOLUME [ "/etc/salt/pki" "/srv/salt/env" "/srv/salt/pillar" "$RECLASS_BASE" "$SALTCLASS_BASE" ]
+    ADD files/reclass/reclass-config.yml /etc/reclass/
+    ADD files/salt/master.conf    /etc/salt/master.d/
+    ADD files/salt/saltclass.conf /tmp/
+    ADD files/salt/reclass.conf   /tmp/
+    COPY files/entrypoint.sh /entrypoint.sh
+    ENTRYPOINT ["/bin/tini", "--", "/entrypoint.sh"]
+    EXPOSE 4505 4506
+
+
+# BASE IMAGES
+centos-7:
+  FROM: centos:7
+  requires:
+    - base
+    - common
+

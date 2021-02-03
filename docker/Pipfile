@@ -1,0 +1,14 @@
+[[source]]
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[dev-packages]
+
+[packages]
+pygithub = "*"
+docker-make = {git = "https://github.com/avirshup/DockerMake", ref = "aeac230fd5ab468d806bf42b120aa97f91eb40a2"}
+dockermake = {git = "https://github.com/avirshup/DockerMake", ref = "aeac230fd5ab468d806bf42b120aa97f91eb40a2"}
+
+[requires]
+python_version = "3.6"
