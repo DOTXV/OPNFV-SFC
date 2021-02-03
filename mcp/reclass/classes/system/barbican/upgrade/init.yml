@@ -1,0 +1,6 @@
+parameters:
+  barbican:
+    upgrade:
+      enabled: ${_param:barbican_upgrade_enabled}
+      old_release: ${_param:barbican_old_version}
+      new_release: ${_param:barbican_version}

@@ -1,0 +1,48 @@
+classes:
+- service.barbican.server.single
+- system.barbican.upgrade
+- system.salt.minion.cert.mysql.clients.openstack.barbican
+- system.salt.minion.cert.rabbitmq.clients.openstack.barbican
+parameters:
+  _param:
+    internal_protocol: 'http'
+  barbican:
+    server:
+      database:
+        x509:
+          enabled: ${_param:openstack_mysql_x509_enabled}
+          ca_file: ${_param:mysql_barbican_ssl_ca_file}
+          key_file: ${_param:mysql_barbican_client_ssl_key_file}
+          cert_file: ${_param:mysql_barbican_client_ssl_cert_file}
+        ssl:
+          enabled: ${_param:galera_ssl_enabled}
+      role: ${_param:openstack_node_role}
+      identity:
+        protocol: ${_param:internal_protocol}
+      message_queue:
+        port: ${_param:openstack_rabbitmq_port}
+        x509:
+          enabled: ${_param:openstack_rabbitmq_x509_enabled}
+          ca_file: ${_param:rabbitmq_barbican_ssl_ca_file}
+          key_file: ${_param:rabbitmq_barbican_client_ssl_key_file}
+          cert_file: ${_param:rabbitmq_barbican_client_ssl_cert_file}
+        ssl:
+          enabled: ${_param:rabbitmq_ssl_enabled}
+      cache:
+        security:
+          enabled: ${_param:barbican_memcache_security_enabled}
+          strategy: ${_param:openstack_memcache_security_strategy}
+          secret_key: ${_param:barbican_memcache_secret_key}
+  linux:
+    system:
+      package:
+        python-pymysql:
+          fromrepo: ${_param:openstack_version}
+          version: latest
+      user:
+        barbican:
+          enabled: true
+          name: barbican
+          home: /var/lib/barbican
+          shell: /bin/bash
+          system: True

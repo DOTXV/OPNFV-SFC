@@ -1,0 +1,28 @@
+classes:
+- system.barbican.client
+- system.barbican.client.v1
+- system.keystone.client.os_client_config.octavia_identity
+
+parameters:
+  _param:
+    octavia_image_cert_file: '/etc/octavia/certs/image.crt'
+
+  barbican:
+    client:
+      resources:
+        v1:
+          cloud_name: octavia_identity
+          secrets:
+            OctaviaAmphoraSecret:
+              cloud_name: octavia_identity
+              type: certificate
+              algorithm: RSA
+              payload_content_type: application/octet-stream
+              payload_content_encoding: base64
+              payload_path: ${_param:octavia_image_cert_file}
+              encodeb64_payload: true
+          acl:
+            OctaviaAmphoraSecret:
+              octavia:
+                cloud_name: octavia_identity
+                enabled: True

@@ -1,0 +1,9 @@
+classes:
+- service.backupninja.server.single
+parameters:
+  backupninja:
+    server:
+      home_dir: /srv/volumes/backup/backupninja
+      key:
+        backupninja_pub_key:
+          key: ${_param:backupninja_public_key}

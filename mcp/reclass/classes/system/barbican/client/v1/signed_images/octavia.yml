@@ -1,0 +1,17 @@
+classes:
+- system.barbican.client.v1.octavia
+
+parameters:
+  _param:
+    octavia_image_cert_key: '/etc/octavia/certs/image.key'
+  barbican:
+    client:
+      signed_images:
+        v1:
+          enabled: true
+          images:
+            OctaviaAmphora:
+              secret_name: 'OctaviaAmphoraSecret'
+              cert_key: ${_param:octavia_image_cert_key}
+              name: ${_param:amphora_image_name}
+              cloud_name: octavia_identity

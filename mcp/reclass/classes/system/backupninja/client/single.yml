@@ -1,0 +1,8 @@
+classes:
+- service.backupninja.client.single
+parameters:
+  backupninja:
+    client:
+      scheduling:
+        when:
+          - manual

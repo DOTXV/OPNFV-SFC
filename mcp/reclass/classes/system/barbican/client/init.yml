@@ -1,0 +1,4 @@
+parameters:
+  barbican:
+    client:
+      enabled: True
