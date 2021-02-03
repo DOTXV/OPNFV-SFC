@@ -1,0 +1,6 @@
+parameters:
+  manila:
+    upgrade:
+      enabled: ${_param:manila_upgrade_enabled}
+      old_release: ${_param:manila_old_version}
+      new_release: ${_param:manila_version}

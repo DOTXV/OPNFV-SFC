@@ -1,0 +1,5 @@
+classes:
+- service.manila.client
+- system.keystone.client.os_client_config.admin_identity
+- system.manila.client.share_type
+- system.manila.upgrade

@@ -1,0 +1,10 @@
+classes:
+  - system.manila.common.cluster
+parameters:
+  manila:
+    common:
+      dhss: false
+      version: ${_param:manila_version}
+    share:
+      enabled: true
+      version: ${_param:manila_version}

@@ -1,0 +1,17 @@
+classes:
+  - system.maas.region.single
+  - system.keepalived.server.cluster_maas
+  - system.linux.system.repo.keystorage.saltstack
+parameters:
+  _param:
+    cluster_vip_address: 10.0.175.80
+  maas:
+    cluster:
+      enabled: true
+      role: ${_param:maas_cluster_role}
+      region:
+        host: ${_param:cluster_vip_address}
+      saltstack_repo_key: ${linux:system:repo:mcp_saltstack:key}
+      saltstack_repo_trusty: "deb [arch=amd64] ${_param:linux_system_repo_mcp_saltstack_url}/trusty/ trusty main"
+      saltstack_repo_xenial: "deb [arch=amd64] ${_param:linux_system_repo_mcp_saltstack_url}/xenial/ xenial main"
+

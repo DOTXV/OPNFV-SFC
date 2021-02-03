@@ -1,0 +1,18 @@
+classes:
+ - system.manila.common.single
+ - system.apache.server.site.manila
+parameters:
+  _param:
+    openstack_node_role: primary
+  manila:
+    common:
+      dhss: false
+      default_share_type: default
+      version: ${_param:manila_version}
+    api:
+      role: ${_param:openstack_node_role}
+      enabled: true
+      version: ${_param:manila_version}
+    scheduler:
+      enabled: true
+      version: ${_param:manila_version}

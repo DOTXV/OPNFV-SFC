@@ -1,0 +1,17 @@
+classes:
+  - service.haproxy.proxy.single
+  - system.manila.common.cluster
+  - system.apache.server.site.manila
+  - system.haproxy.proxy.listen.openstack.manila
+parameters:
+  manila:
+    common:
+      dhss: false
+      version: ${_param:manila_version}
+    api:
+      enabled: true
+      version: ${_param:manila_version}
+      role: ${_param:openstack_node_role}
+    scheduler:
+      enabled: true
+      version: ${_param:manila_version}

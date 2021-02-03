@@ -1,0 +1,51 @@
+classes:
+- service.manila.common.cluster
+- system.manila.upgrade
+- system.salt.minion.cert.mysql.clients.openstack.manila
+- system.salt.minion.cert.rabbitmq.clients.openstack.manila
+parameters:
+  _param:
+    manila_cluster_vip_address: ${_param:cluster_vip_address}
+  manila:
+    common:
+      version: ${_param:manila_version}
+      message_queue:
+        engine: rabbitmq
+        port: ${_param:openstack_rabbitmq_port}
+        user: openstack
+        password: ${_param:rabbitmq_openstack_password}
+        virtual_host: '/openstack'
+        host: ${_param:openstack_message_queue_address}
+        x509:
+          enabled: ${_param:openstack_rabbitmq_x509_enabled}
+          ca_file: ${_param:rabbitmq_manila_ssl_ca_file}
+          key_file: ${_param:rabbitmq_manila_client_ssl_key_file}
+          cert_file: ${_param:rabbitmq_manila_client_ssl_cert_file}
+        ssl:
+           enabled: ${_param:rabbitmq_ssl_enabled}
+      database:
+        engine: mysql
+        host: ${_param:openstack_database_address}
+        port: 3306
+        name: manila
+        user: manila
+        password: ${_param:mysql_manila_password}
+        x509:
+          enabled: ${_param:openstack_mysql_x509_enabled}
+          ca_file: ${_param:mysql_manila_ssl_ca_file}
+          key_file: ${_param:mysql_manila_client_ssl_key_file}
+          cert_file: ${_param:mysql_manila_client_ssl_cert_file}
+        ssl:
+          enabled: ${_param:galera_ssl_enabled}
+      identity:
+        engine: keystone
+        region: ${_param:openstack_region}
+        host: ${_param:manila_cluster_vip_address}
+        port: 35357
+        user: manila
+        password: ${_param:keystone_manila_password}
+        tenant: service
+        auth_type: password
+        user_domain_id: default
+        project_domain_id: default
+        protocol: ${_param:cluster_internal_protocol}
