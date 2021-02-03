@@ -1,0 +1,91 @@
+{%- from "etcd/map.jinja" import server, monitoring with context %}
+
+{%- set hostname = grains.get('nodename') %}
+{%- set etcd = {} %}
+{%- for member in server.members %}
+  {%- if member.name == hostname %}
+    {%- do etcd.update({'hostname': hostname}) %}
+    {%- do etcd.update({'host': member.host}) %}
+    {%- do etcd.update({'port': member.port}) %}
+  {%- endif %}
+{%- endfor %}
+server:
+  {%- if etcd.host is defined and etcd.port is defined and etcd.hostname is defined %}
+  target:
+    static:
+      etcd:
+        enabled: true
+        {%- if server.get('ssl', {}).get('enabled') %}
+        scheme: https
+        tls_config:
+          skip_verify: true
+          cert_name: prometheus-server.crt
+          key_name: prometheus-server.key
+        {%- else %}
+        scheme: http
+        {%- endif %}
+        endpoint:
+          - address: {{ etcd.host }}
+            port: {{ etcd.port }}
+        relabel_configs:
+          - regex: {{ etcd.host }}:{{ etcd.port }}
+            replacement: {{ etcd.hostname }}
+            source_labels: "__address__"
+            target_label: "host"
+  {%- endif %}
+  alert:
+    EtcdRequestFailureTooHigh:
+      {%- set failed_http_requests = monitoring.failed_http_requests_percentage / 100.0 %}
+      if: >-
+        sum by(method) (rate(etcd_http_failed_total[5m]))
+        / sum by(method) (rate(etcd_http_received_total[5m])) > {{ failed_http_requests }}
+      {%- raw %}
+      labels:
+        severity: minor
+        service: etcd
+      annotations:
+        summary: "High number of HTTP requests to etcd are failing"
+        description: "{{ $value }}% of HTTP {{ $labels.method }} requests to the etcd API failed on the {{ $labels.instance }} instance."
+      {%- endraw %}
+    EtcdInstanceNoLeader:
+      if: "etcd_server_has_leader != 1"
+      {%- raw %}
+      labels:
+        severity: major
+        service: etcd
+      annotations:
+        summary: "Etcd instance has no leader"
+        description: "The etcd {{ $labels.instance }} instance has no leader."
+      {%- endraw %}
+    EtcdServiceDownMinor:
+      if: "up{job='etcd'} == 0"
+      {%- raw %}
+      for: 2m
+      labels:
+        severity: minor
+        service: etcd
+      annotations:
+        summary: "Etcd instance is down"
+        description: "The etcd {{ $labels.instance }} instance is down for 2 minutes."
+      {%- endraw %}
+    EtcdServiceDownMajor:
+      {%- set instances_major_threshold_percent = monitoring.instances_major_threshold_percent|float %}
+      if: "count(up{job='etcd'} == 0) > count(up{job='etcd'}) * {{ monitoring.instances_major_threshold_percent }}"
+      {%- raw %}
+      for: 2m
+      labels:
+        severity: major
+        service: etcd
+      annotations:
+        summary: "{%- endraw %}{{ instances_major_threshold_percent*100 }}% of etcd instances are down"
+        description: "{%- raw %}{{ $value }}{%- endraw %} etcd instances (>= {{ instances_major_threshold_percent*100 }}%) are down for 2 minutes."
+    EtcdServiceOutage:
+      if: "count(up{job='etcd'} == 0) == count(up{job='etcd'})"
+      {%- raw %}
+      labels:
+        severity: critical
+        service: etcd
+      annotations:
+        summary: "Etcd service outage"
+        description: "All etcd services within the cluster are down."
+      {%- endraw %}

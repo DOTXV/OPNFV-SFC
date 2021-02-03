@@ -1,0 +1,15 @@
+Source: salt-formula-etcd
+Maintainer: Mirantis Dev <dev@mirantis.com>
+Section: admin
+Priority: optional
+Build-Depends: debhelper (>= 9), salt-master, python, python-yaml, salt-formula-linux
+Standards-Version: 3.9.6
+Homepage: https://www.mirantis.com
+Vcs-Browser: https://gerrit.mcp.mirantis.com/#/admin/projects/salt-formulas/etcd
+Vcs-Git: https://gerrit.mcp.mirantis.com/salt-formulas/etcd.git
+
+Package: salt-formula-etcd
+Architecture: all
+Depends: ${misc:Depends}
+Description: etcd salt formula
+ Install and configure etcd system.
