@@ -1,0 +1,6 @@
+name: "panko"
+version: "2017.6"
+source: "https://gerrit.mcp.mirantis.com/salt-formulas/panko"
+dependencies:
+  - name: apache
+    source: "https://gerrit.mcp.mirantis.com/salt-formulas/apache"
