@@ -1,0 +1,60 @@
+classes:
+- system.salt.minion.cert.mysql.clients.openstack.ironic
+- system.salt.minion.cert.rabbitmq.clients.openstack.ironic
+- service.ironic.conductor.single
+- system.ironic.upgrade
+parameters:
+  linux:
+    system:
+      package:
+        python-pymysql:
+          fromrepo: ${_param:openstack_version}
+          version: latest
+  ironic:
+    conductor:
+      enabled: true
+      version: ${_param:ironic_version}
+      enabled_hardware_types:
+        - ipmi
+      enabled_boot_interfaces:
+        - pxe
+      default_deploy_interface: iscsi
+      enabled_management_interfaces:
+        - ipmitool
+      enabled_power_interfaces:
+        - ipmitool
+      database:
+        x509:
+          enabled: ${_param:openstack_mysql_x509_enabled}
+          ca_file: ${_param:mysql_ironic_ssl_ca_file}
+          key_file: ${_param:mysql_ironic_client_ssl_key_file}
+          cert_file: ${_param:mysql_ironic_client_ssl_cert_file}
+        ssl:
+          enabled: ${_param:galera_ssl_enabled}
+      message_queue:
+        port: ${_param:openstack_rabbitmq_port}
+        x509:
+          enabled: ${_param:openstack_rabbitmq_x509_enabled}
+          ca_file: ${_param:rabbitmq_ironic_ssl_ca_file}
+          key_file: ${_param:rabbitmq_ironic_client_ssl_key_file}
+          cert_file: ${_param:rabbitmq_ironic_client_ssl_cert_file}
+        ssl:
+          enabled: ${_param:rabbitmq_ssl_enabled}
+      cache:
+        security:
+          enabled: ${_param:ironic_memcache_security_enabled}
+          strategy: ${_param:openstack_memcache_security_strategy}
+          secret_key: ${_param:ironic_memcache_secret_key}
+      identity:
+        region: ${_param:openstack_region}
+        protocol: ${_param:cluster_internal_protocol}
+      automated_clean: true
+      erase_devices_priority: 0
+      erase_devices_metadata_priority: 1
+      console:
+        enabled: ${_param:ironic_console_enabled}
+      enabled_console_interfaces:
+        - ipmitool-shellinabox
+        - ipmitool-socat
+        - no-console
+      pxe_append_params: 'nofb nomodeset vga=normal ipa-insecure=1'

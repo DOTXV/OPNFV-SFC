@@ -1,0 +1,15 @@
+parameters:
+  ironic:
+    conductor:
+      enabled_storage_interfaces:
+        - noop
+        - cinder
+      cinder:
+        auth_strategy: keystone
+        auth_type: password
+        password: ${_param:keystone_cinder_password}
+        project_domain_id: default
+        project_name: service
+        user_domain_name: Default
+        username: cinder
+        region: ${_param:openstack_region}

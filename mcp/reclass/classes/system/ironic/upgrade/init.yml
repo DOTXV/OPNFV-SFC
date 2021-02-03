@@ -1,0 +1,6 @@
+parameters:
+  ironic:
+    upgrade:
+      enabled: ${_param:ironic_upgrade_enabled}
+      old_release: ${_param:ironic_old_version}
+      new_release: ${_param:ironic_version}
