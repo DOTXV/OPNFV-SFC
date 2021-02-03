@@ -1,0 +1,15 @@
+Source: salt-formula-aodh
+Maintainer: Mirantis Dev <dev@mirantis.com>
+Section: admin
+Priority: optional
+Build-Depends: debhelper (>= 9), salt-master, python, python-yaml
+Standards-Version: 3.9.6
+Homepage: https://www.mirantis.com
+Vcs-Browser: https://gerrit.mcp.mirantis.com/#/admin/projects/salt-formulas/aodh
+Vcs-Git: https://gerrit.mcp.mirantis.com/salt-formulas/aodh.git
+
+Package: salt-formula-aodh
+Architecture: all
+Depends: ${misc:Depends}
+Description: aodh salt formula
+ Install and configure aodh system.

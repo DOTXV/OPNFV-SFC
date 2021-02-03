@@ -1,0 +1,10 @@
+{%- from "aodh/map.jinja" import server with context %}
+{%- if server.get('enabled', False) %}
+  {%- set protocol = server.get('identity', {}).get('protocol', 'http') %}
+agent:
+  input:
+    http_response:
+      aodh-api:
+        address: "{{ protocol }}://{{ server.bind.host|replace('0.0.0.0', '127.0.0.1') }}:{{ server.bind.port }}/"
+        expected_code: {% if server.version in ['juno', 'kilo', 'liberty', 'mitaka', 'newton', 'ocata'] %}401{% else %}200{% endif %}
+{%- endif %}

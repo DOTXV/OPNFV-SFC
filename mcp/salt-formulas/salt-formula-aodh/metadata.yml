@@ -1,0 +1,8 @@
+name: "aodh"
+version: "2016.4.1"
+source: "https://gerrit.mcp.mirantis.com/salt-formulas/aodh"
+dependencies:
+  - name: apache
+    source: "https://gerrit.mcp.mirantis.com/salt-formulas/apache"
+  - name: linux
+    source: "https://gerrit.mcp.mirantis.com/salt-formulas/linux"
