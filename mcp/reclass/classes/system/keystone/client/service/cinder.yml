@@ -1,0 +1,17 @@
+classes:
+- system.keystone.client.v3.service.cinder
+parameters:
+  _param:
+    cinder_service_protocol: http
+  keystone:
+    client:
+      server:
+        identity:
+          project:
+            service:
+              user:
+                cinder:
+                  is_admin: true
+                  password: ${_param:keystone_cinder_password}
+                  email: ${_param:admin_email}
+                  options: ${_param:openstack_service_user_options}

@@ -1,0 +1,16 @@
+parameters:
+  _param:
+    cinder_service_protocol: http
+  keystone:
+    client:
+      resources:
+        v3:
+          users:
+            cinder:
+              password: ${_param:keystone_cinder_password}
+              email: ${_param:admin_email}
+              options: ${_param:openstack_service_user_options}
+              roles:
+                service_admin:
+                  name: admin
+                  project_id: service

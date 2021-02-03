@@ -1,0 +1,50 @@
+classes:
+- system.keystone.client.os_client_config.octavia_identity
+
+parameters:
+  _param:
+    keystone_service_protocol: http
+    octavia_service_protocol: http
+  keystone:
+    client:
+      server:
+        octavia_identity:
+          admin:
+            api_version: ''
+            user_domain_name: 'Default'
+            project_domain_name: 'Default'
+      resources:
+        v3:
+          roles:
+            global_load_balancer_member:
+              name: load-balancer_member
+              enabled: true
+            global_load_balancer_admin:
+              name: load-balancer_admin
+              enabled: true
+          users:
+            octavia:
+              password: ${_param:keystone_octavia_password}
+              email: ${_param:admin_email}
+              options: ${_param:openstack_service_user_options}
+              roles:
+                service_admin:
+                  name: admin
+                  project_id: service
+          services:
+            octavia:
+              type: load-balancer
+              description: OpenStack Loadbalancing Service
+              endpoints:
+                octavia_public:
+                  interface: 'public'
+                  url: ${_param:cluster_public_protocol}://${_param:cluster_public_host}:9876/
+                  region: ${_param:openstack_region}
+                octavia_internal:
+                  interface: 'internal'
+                  url: ${_param:octavia_service_protocol}://${_param:octavia_service_host}:9876/
+                  region: ${_param:openstack_region}
+                octavia_admin:
+                  interface: 'admin'
+                  url: ${_param:octavia_service_protocol}://${_param:octavia_service_host}:9876/
+                  region: ${_param:openstack_region}

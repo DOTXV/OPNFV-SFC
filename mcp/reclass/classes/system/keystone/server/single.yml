@@ -1,0 +1,85 @@
+classes:
+- service.keystone.server.single
+- system.keystone.upgrade
+- system.linux.system.users.keystone
+- system.keystone.server.fernet_rotation.single
+- system.salt.minion.cert.mysql.clients.openstack.keystone
+- system.salt.minion.cert.rabbitmq.clients.openstack.keystone
+- system.keystone.client.os_client_config.admin_identity
+parameters:
+  _param:
+    keystone_service_token: token
+    mysql_admin_user: root
+    keystone_tokens_expiration: 3600
+    openstack_node_role: primary
+    keystone_service_protocol: ${_param:cluster_internal_protocol}
+  linux:
+    system:
+      package:
+        python-pymysql:
+          fromrepo: ${_param:openstack_version}
+          version: latest
+  keystone:
+    server:
+      enabled: true
+      version: ${_param:keystone_version}
+      service_token: ${_param:keystone_service_token}
+      service_tenant: service
+      admin_tenant: admin
+      admin_name: admin
+      admin_password: ${_param:keystone_admin_password}
+      admin_email: ${_param:admin_email}
+      role: ${_param:openstack_node_role}
+      admin_region: ${_param:openstack_region}
+      region: ${_param:openstack_region}
+      bind:
+        address: ${_param:single_address}
+        private_address: ${_param:single_address}
+        private_port: 35357
+        public_address: ${_param:single_address}
+        public_port: 5000
+      database:
+        engine: mysql
+        host: ${_param:single_address}
+        name: keystone
+        password: ${_param:mysql_keystone_password}
+        user: keystone
+        x509:
+          enabled: ${_param:openstack_mysql_x509_enabled}
+          ca_file: ${_param:mysql_keystone_ssl_ca_file}
+          key_file: ${_param:mysql_keystone_client_ssl_key_file}
+          cert_file: ${_param:mysql_keystone_client_ssl_cert_file}
+        ssl:
+          enabled: ${_param:galera_ssl_enabled}
+      tokens:
+        engine: fernet
+        expiration: ${_param:keystone_tokens_expiration}
+        max_active_keys: ${_param:keystone_tokens_max_active_keys}
+        allow_expired_window: ${_param:keystone_tokens_allow_expired_window}
+        location: /var/lib/keystone/fernet-keys
+      credential:
+        location: /var/lib/keystone/credential-keys
+      message_queue:
+        port: ${_param:openstack_rabbitmq_port}
+        engine: rabbitmq
+        host: ${_param:single_address}
+        user: openstack
+        password: ${_param:rabbitmq_openstack_password}
+        virtual_host: '/openstack'
+        ha_queues: true
+        x509:
+          enabled: ${_param:openstack_rabbitmq_x509_enabled}
+          ca_file: ${_param:rabbitmq_keystone_ssl_ca_file}
+          key_file: ${_param:rabbitmq_keystone_client_ssl_key_file}
+          cert_file: ${_param:rabbitmq_keystone_client_ssl_cert_file}
+        ssl:
+          enabled: ${_param:rabbitmq_ssl_enabled}
+      roles:
+        - admin
+        - Member
+        - image_manager
+      auth_methods:
+      - password
+      - token
+    database:
+      host: 127.0.0.1

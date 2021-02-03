@@ -1,0 +1,32 @@
+classes:
+- system.keystone.client.v3.service.keystone
+parameters:
+  _param:
+    keystone_service_protocol: http
+    keystone_public_path: "/v2.0"
+    keystone_internal_path: "/v2.0"
+    keystone_admin_path: "/v2.0"
+    keystone_public_address: ${_param:cluster_public_host}
+    keystone_public_port: 5000
+  keystone:
+    client:
+      server:
+        identity:
+          service:
+            keystone:
+              type: identity
+              description: OpenStack Identity Service
+              endpoints:
+              - region: ${_param:openstack_region}
+                public_address: ${_param:keystone_public_address}
+                public_protocol: ${_param:cluster_public_protocol}
+                public_port: ${_param:keystone_public_port}
+                public_path: ${_param:keystone_public_path}
+                internal_address: ${_param:keystone_service_host}
+                internal_port: 5000
+                internal_path: ${_param:keystone_internal_path}
+                internal_protocol: ${_param:keystone_service_protocol}
+                admin_address: ${_param:keystone_service_host}
+                admin_port: 35357
+                admin_path: ${_param:keystone_admin_path}
+                admin_protocol: ${_param:keystone_service_protocol}

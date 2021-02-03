@@ -1,0 +1,6 @@
+parameters:
+  keystone:
+    upgrade:
+      enabled: ${_param:keystone_upgrade_enabled}
+      old_release: ${_param:keystone_old_version}
+      new_release: ${_param:keystone_version}

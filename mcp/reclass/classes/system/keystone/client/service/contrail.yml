@@ -1,0 +1,35 @@
+classes:
+- system.keystone.client.v3.service.contrail
+parameters:
+  _param:
+    contrail_service_protocol: http
+  keystone:
+    client:
+      server:
+        identity:
+          project:
+            admin:
+              user:
+                contrail:
+                  is_admin: true
+                  password: ${_param:opencontrail_admin_password}
+                  email: ${_param:admin_email}
+                  options: ${_param:openstack_service_user_options}
+          service:
+            opencontrail:
+              type: contrail
+              description: OpenContrail API
+              endpoints:
+              - region: ${_param:openstack_region}
+                public_protocol: ${_param:cluster_public_protocol}
+                public_address: ${_param:cluster_public_host}
+                public_port: 8082
+                public_path: ''
+                internal_protocol: ${_param:contrail_service_protocol}
+                internal_address: ${_param:opencontrail_control_address}
+                internal_port: 8082
+                internal_path: ''
+                admin_protocol: ${_param:contrail_service_protocol}
+                admin_address: ${_param:opencontrail_control_address}
+                admin_port: 8082
+                admin_path: ''

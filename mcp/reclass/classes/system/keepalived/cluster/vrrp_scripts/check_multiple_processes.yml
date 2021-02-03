@@ -1,0 +1,17 @@
+parameters:
+  keepalived:
+    cluster:
+      vrrp_scripts:
+        multiple_processes:
+          args: ${_param:keepalived_vrrp_script_check_multiple_processes}
+          content: |
+            #!/bin/sh
+            set -o errexit
+            for process in $@; do
+              if ! pidof $process; then
+                exit 1
+              fi
+            done
+          interval: 10
+          rise: 1
+          fall: 1

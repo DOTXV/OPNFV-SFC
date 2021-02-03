@@ -1,0 +1,11 @@
+classes:
+- service.keepalived.cluster.single
+- system.keepalived.cluster.vrrp_scripts.check_multiple_processes
+parameters:
+  _param:
+    keepalived_vrrp_script_check_multiple_processes: 'nginx haproxy'
+  keepalived:
+    cluster:
+      instance:
+        VIP:
+          track_script: multiple_processes

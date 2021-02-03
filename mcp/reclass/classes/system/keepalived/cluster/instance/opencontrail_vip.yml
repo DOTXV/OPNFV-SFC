@@ -1,0 +1,9 @@
+classes:
+- service.keepalived.cluster.single
+- system.keepalived.cluster.vrrp_scripts.check_single_process
+parameters:
+  keepalived:
+    cluster:
+      instance:
+        VIP:
+          track_script: check_pidof

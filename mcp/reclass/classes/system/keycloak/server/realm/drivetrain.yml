@@ -1,0 +1,108 @@
+parameters:
+  _param:
+    keycloak_drivetrain_users_dn: ou=people,dc=cicd,dc=local
+    keycloak_drivetrain_bind_dn: cn=admin,dc=cicd,dc=local
+    keycloak_drivetrain_connection_url: ldap://${_param:single_address}:1389
+    keycloak_drivetrain_provider_display_name: drivetrain-ldap
+  keycloak:
+    server:
+      realm:
+        drivetrain-realm:
+          enabled: true
+          client:
+            operations-api:
+              enabled: true
+              base_url: /operations-api-portal
+              redirect_uris:
+              - "/operations-api/*"
+              admin_url: /operations-api-portal
+              direct_access_grants_enabled: true
+              secret: ${_param:keycloak_operations_api_client_secret}
+              protocol_mapper:
+                oidc-usermodel-property-mapper:
+                  username:
+                    name: username
+                    user_attribute: username
+                    claim_name: preferred_username
+                  given_name:
+                    name: given name
+                    user_attribute: firstName
+                    claim_name: given_name
+                  family_name:
+                    name: family name
+                    user_attribute: lastName
+                    claim_name: family_name
+                  email:
+                    name: email
+                    user_attribute: email
+                    claim_name: email
+                oidc-full-name-mapper:
+                  full_name:
+                    name: full_name
+            operations-ui:
+              enabled: true
+              base_url: /
+              web_origins:
+              - "*"
+              redirect_uris:
+              - "*"
+              public_client: true
+              admin_url: /
+              direct_access_grants_enabled: true
+              secret: '*****'
+              protocol_mapper:
+                oidc-usermodel-property-mapper:
+                  username:
+                    name: username
+                    user_attribute: username
+                    claim_name: preferred_username
+                  given_name:
+                    name: given name
+                    user_attribute: firstName
+                    claim_name: given_name
+                  family_name:
+                    name: family name
+                    user_attribute: lastName
+                    claim_name: family_name
+                  email:
+                    name: email
+                    user_attribute: email
+                    claim_name: email
+                oidc-full-name-mapper:
+                  full_name:
+                    name: full_name
+          federation_provider:
+            ldap:
+              display_name: ${_param:keycloak_drivetrain_provider_display_name}
+              users_dn: ${_param:keycloak_drivetrain_users_dn}
+              bind_dn: ${_param:keycloak_drivetrain_bind_dn}
+              bind_credential: ${_param:keycloak_drivetrain_bind_credential}
+              connection_url: ${_param:keycloak_drivetrain_connection_url}
+          federation_mapper:
+            user-attribute-ldap-mapper:
+              username:
+                name: username
+                provider_display_name: ${_param:keycloak_drivetrain_provider_display_name}
+                ldap_attribute: uid
+                model_attribute: username
+              first_name:
+                name: first name
+                provider_display_name: ${_param:keycloak_drivetrain_provider_display_name}
+                ldap_attribute: givenName
+                model_attribute: firstName
+              last_name:
+                name: last name
+                provider_display_name: ${_param:keycloak_drivetrain_provider_display_name}
+                ldap_attribute: sn
+                model_attribute: lastName
+              email:
+                name: email
+                provider_display_name: ${_param:keycloak_drivetrain_provider_display_name}
+                ldap_attribute: mail
+                model_attribute: email
+                mandatory: false
+            role-ldap-mapper:
+              realm_roles:
+                name: realm roles
+                provider_display_name: ${_param:keycloak_drivetrain_provider_display_name}
+                roles_dn: ou=groups,dc=cicd,dc=local

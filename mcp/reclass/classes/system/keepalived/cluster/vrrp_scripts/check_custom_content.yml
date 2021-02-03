@@ -1,0 +1,9 @@
+parameters:
+  keepalived:
+    cluster:
+      vrrp_scripts:
+        vrrp_check:
+          content: ${_param:keepalived_vip_vrrp_check_script_content}
+          interval: 10
+          rise: 1
+          fall: 1

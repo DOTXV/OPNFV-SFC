@@ -1,0 +1,43 @@
+parameters:
+  _param:
+    radosgw_swift_cluster_port: 8081
+    radosgw_service_protocol: http
+  keystone:
+    client:
+      resources:
+        v3:
+          roles:
+            reseller_admin:
+              name: ResellerAdmin
+              enabled: true
+          users:
+            swift:
+              password: ${_param:keystone_swift_password}
+              email: ${_param:admin_email}
+              options: ${_param:openstack_service_user_options}
+              roles:
+                service_admin:
+                  name: admin
+                  project_id: service
+            admin:
+              roles:
+                reseller_admin:
+                  name: ResellerAdmin
+                  project_id: admin
+          services:
+            radosgw-swift:
+              type: object-store
+              description: Swift Service (radosgw)
+              endpoints:
+                radosgw-swift_public:
+                  interface: 'public'
+                  url: ${_param:cluster_public_protocol}://${_param:cluster_public_host}:${_param:radosgw_swift_cluster_port}/swift/v1/AUTH_%(tenant_id)s
+                  region: ${_param:openstack_region}
+                radosgw-swift_internal:
+                  interface: 'internal'
+                  url: ${_param:radosgw_service_protocol}://${_param:radosgw_service_host}:${_param:radosgw_swift_cluster_port}/swift/v1/AUTH_%(tenant_id)s
+                  region: ${_param:openstack_region}
+                radosgw-swift_admin:
+                  interface: 'admin'
+                  url: ${_param:radosgw_service_protocol}://${_param:radosgw_service_host}:${_param:radosgw_swift_cluster_port}/swift/v1/AUTH_%(tenant_id)s
+                  region: ${_param:openstack_region}

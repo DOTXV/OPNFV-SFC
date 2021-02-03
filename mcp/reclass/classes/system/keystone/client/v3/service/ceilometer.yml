@@ -1,0 +1,37 @@
+parameters:
+  _param:
+    ceilometer_service_protocol: http
+    ceilometer_public_host: ${_param:cluster_public_host}
+  keystone:
+    client:
+      resources:
+        v3:
+          users:
+            ceilometer:
+              password: ${_param:keystone_ceilometer_password}
+              email: ${_param:admin_email}
+              options: ${_param:openstack_service_user_options}
+              roles:
+                service_admin:
+                  name: admin
+                  project_id: service
+          services:
+            ceilometer:
+              type: metering
+              description: OpenStack Telemetry Service
+              endpoints:
+                ceilometer_public:
+                  status: ${_param:ceilometer_endpoint_status}
+                  interface: 'public'
+                  url: ${_param:cluster_public_protocol}://${_param:ceilometer_public_host}:8777/
+                  region: ${_param:openstack_region}
+                ceilometer_internal:
+                  status: ${_param:ceilometer_endpoint_status}
+                  interface: 'internal'
+                  url: ${_param:ceilometer_service_protocol}://${_param:ceilometer_service_host}:8777/
+                  region: ${_param:openstack_region}
+                ceilometer_admin:
+                  status: ${_param:ceilometer_endpoint_status}
+                  interface: 'admin'
+                  url: ${_param:ceilometer_service_protocol}://${_param:ceilometer_service_host}:8777/
+                  region: ${_param:openstack_region}

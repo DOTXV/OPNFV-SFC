@@ -1,0 +1,45 @@
+parameters:
+  _param:
+    contrail_service_protocol: http
+  keystone:
+    client:
+      server:
+        contrail_identity:
+          admin:
+            user: contrail
+            password: ${_param:opencontrail_admin_password}
+            project: admin
+            host: ${_param:keystone_service_host}
+            port: 5000
+            region_name: ${_param:openstack_region}
+            use_keystoneauth: true
+            protocol: ${_param:keystone_service_protocol}
+      resources:
+        v3:
+          users:
+            contrail:
+              password: ${_param:opencontrail_admin_password}
+              email: ${_param:admin_email}
+              options: ${_param:openstack_service_user_options}
+              is_admin: true
+              roles:
+                admin:
+                  name: admin
+                  project_id: admin
+          services:
+            opencontrail:
+              type: contrail
+              description: OpenContrail API
+              endpoints:
+                contrail_public:
+                  interface: 'public'
+                  url: ${_param:cluster_public_protocol}://${_param:cluster_public_host}:8082
+                  region: ${_param:openstack_region}
+                contrail_internal:
+                  interface: 'internal'
+                  url: ${_param:contrail_service_protocol}://${_param:opencontrail_control_address}:8082
+                  region: ${_param:openstack_region}
+                contrail_admin:
+                  interface: 'admin'
+                  url: ${_param:contrail_service_protocol}://${_param:opencontrail_control_address}:8082
+                  region: ${_param:openstack_region}
