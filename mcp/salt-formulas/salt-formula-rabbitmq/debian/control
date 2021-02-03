@@ -1,0 +1,15 @@
+Source: salt-formula-rabbitmq
+Maintainer: Mirantis Dev <dev@mirantis.com>
+Section: admin
+Priority: optional
+Build-Depends: salt-master, python, python-yaml, debhelper (>= 9), salt-formula-linux
+Standards-Version: 3.9.6
+Homepage: https://www.mirantis.com
+Vcs-Browser: https://gerrit.mcp.mirantis.com/#/admin/projects/salt-formulas/rabbitmq
+Vcs-Git: https://gerrit.mcp.mirantis.com/salt-formulas/rabbitmq.git
+
+Package: salt-formula-rabbitmq
+Architecture: all
+Depends: ${misc:Depends}
+Description: RabbitMQ Salt formula
+ Install and configure RabbitMQ server and client.

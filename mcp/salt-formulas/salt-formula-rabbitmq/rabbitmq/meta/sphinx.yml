@@ -1,0 +1,51 @@
+{%- from "rabbitmq/map.jinja" import server with context %}
+doc:
+  name: rabbitmq
+  description: RabbitMQ is a complete and highly reliable enterprise messaging system based on the emerging AMQP standard.
+  role:
+    server:
+      name: server
+      param:
+        bind:
+          value: {{ server.bind.address }}:{{ server.bind.port }}
+      endpoint:
+        {%- if server.bind.address == '0.0.0.0' %}
+        {%- for address in salt['grains.item']('ipv4')['ipv4'] %}
+        {%- if address != '127.0.0.1' %}
+        rabbitmq_amqp:
+          name: server
+          type: rabbitmq_amqp
+          address: {{ address }}:{{ server.bind.port }}
+          protocol: tcp
+        rabbitmq_admin:
+          name: server
+          type: rabbitmq_admin
+          address: http://{{ address }}:15672/
+          protocol: http
+        {%- endif %}
+        {%- endfor %}
+        {%- else %}
+        rabbitmq_amqp:
+          name: server
+          type: rabbitmq_amqp
+          address: {{ server.bind.address }}:{{ server.bind.port }}
+          protocol: tcp
+        rabbitmq_admin:
+          name: server
+          type: rabbitmq_admin
+          address: http://{{ server.bind.address }}:15672/
+          protocol: http
+        {%- endif %}
+    {%- if pillar.rabbitmq.cluster is defined %}
+    {%- from "rabbitmq/map.jinja" import cluster with context %}
+    cluster:
+      name: server
+      param:
+        members:
+          name: Members
+          value: {{ cluster.members }}
+        status:
+          name: Status
+          value: |
+            {{ salt['cmd.shell']('rabbitmqctl cluster_status')|indent(12) }}
+    {%- endif %}

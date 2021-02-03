@@ -1,0 +1,105 @@
+{%- from "rabbitmq/map.jinja" import server, monitoring with context %}
+
+{%- if server.get('enabled', False) %}
+{%- set disk_threshold = monitoring.disk_full_threshold %}
+{%- set msg_threshold = monitoring.too_many_messages %}
+{%- set mem_high_watermark = server.get('memory', {}).get('vm_high_watermark', 0.8) %}
+{%- raw %}
+server:
+  alert:
+    RabbitmqServiceDown:
+      if: >-
+        rabbitmq_up == 0
+      for: 1m
+      labels:
+        severity: critical
+        service: rabbitmq
+      annotations:
+        summary: "RabbitMQ service is down"
+        description: "The RabbitMQ service on the {{ $labels.host }} node is down."
+    RabbitmqServiceOutage:
+      if: >-
+        count(rabbitmq_up == 0) == count(rabbitmq_up)
+      for: 1m
+      labels:
+        severity: critical
+        service: rabbitmq
+      annotations:
+        summary: "RabbitMQ service outage"
+        description: "All RabbitMQ services are down."
+    RabbitMQUnequalQueueCritical:
+      if: >-
+        max(rabbitmq_overview_queues) != min(rabbitmq_overview_queues)
+      for: 10m
+      labels:
+        severity: critical
+        service: rabbitmq
+      annotations:
+        summary: "RabbitMQ service has unequal number of queues"
+        description: "RabbitMQ service has unequal number of queues across cluster instances."
+    RabbitmqDiskFullWarning:
+{%- endraw %}
+      if: >-
+        rabbitmq_node_disk_free <= rabbitmq_node_disk_free_limit * {{ disk_threshold }}
+{%- raw %}
+      for: 1m
+      labels:
+        severity: warning
+        service: rabbitmq
+      annotations:
+        summary: "{%- endraw %}{{ 100 - disk_threshold*100 }}{%- raw %}% of free RabbitMQ disk space"
+        description: "The RabbitMQ service on the {{ $labels.host }} node has {{ $value }}B of free disk space."
+    RabbitmqDiskFullCritical:
+      if: >-
+        rabbitmq_node_disk_free <= rabbitmq_node_disk_free_limit
+      for: 1m
+      labels:
+        severity: critical
+        service: rabbitmq
+      annotations:
+        summary: "RabbitMQ disk space is full"
+        description: "The RabbitMQ disk space on the {{ $labels.host }} node is full."
+    RabbitmqMemoryWaterMarkWarning:
+{%- endraw %}
+      if: >-
+        100 * rabbitmq_node_mem_used / rabbitmq_node_mem_limit >= 100 * {{ mem_high_watermark }}
+{%- raw %}
+      for: 2m
+      labels:
+        severity: warning
+        service: rabbitmq
+      annotations:
+        summary: "RabbitMQ uses {%- endraw %} {{100*mem_high_watermark}}%{%- raw %} of memory"
+        description: "The RabbitMQ service uses {{ $value }}% of memory on the {{ $labels.host }} node for 2 minutes"
+    RabbitmqMemoryLowCritical:
+      if: >-
+        rabbitmq_node_mem_used >= rabbitmq_node_mem_limit
+      for: 1m
+      labels:
+        severity: critical
+        service: rabbitmq
+      annotations:
+        summary: "RabbitMQ is out of memory"
+        description: "The RabbitMQ service on the {{ $labels.host }} node is out of memory."
+    RabbitmqMessagesTooHigh:
+{%- endraw %}
+      if: >-
+        rabbitmq_overview_messages > {{ msg_threshold }}
+{%- raw %}
+      labels:
+        severity: warning
+        service: rabbitmq
+      annotations:
+        summary: "RabbitMQ has reached the limit of {%- endraw %}{{ msg_threshold }}{%- raw %} messages"
+        description: "The RabbitMQ service on the {{ $labels.host }} node has received {{ $value }} messages."
+    RabbitmqErrorLogsTooHigh:
+      if: >-
+        sum(rate(log_messages{service="rabbitmq",level=~"(?i:(error|emergency|fatal))"}[5m])) without (level) > 0.2
+      labels:
+        severity: major
+        service: rabbitmq
+      annotations:
+        summary: "Too many errors in RabbitMQ logs"
+        description: "The rate of errors in RabbitMQ logs is too high on the {{ $labels.host }} node (as measured over the last 5 minutes)."
+{%- endraw %}
+{%- endif %}

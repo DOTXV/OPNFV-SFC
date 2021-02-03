@@ -1,0 +1,6 @@
+name: "rabbitmq"
+version: "0.2"
+source: "https://gerrit.mcp.mirantis.com/salt-formulas/rabbitmq"
+dependencies:
+- name: linux
+  source: "https://gerrit.mcp.mirantis.com/salt-formulas/linux"

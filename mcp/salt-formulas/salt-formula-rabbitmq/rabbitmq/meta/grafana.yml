@@ -1,0 +1,40 @@
+dashboard:
+  rabbitmq_influxdb:
+    datasource: influxdb
+    format: json
+    template: rabbitmq/files/grafana_dashboards/rabbitmq_influxdb.json
+  rabbitmq_prometheus:
+    datasource: prometheus
+    format: json
+    template: rabbitmq/files/grafana_dashboards/rabbitmq_prometheus.json
+  main_influxdb:
+    datasource: influxdb
+    row:
+      ost-middleware:
+        title: Middleware
+        panel:
+          rabbitmq:
+            title: RabbitMQ
+            links:
+            - dashboard: RabbitMQ
+              title: RabbitMQ
+              type: dashboard
+            target:
+              cluster_status:
+                rawQuery: true
+                query: SELECT last(value) FROM cluster_status WHERE cluster_name = 'rabbitmq' AND environment_label = '$environment' AND $timeFilter GROUP BY time($interval) fill(null)
+  main_prometheus:
+    datasource: prometheus
+    row:
+      ost-middleware:
+        title: Middleware
+        panel:
+          rabbitmq:
+            title: RabbitMQ
+            links:
+            - dashboard: RabbitMQ
+              title: RabbitMQ
+              type: dashboard
+            target:
+              cluster_status:
+                expr: avg(rabbitmq_up) by (name)

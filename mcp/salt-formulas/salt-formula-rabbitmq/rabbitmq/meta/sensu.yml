@@ -1,0 +1,48 @@
+{%- from "rabbitmq/map.jinja" import server with context -%}
+{%- from "linux/map.jinja" import network with context -%}
+{%- if server.bind.address == '0.0.0.0' %}
+{% if grains.ipv4[0] == '127.0.0.1' %}{% set address =  grains.ipv4[1] %}{% else %}{% set address =  grains.ipv4[0] %}{% endif %}
+{%- else %}
+{%- set address = server.bind.address %}
+{%- endif %}
+check:
+  local_rabbitmq_server_beam.smp_proc:
+    command: "PATH=$PATH:/usr/lib64/nagios/plugins:/usr/lib/nagios/plugins check_procs -C beam.smp -u rabbitmq -c 1:5"
+    interval: 60
+    occurrences: 1
+    subscribers:
+    - local-rabbitmq-server
+  local_rabbitmq_server_epmd_proc:
+    command: "PATH=$PATH:/usr/lib64/nagios/plugins:/usr/lib/nagios/plugins check_procs -C epmd -u rabbitmq -c 1:2"
+    interval: 60
+    occurrences: 1
+    subscribers:
+    - local-rabbitmq-server
+{%- if server.bind.address == '127.0.0.1' %}
+  local_rabbitmq_server_tcp_{{ network.fqdn }}:
+    command: "PATH=$PATH:/usr/lib64/nagios/plugins:/usr/lib/nagios/plugins check_tcp -H 127.0.0.1 -p 5672"
+    interval: 60
+    occurrences: 1
+    subscribers:
+    - {{ network.fqdn|replace('.', '-') }}
+{%- else %}
+  remote_rabbitmq_server_tcp_{{ network.fqdn }}:
+    command: "PATH=$PATH:/usr/lib64/nagios/plugins:/usr/lib/nagios/plugins check_tcp -H {{ address }} -p 5672"
+    interval: 60
+    occurrences: 1
+    subscribers:
+    - remote-network
+{%- endif %}
+  local_rabbitmq_alive_{{ address }}:
+    command: "PATH=$PATH:/etc/sensu/plugins rabbitmq-amqp-alive.rb -w {{ address }}"
+    interval: 60
+    occurrences: 1
+    subscribers:
+    - remote-network
+  local_rabbitmq_eva_diag_{{ address }}:
+    command: "PATH=$PATH:/etc/sensu/plugins check_rabbitmq_stuck_nodes.sh -w 5 -c 10"
+    interval: 300
+    occurrences: 3
+    subscribers:
+    - {{ grains['fqdn']|replace('.', '-') }}
+

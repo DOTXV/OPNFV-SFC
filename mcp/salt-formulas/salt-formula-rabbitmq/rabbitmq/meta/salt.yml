@@ -1,0 +1,10 @@
+orchestrate:
+  server:
+    priority: 130
+  cluster:
+    priority: 130
+orchestration:
+  upgrade:
+    applications:
+      rabbitmq:
+        priority: 910
