@@ -1,0 +1,22 @@
+parameters:
+  _param:
+    mcp_docker_registry: 'docker-dev-local.docker.mirantis.net'
+    vnf_gerrit_credentials: "gerrit"
+    vnf_openstack_api_url: "${_param:cluster_public_protocol}://${_param:cluster_public_host}:5000/v2.0"
+    vnf_openstack_api_credentials: "test-openstack"
+    vnf_openstack_api_admin_credentials: "admin-openstack"
+    vnf_openstack_ssh_key_credentials: "openstack_key"
+    vnf_elastic_url: "${_param:stacklight_log_address}:${_param:cluster_elasticsearch_port}"
+    vnf_docker_registry_path: "${_param:mcp_docker_registry}/mirantis/vnf-onboarding"
+    vnf_artifactory_url: "https://artifactory.mcp.mirantis.net/artifactory/vnf-onboarding-sandbox"
+    contrail_api_url: "http://127.0.0.1:8082"
+    cloudify_enterprise_manager_image_url: "${_param:vnf_artifactory_url}/${_param:vnf_cloudify_enterprise_manager_image_name}.qcow2"
+    cloudify_enterprise_manager_image_name:  "${_param:vnf_cloudify_enterprise_manager_image_name}"
+    cloudify_community_manager_image_url: "${_param:vnf_artifactory_url}/${_param:vnf_cloudify_community_manager_image_name}.qcow2"
+    cloudify_community_manager_image_name: "${_param:vnf_cloudify_community_manager_image_name}"
+    agent_vm_image_url: "${_param:vnf_artifactory_url}/${_param:vnf_agent_vm_image_name}.img"
+    agent_vm_image_name:  "${_param:vnf_agent_vm_image_name}"
+    base_agent_vm_image_url: "${_param:vnf_artifactory_url}/${_param:vnf_base_agent_vm_image_name}.qcow2"
+    base_agent_vm_image_name:  "${_param:vnf_base_agent_vm_image_name}"
+    base_backend_vm_image_url: "${_param:vnf_artifactory_url}/${_param:vnf_base_backend_vm_image_name}.qcow2"
+    base_backend_vm_image_name:  "${_param:vnf_base_backend_vm_image_name}"

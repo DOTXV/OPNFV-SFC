@@ -1,0 +1,10 @@
+parameters:
+  telegraf:
+    agent:
+      output:
+        prometheus_client:
+          scheme: https
+          tls_cert: ${telegraf:agent:dir:config}/telegraf-agent.crt
+          tls_key: ${telegraf:agent:dir:config}/telegraf-agent.key
+          tls_config:
+            ca_file: /etc/ssl/certs/ca-certificates.crt

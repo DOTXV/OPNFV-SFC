@@ -1,0 +1,16 @@
+classes:
+- service.xtrabackup.server.single
+parameters:
+  xtrabackup:
+    server:
+      cron: false
+      backup_dir: /srv/volumes/backup/xtrabackup
+      key:
+        xtrabackup_pub_key:
+          key: ${_param:xtrabackup_public_key}
+  linux:
+    system:
+      cron:
+        user:
+          xtrabackup:
+            enabled: true
