@@ -1,0 +1,17 @@
+classes:
+- service.etcd.server.single
+- service.etcd.support
+- service.etcd.linux
+parameters:
+  etcd:
+    server:
+      enabled: true
+      image: ${_param:docker_image_etcd}
+      source:
+        engine: archive
+      etcd_source: ${_param:kubernetes_etcd_source}
+      etcd_source_hash: ${_param:kubernetes_etcd_source_hash}
+      bind:
+        host: ${_param:single_address}
+      ssl:
+        enabled: true

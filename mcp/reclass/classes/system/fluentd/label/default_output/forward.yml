@@ -1,0 +1,16 @@
+classes:
+- service.fluentd.agent.output.forward
+- system.fluentd.label.default_output.filter.common
+parameters:
+  _param:
+    fluentd_forward_host: 127.0.0.1
+    fluentd_forward_port: 24224
+  fluentd:
+    agent:
+      config:
+        label:
+          default_output:
+            match:
+              forward_output:
+                host: ${_param:fluentd_forward_host}
+                port: ${_param:fluentd_forward_port}

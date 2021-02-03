@@ -1,0 +1,4 @@
+classes:
+- service.haproxy.proxy.single
+- system.haproxy.proxy.listen.openstack.galera
+- system.keepalived.cluster.instance.galera_vip
