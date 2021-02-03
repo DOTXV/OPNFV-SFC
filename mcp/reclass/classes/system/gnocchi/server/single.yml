@@ -1,0 +1,17 @@
+classes:
+- service.gnocchi.server.single
+parameters:
+  gnocchi:
+    server:
+      role: ${_param:openstack_node_role}
+      identity:
+        region: ${_param:openstack_region}
+        protocol: ${_param:internal_protocol}
+      metricd:
+        metric_processing_delay: 15
+        metric_reporting_delay: 30
+      cache:
+        security:
+          enabled: ${_param:gnocchi_memcache_security_enabled}
+          strategy: ${_param:openstack_memcache_security_strategy}
+          secret_key: ${_param:gnocchi_memcache_secret_key}

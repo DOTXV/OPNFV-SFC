@@ -1,0 +1,6 @@
+parameters:
+  gnocchi:
+    upgrade:
+      enabled: ${_param:gnocchi_upgrade_enabled}
+      old_release: ${_param:gnocchi_old_version}
+      new_release: ${_param:gnocchi_version}

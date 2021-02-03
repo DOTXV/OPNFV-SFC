@@ -1,0 +1,19 @@
+parameters:
+  _param:
+    gnocchi_storage_redis_url: redis://openstack:${_param:openstack_telemetry_redis_password}@${_param:redis_sentinel_node01_address}:26379?db=0&sentinel=master_1&sentinel_fallback=${_param:redis_sentinel_node02_address}:26379&sentinel_fallback=${_param:redis_sentinel_node03_address}:26379
+    gnocchi_storage_driver: redis
+  gnocchi:
+    common:
+      storage:
+        driver: ${_param:gnocchi_storage_driver}
+        redis_url: ${_param:gnocchi_storage_redis_url}
+        redis:
+          password: ${_param:openstack_telemetry_redis_password}
+          user: openstack
+          db: ${_param:gnocchi_redis_db}
+          sentinel:
+            host: ${_param:redis_sentinel_node01_address}
+            master_name: ${_param:gnocchi_redis_sentinel_mastername}
+            fallback:
+              - host: ${_param:redis_sentinel_node02_address}
+              - host: ${_param:redis_sentinel_node03_address}

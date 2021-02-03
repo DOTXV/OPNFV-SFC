@@ -1,0 +1,35 @@
+classes:
+- service.gnocchi.server.cluster
+- service.haproxy.proxy.single
+- system.apache.server.site.gnocchi
+- system.haproxy.proxy.listen.openstack.gnocchi
+- system.keepalived.cluster.instance.openstack_telemetry_vip
+parameters:
+  _param:
+    gnocchi_memcached_node01_address: ${_param:cluster_node01_address}
+    gnocchi_memcached_node02_address: ${_param:cluster_node02_address}
+    gnocchi_memcached_node03_address: ${_param:cluster_node03_address}
+  gnocchi:
+    server:
+      enable_proxy_headers_parsing: true
+      role: ${_param:openstack_node_role}
+      metricd:
+        metric_processing_delay: 15
+        metric_reporting_delay: 30
+      identity:
+        host: ${_param:openstack_control_address}
+        region: ${_param:openstack_region}
+        protocol: ${_param:cluster_internal_protocol}
+      cache:
+        engine: memcached
+        members:
+        - host: ${_param:gnocchi_memcached_node01_address}
+          port: 11211
+        - host: ${_param:gnocchi_memcached_node02_address}
+          port: 11211
+        - host: ${_param:gnocchi_memcached_node03_address}
+          port: 11211
+        security:
+          enabled: ${_param:gnocchi_memcache_security_enabled}
+          strategy: ${_param:openstack_memcache_security_strategy}
+          secret_key: ${_param:gnocchi_memcache_secret_key}

@@ -1,0 +1,35 @@
+classes:
+- service.memcached.server.local
+- service.postgresql.server.local
+- service.graphite.server.single
+- service.apache.server.single
+- service.supervisor.server.single
+parameters:
+  _param:
+    graphite_secret_key: secret
+    apache2_site_graphite_host: ${_param:single_address}
+  apache:
+    server:
+      modules:
+      - wsgi
+      site:
+        graphite_server:
+          enabled: true
+          type: graphite
+          name: server
+          host:
+            name: ${_param:apache2_site_graphite_host}
+  postgresql:
+    server:
+      database:
+        graphite:
+          encoding: UTF8
+          locale: en_US
+          users:
+          - name: graphite
+            password: ${_param:postgresql_graphite_password}
+            host: 127.0.0.1
+            rights: all privileges
+  supervisor:
+    server:
+      enabled: true
