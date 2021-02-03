@@ -1,0 +1,5 @@
+classes:
+- system.haproxy.proxy.single
+- system.haproxy.proxy.listen.radosgw
+- system.keepalived.cluster.instance.ceph_rgw_vip
+- service.ceph.radosgw.cluster

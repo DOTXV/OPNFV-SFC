@@ -1,0 +1,10 @@
+parameters:
+  cinder:
+    controller:
+      backup:
+        engine: ceph
+        ceph_pool: ${_param:cinder_ceph_backup_pool}
+        ceph_stripe_count: ${_param:cinder_ceph_stripe_count}
+        ceph_stripe_unit: ${_param:cinder_ceph_stripe_unit}
+        ceph_user: ${_param:cinder_ceph_backup_user}
+        ceph_chunk_size: ${_param:cinder_ceph_chunk_size}

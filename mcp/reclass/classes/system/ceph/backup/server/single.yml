@@ -1,0 +1,9 @@
+classes:
+- service.ceph.backup.server
+parameters:
+  linux:
+    system:
+      cron:
+        user:
+          ceph:
+            enabled: true

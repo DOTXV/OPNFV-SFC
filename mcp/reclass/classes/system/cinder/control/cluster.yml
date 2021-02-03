@@ -1,0 +1,84 @@
+classes:
+- service.cinder.control.cluster_control
+- system.cinder.upgrade
+- service.haproxy.proxy.single
+- service.keepalived.cluster.single
+- system.haproxy.proxy.listen.openstack.cinder
+- system.salt.minion.cert.mysql.clients.openstack.cinder
+- system.salt.minion.cert.rabbitmq.clients.openstack.cinder
+parameters:
+  linux:
+    system:
+      package:
+        python-pymysql:
+          fromrepo: ${_param:openstack_version}
+          version: latest
+  cinder:
+    volume:
+      enabled: false
+      default_volume_type: ""
+      backend: {}
+      logging:
+        heka:
+          enabled: true
+    controller:
+      enabled: true
+      default_volume_type: ""
+      backend: {}
+      version: ${_param:cinder_version}
+      role: ${_param:openstack_node_role}
+      osapi:
+        host: ${_param:cluster_local_address}
+      database:
+        engine: mysql
+        host: ${_param:openstack_database_address}
+        port: 3306
+        name: cinder
+        user: cinder
+        password: ${_param:mysql_cinder_password}
+        x509:
+          enabled: ${_param:openstack_mysql_x509_enabled}
+          ca_file: ${_param:mysql_cinder_ssl_ca_file}
+          key_file: ${_param:mysql_cinder_client_ssl_key_file}
+          cert_file: ${_param:mysql_cinder_client_ssl_cert_file}
+        ssl:
+          enabled: ${_param:galera_ssl_enabled}
+      identity:
+        engine: keystone
+        region: ${_param:openstack_region}
+        host: ${_param:cluster_vip_address}
+        port: 35357
+        tenant: service
+        user: cinder
+        password: ${_param:keystone_cinder_password}
+        protocol: ${_param:cluster_internal_protocol}
+      service_user:
+        enabled: ${_param:cinder_service_user_enabled}
+      glance:
+        host: ${_param:cluster_vip_address}
+        port: 9292
+        protocol: ${_param:cluster_internal_protocol}
+      barbican:
+        enabled: ${_param:barbican_integration_enabled}
+      message_queue:
+        port: ${_param:openstack_rabbitmq_port}
+        engine: rabbitmq
+        members:
+          - host: ${_param:openstack_message_queue_node01_address}
+          - host: ${_param:openstack_message_queue_node02_address}
+          - host: ${_param:openstack_message_queue_node03_address}
+        user: openstack
+        password: ${_param:rabbitmq_openstack_password}
+        virtual_host: '/openstack'
+        x509:
+          enabled: ${_param:openstack_rabbitmq_x509_enabled}
+          ca_file: ${_param:rabbitmq_cinder_ssl_ca_file}
+          key_file: ${_param:rabbitmq_cinder_client_ssl_key_file}
+          cert_file: ${_param:rabbitmq_cinder_client_ssl_cert_file}
+        ssl:
+          enabled: ${_param:rabbitmq_ssl_enabled}
+      cache:
+        security:
+          enabled: ${_param:cinder_memcache_security_enabled}
+          strategy: ${_param:openstack_memcache_security_strategy}
+          secret_key: ${_param:cinder_memcache_secret_key}

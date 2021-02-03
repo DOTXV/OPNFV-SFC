@@ -1,0 +1,6 @@
+parameters:
+  cinder:
+    upgrade:
+      enabled: ${_param:cinder_upgrade_enabled}
+      old_release: ${_param:cinder_old_version}
+      new_release: ${_param:cinder_version}

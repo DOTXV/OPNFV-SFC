@@ -1,0 +1,51 @@
+classes:
+- service.cinder.control.single
+- system.cinder.upgrade
+- system.salt.minion.cert.mysql.clients.openstack.cinder
+- system.salt.minion.cert.rabbitmq.clients.openstack.cinder
+parameters:
+  _param:
+    internal_protocol: 'http'
+  linux:
+    system:
+      package:
+        python-pymysql:
+          fromrepo: ${_param:openstack_version}
+          version: latest
+  cinder:
+    volume:
+      enabled: false
+    controller:
+      backend: {}
+      default_volume_type: ''
+      role: ${_param:openstack_node_role}
+      database:
+        host: ${_param:single_address}
+        x509:
+          enabled: ${_param:openstack_mysql_x509_enabled}
+          ca_file: ${_param:mysql_cinder_ssl_ca_file}
+          key_file: ${_param:mysql_cinder_client_ssl_key_file}
+          cert_file: ${_param:mysql_cinder_client_ssl_cert_file}
+        ssl:
+          enabled: ${_param:galera_ssl_enabled}
+      identity:
+        protocol: ${_param:internal_protocol}
+        region: ${_param:openstack_region}
+      service_user:
+        enabled: ${_param:cinder_service_user_enabled}
+      barbican:
+        enabled: ${_param:barbican_integration_enabled}
+      message_queue:
+        port: ${_param:openstack_rabbitmq_port}
+        x509:
+          enabled: ${_param:openstack_rabbitmq_x509_enabled}
+          ca_file: ${_param:rabbitmq_cinder_ssl_ca_file}
+          key_file: ${_param:rabbitmq_cinder_client_ssl_key_file}
+          cert_file: ${_param:rabbitmq_cinder_client_ssl_cert_file}
+        ssl:
+          enabled: ${_param:rabbitmq_ssl_enabled}
+      cache:
+        security:
+          enabled: ${_param:cinder_memcache_security_enabled}
+          strategy: ${_param:openstack_memcache_security_strategy}
+          secret_key: ${_param:cinder_memcache_secret_key}
