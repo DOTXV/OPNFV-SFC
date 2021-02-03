@@ -1,0 +1,44 @@
+parameters:
+  _param:
+    nginx_proxy_openstack_web_host: ${_param:cluster_public_host}
+    nginx_proxy_openstack_web_proxy_host: ${_param:cluster_vip_address}
+    nginx_proxy_openstack_web_buffer_size:
+      number: 4
+      size: 256
+    # starting from 2019.2.0 horizon is running under haproxy in HA mode.
+    nginx_server_site_nginx_proxy_openstack_web_enabled: False
+  nginx:
+    server:
+      enabled: true
+      site:
+        nginx_proxy_openstack_web:
+          enabled: ${_param:nginx_server_site_nginx_proxy_openstack_web_enabled}
+          type: nginx_proxy
+          name: openstack_web
+          proxy:
+            host: ${_param:horizon_server_bind_address}
+            # TODO: port must be configurable, as some deployments might have HAproxy over prx nodes
+            port: 8078
+            size: 10000m
+            timeout: 43200
+            protocol: http
+            websocket: true
+            request_buffer: false
+            buffer:
+              ${_param:nginx_proxy_openstack_web_buffer_size}
+          host:
+            name: ${_param:horizon_public_host}
+            port: ${_param:horizon_public_port}
+            protocol: ${_param:horizon_public_protocol}
+          ssl: ${_param:nginx_proxy_ssl}
+        nginx_ssl_redirect_openstack_web:
+          enabled: ${_param:nginx_server_site_nginx_proxy_openstack_web_enabled}
+          type: nginx_redirect
+          name: openstack_web_redirect
+          host:
+            name: ${_param:nginx_proxy_openstack_web_host}
+            port: 80
+  apache:
+    server:
+      bind:
+        listen_default_ports: false
