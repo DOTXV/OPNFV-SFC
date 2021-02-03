@@ -1,0 +1,8 @@
+{%- from "apache/map.jinja" import server with context %}
+{%- if server is defined and server.get('mods', {}).get('status', {}).get('enabled', False) %}
+agent:
+  input:
+    apache:
+      template: apache/files/telegraf.conf
+      urls: [ "http://{{ server.mods.status.host.address }}:{{ server.mods.status.host.port }}/server-status?auto" ]
+{%- endif %}
