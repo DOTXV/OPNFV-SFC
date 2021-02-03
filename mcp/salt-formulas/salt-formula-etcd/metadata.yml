@@ -1,0 +1,6 @@
+name: "etcd"
+version: "0.1"
+source: "https://gerrit.mcp.mirantis.com/salt-formulas/etcd"
+dependencies:
+- name: linux
+  source: "https://gerrit.mcp.mirantis.com/salt-formulas/linux"
