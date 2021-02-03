@@ -1,0 +1,7 @@
+classes:
+- system.prometheus.server.target.dns.alertmanager
+- system.prometheus.server.target.dns.elasticsearch_exporter
+- system.prometheus.server.target.dns.prometheus
+- system.prometheus.server.target.dns.pushgateway
+- system.prometheus.server.target.dns.remote_agent
+- system.prometheus.server.target.dns.remote_storage_adapter

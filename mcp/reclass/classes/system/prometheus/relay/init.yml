@@ -1,0 +1,11 @@
+classes:
+ - service.prometheus.relay
+ - service.prometheus.relay.cluster
+parameters:
+  _param:
+    prometheus_relay_bind_port: 9094
+  prometheus:
+    relay:
+      enabled: true
+      bind:
+        port: ${_param:prometheus_relay_bind_port}

@@ -1,0 +1,4 @@
+classes:
+- service.prometheus.elasticsearch_exporter.container
+- system.prometheus.elasticsearch_exporter.queries.default
+

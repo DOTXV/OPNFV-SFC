@@ -1,0 +1,122 @@
+parameters:
+  prometheus:
+    elasticsearch_exporter:
+      queries:
+        compute_instance:
+          # Produces metrics:
+          #   - compute_instance_event_doc_count{event="example"}
+          #   - compute_instance_event_sum_other_doc_count
+          #   - compute_instance_event_doc_count_error_upper_bound
+          #   - compute_instance_event_host_doc_count{host="example01",event="example"}
+          #   - compute_instance_event_host_sum_other_doc_count{event="example"}
+          #   - compute_instance_event_host_doc_count_error_upper_bound{event="example"}
+          #
+          indices: '<notification-{now/d}>'
+          interval: 600
+          json: |
+            {
+              "size": 0,
+              "query": {
+                "match_all": {}
+              },
+              "aggs": {
+                "event": {
+                  "terms": {
+                    "field": "event_type.keyword"
+                  },
+                  "aggs": {
+                    "host": {
+                      "terms": {
+                        "field": "Hostname.keyword",
+                        "min_doc_count": 0
+                      }
+                    }
+                  }
+                }
+              }
+            }
+
+        compute_instance_create_start:
+          # Produces metrics:
+          #   - compute_instance_create_start_host_doc_count{host="example01"}
+          #   - compute_instance_create_start_host_event_sum_other_doc_count
+          #   - compute_instance_create_start_host_doc_count_error_upper_bound
+          #   - compute_instance_create_start_hits
+          #   - compute_instance_create_start_took_milliseconds
+          #
+          indices: '<notification-{now/d}>'
+          interval: 60
+          json: |
+            {
+              "size": 0,
+              "query": {
+                "term": {
+                  "event_type": "compute.instance.create.start"
+                }
+              },
+              "aggs": {
+                "host": {
+                  "terms": {
+                    "field": "Hostname.keyword",
+                    "min_doc_count": 0
+                  }
+                }
+              }
+            }
+
+        compute_instance_create_end:
+          # Produces metrics:
+          #   - compute_instance_create_end_host_doc_count{host="example01"}
+          #   - compute_instance_create_end_host_event_sum_other_doc_count
+          #   - compute_instance_create_end_host_doc_count_error_upper_bound
+          #   - compute_instance_create_end_hits
+          #   - compute_instance_create_end_took_milliseconds
+          #
+          indices: '<notification-{now/d}>'
+          interval: 60
+          json: |
+            {
+              "size": 0,
+              "query": {
+                "term": {
+                  "event_type": "compute.instance.create.end"
+                }
+              },
+              "aggs": {
+                "host": {
+                  "terms": {
+                    "field": "Hostname.keyword",
+                    "min_doc_count": 0
+                  }
+                }
+              }
+            }
+
+        compute_instance_create_error:
+          # Produces metrics:
+          #   - compute_instance_create_error_host_doc_count{host="example01"}
+          #   - compute_instance_create_error_host_event_sum_other_doc_count
+          #   - compute_instance_create_error_host_doc_count_error_upper_bound
+          #   - compute_instance_create_error_hits
+          #   - compute_instance_create_error_took_milliseconds
+          #
+          indices: '<notification-{now/d}>'
+          interval: 60
+          json: |
+            {
+              "size": 0,
+              "query": {
+                "term": {
+                  "event_type": "compute.instance.create.error"
+                }
+              },
+              "aggs": {
+                "host": {
+                  "terms": {
+                    "field": "Hostname.keyword",
+                    "min_doc_count": 0
+                  }
+                }
+              }
+            }
+

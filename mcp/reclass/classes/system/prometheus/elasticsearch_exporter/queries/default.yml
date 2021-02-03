@@ -1,0 +1,40 @@
+parameters:
+  prometheus:
+    elasticsearch_exporter:
+      queries:
+        default:
+          interval: 600
+          json: {}
+
+        logs:
+          # Produces metrics:
+          #   - logs_program_doc_count{program="example"}
+          #   - logs_program_sum_other_doc_count
+          #   - logs_program_doc_count_error_upper_bound
+          #   - logs_program_host_doc_count{host="example01",program="example"}
+          #   - logs_program_host_sum_other_doc_count{program="example"}
+          #   - logs_program_host_doc_count_error_upper_bound{program="example"}
+          #
+          indices: '<log-{now/d}>'
+          interval: 600
+          json: |
+            {
+              "size": 0,
+              "query": {
+                "match_all": {}
+              },
+              "aggs": {
+                "program": {
+                  "terms": {
+                    "field": "programname.keyword"
+                  },
+                  "aggs": {
+                    "host": {
+                      "terms": {
+                        "field": "Hostname.keyword"
+                      }
+                    }
+                  }
+                }
+              }
+            }

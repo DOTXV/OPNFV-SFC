@@ -1,0 +1,21 @@
+parameters:
+  prometheus:
+    gainsight:
+      queries:
+        vcpu_used: "'vCPU Used','avg(sum(avg_over_time(openstack_nova_used_vcpus[24h])) by (instance))'"
+        vcpu_free: "'vCPU Free','avg(sum(avg_over_time(openstack_nova_free_vcpus[24h])) by (instance))'"
+        vstorage_used: "'vStorage Used','avg(sum(avg_over_time(openstack_nova_used_disk[24h])) by (instance))'"
+        vstorage_free: "'vStorage Free','avg(sum(avg_over_time(openstack_nova_free_disk[24h])) by (instance))'"
+        vram_used: "'vRAM Used','avg(sum(avg_over_time(openstack_nova_used_ram[24h])) by (instance))'"
+        vram_free: "'vRAM Free','avg(sum(avg_over_time(openstack_nova_free_ram[24h])) by (instance))'"
+        instances: "'Instances','avg(sum(avg_over_time(openstack_nova_instances{state=\"active\"}[24h])) by (instance))'"
+        compute_nodes: "'Compute Nodes','avg(sum(openstack_nova_services{binary=~\"nova.compute\"}) by (instance))'"
+        tenants: "'Tenants','avg(sum(avg_over_time(openstack_keystone_tenants_total[24h])) by (instance))'"
+        cinder_api: "'Cinder API','avg(avg_over_time(openstack_api_check_status{name=\"cinderv2\"}[24h]))'"
+        nova_api: "'Nova API','avg(avg_over_time(openstack_api_check_status{name=\"nova\"}[24h]))'"
+        keystone_api: "'Keystone API','avg(avg_over_time(openstack_api_check_status{name=\"keystone\"}[24h]))'"
+        glance_api: "'Glance API','avg(avg_over_time(openstack_api_check_status{name=\"glance\"}[24h]))'"
+        neutron_api: "'Neutron API','avg(avg_over_time(openstack_api_check_status{name=\"neutron\"}[24h]))'"
+        compute_instance_create_start: "'VM creation start','sum(compute_instance_create_start_host_doc_count)'"
+        compute_instance_create_end: "'VM creation end','sum(compute_instance_create_end_host_doc_count)'"
+        compute_instance_create_error: "'VM creation error','sum(compute_instance_create_error_host_doc_count)'"

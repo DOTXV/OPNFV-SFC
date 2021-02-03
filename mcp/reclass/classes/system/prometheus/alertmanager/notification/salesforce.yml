@@ -1,0 +1,23 @@
+parameters:
+  _param:
+    alertmanager_notification_salesforce_host: sf_notifier
+    alertmanager_notification_salesforce_port: ${prometheus:sf_notifier:uwsgi:bind_port}
+  prometheus:
+    alertmanager:
+      enabled: true
+      config:
+        route:
+          routes:
+            salesforce:
+              receiver: HTTP-salesforce
+              match_re:
+                - label: route
+                  value: '(.*salesforce.*)'
+              continue: true
+        receiver:
+          HTTP-salesforce:
+            enabled: true
+            webhook_configs:
+              salesforce-vip:
+                url: "http://${_param:alertmanager_notification_salesforce_host}:${_param:alertmanager_notification_salesforce_port}/hook"
+                send_resolved: true

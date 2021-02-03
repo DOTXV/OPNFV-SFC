@@ -1,0 +1,10 @@
+classes:
+- service.prometheus.server.container
+- system.prometheus.server
+parameters:
+  _param:
+    prometheus_environment_label: ${_param:cluster_domain}
+  prometheus:
+    server:
+      config:
+        environment_label: ${_param:prometheus_environment_label}

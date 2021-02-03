@@ -1,0 +1,6 @@
+parameters:
+  panko:
+    upgrade:
+      enabled: ${_param:panko_upgrade_enabled}
+      old_release: ${_param:panko_old_version}
+      new_release: ${_param:panko_version}
