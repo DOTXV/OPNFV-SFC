@@ -1,0 +1,34 @@
+##############################################################################
+# Copyright (c) 2018 Mirantis Inc., Enea AB and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+---
+classes:
+  - service.neutron.gateway.opendaylight.single
+  - cluster.mcp-common-ha.openstack_compute
+  - cluster.mcp-odl-ha.openstack.compute_pdf
+  - cluster.mcp-odl-ha.infra
+parameters:
+  neutron:
+    gateway:
+      agent_mode: ${_param:neutron_gateway_agent_mode}
+      backend:
+        ovsdb_connection: tcp:127.0.0.1:6640
+      opendaylight:
+        ovsdb_server_iface: ptcp:6640:127.0.0.1
+  linux:
+    system:
+      file:
+        /var/tmp/odl_hostconfig.patch:
+          contents: |
+            420c420
+            <                 if datapath_types.find(datapath_type) >= 0)
+            ---
+            >                 if datapath_type in datapath_types)
+            460c460
+            <         return subprocess.check_output(command_line).strip()  # nosec
+            ---
+            >         return subprocess.check_output(command_line).strip().decode()  # nosec

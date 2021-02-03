@@ -1,0 +1,43 @@
+##############################################################################
+# Copyright (c) 2018 Mirantis Inc., Enea AB and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+{%- import 'net_map.j2' as nm with context %}
+---
+{%- if conf.MCP_VCP %}
+# NOTE(armband): we don't want to pull in salt.control for novcp
+classes:
+  - cluster.mcp-common-ha.infra.kvm
+  - cluster.mcp-odl-ha.infra
+parameters:
+  salt:
+    control:
+      size:  # RAM 4096,8192,16384,32768,65536
+        # Default production sizing
+        opendaylight.server:
+          cpu: 4
+          ram: 8192
+          disk_profile: small
+          net_profile: default
+      cluster:
+        internal:
+          node:
+  {%- for i in range(1, 4) %}
+            odl0{{ i }}:
+              name: ${_param:opendaylight_server_node0{{ i }}_hostname}
+              provider: ${_param:infra_kvm_node0{{ i }}_hostname}.${_param:cluster_domain}
+              image: ${_param:salt_control_bionic_image}
+              size: opendaylight.server
+    {%- if conf.nodes[nm.ctl01.idx].node.arch == 'aarch64' %}
+              machine: virt
+              cpu_mode: host-passthrough
+              loader:
+                readonly: 'yes'
+                type: pflash
+                path: /usr/share/AAVMF/AAVMF_CODE.fd
+    {%- endif %}
+  {%- endfor %}
+{%- endif %}

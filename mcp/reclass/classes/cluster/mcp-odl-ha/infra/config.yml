@@ -1,0 +1,52 @@
+##############################################################################
+# Copyright (c) 2018 Mirantis Inc., Enea AB and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+---
+classes:
+  - cluster.mcp-common-ha.infra.config
+  - cluster.mcp-odl-ha.infra
+parameters:
+  _param:
+    opendaylight_server_node01_hostname: odl01
+    opendaylight_server_node02_hostname: odl02
+    opendaylight_server_node03_hostname: odl03
+  reclass:
+    storage:
+      node:
+        opendaylight_control_node01:
+          name: ${_param:opendaylight_server_node01_hostname}
+          domain: ${_param:cluster_domain}
+          classes:
+            - cluster.${_param:cluster_name}.opendaylight.control
+          params:
+            salt_master_host: ${_param:reclass_config_master}
+            linux_system_codename: ${_param:linux_system_codename}
+            single_address: ${_param:opendaylight_server_node01_address}
+            pxe_admin_address: ${_param:opnfv_opendaylight_server_node01_pxe_admin_address}
+            keepalived_vip_priority: 101
+        opendaylight_control_node02:
+          name: ${_param:opendaylight_server_node02_hostname}
+          domain: ${_param:cluster_domain}
+          classes:
+            - cluster.${_param:cluster_name}.opendaylight.control
+          params:
+            salt_master_host: ${_param:reclass_config_master}
+            linux_system_codename: ${_param:linux_system_codename}
+            single_address: ${_param:opendaylight_server_node02_address}
+            pxe_admin_address: ${_param:opnfv_opendaylight_server_node02_pxe_admin_address}
+            keepalived_vip_priority: 102
+        opendaylight_control_node03:
+          name: ${_param:opendaylight_server_node03_hostname}
+          domain: ${_param:cluster_domain}
+          classes:
+            - cluster.${_param:cluster_name}.opendaylight.control
+          params:
+            salt_master_host: ${_param:reclass_config_master}
+            linux_system_codename: ${_param:linux_system_codename}
+            single_address: ${_param:opendaylight_server_node03_address}
+            pxe_admin_address: ${_param:opnfv_opendaylight_server_node03_pxe_admin_address}
+            keepalived_vip_priority: 103

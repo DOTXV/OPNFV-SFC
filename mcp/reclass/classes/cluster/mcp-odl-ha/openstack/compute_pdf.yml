@@ -1,0 +1,40 @@
+##############################################################################
+# Copyright (c) 2018 Mirantis Inc., Enea AB and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+---
+parameters:
+  linux:
+    network:
+      interface:
+
+
+        ens5:
+          enabled: true
+          type: eth
+          proto: manual
+          mtu: ${_param:interface_mtu}
+          name: ens5
+          noifupdown: true
+
+
+        ens5.1000:
+          enabled: true
+          proto: manual
+          mtu: ${_param:interface_mtu}
+          type: vlan
+          name: ens5.1000
+          use_interfaces:
+            - ens5
+
+        br-mesh:
+          enabled: true
+          type: bridge
+          address: ${_param:tenant_address}
+          netmask: ${_param:opnfv_net_private_mask}
+          mtu: 1500
+          use_interfaces:
+            - ens5.1000
