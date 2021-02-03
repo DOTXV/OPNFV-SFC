@@ -1,0 +1,34 @@
+##############################################################################
+# Copyright (c) 2018 Mirantis Inc., Enea AB and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+---
+classes:
+  - service.neutron.compute.single
+  - system.nova.compute.nfv.hugepages
+  - cluster.mcp-common-noha.openstack_compute
+  - cluster.mcp-ovs-noha
+parameters:
+  linux:
+    network:
+      interface:
+        pxe_admin_int:
+          # For scenarios without public network on cmp, set admin gw
+          gateway: 192.168.11.3
+          name_servers:
+            - 192.168.11.3
+        br-mesh:
+          enabled: true
+          type: bridge
+          proto: static
+          address: ${_param:tenant_address}
+          netmask: ${_param:opnfv_net_private_mask}
+          use_interfaces:
+            - ens5.1000
+    system:
+      package:
+        cgroup-tools:
+          version: latest
