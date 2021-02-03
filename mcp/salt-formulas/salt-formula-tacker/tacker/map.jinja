@@ -1,0 +1,21 @@
+{#-
+ Copyright (c) 2018 Mirantis Inc. and others.
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Apache License, Version 2.0
+ which accompanies this distribution, and is available at
+ http://www.apache.org/licenses/LICENSE-2.0
+-#}
+{% set server = salt['grains.filter_by']({
+  'Debian': {
+    'pkgs': ['python-tosca-parser=0.8.1-1~u16.04+mcp2', 'python-heat-translator', 'python-tackerclient', 'python-setuptools'],
+    'bind_host': '0.0.0.0',
+    'git': {
+      'source': 'https://github.com/openstack/tacker',
+      'target': '/tmp/tacker',
+      'branch': 'master',
+    },
+  },
+  'RedHat': {
+    'pkgs': 'openstack-tacker'
+  },
+}, merge=salt['pillar.get']('tacker:server')) %}
