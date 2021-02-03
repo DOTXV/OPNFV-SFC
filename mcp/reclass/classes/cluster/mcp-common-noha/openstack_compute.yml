@@ -1,0 +1,95 @@
+##############################################################################
+# Copyright (c) 2018 Mirantis Inc., Enea AB and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+---
+classes:
+  - service.nfs.client
+  - system.nova.compute.single
+  - service.cinder.volume.single
+  - system.cinder.volume.backend.lvm
+  - system.ceilometer.agent.cluster
+  - system.ceilometer.client.nova_compute
+  - system.ceilometer.client.cinder_volume
+  - system.ceilometer.agent.polling.default
+  - service.barbican.client.single
+  - cluster.all-mcp-arch-common.backports
+  - cluster.mcp-common-noha.openstack_compute_pdf
+parameters:
+  nova:
+    compute:
+      libvirt_service: libvirtd
+      libvirt_bin: /etc/default/libvirtd
+      disk_cachemodes: file=directsync,block=none
+      vncproxy_url: http://${_param:cluster_vip_address}:6080
+      heal_instance_info_cache_interval: 300
+      bind:
+        vnc_address: ${_param:single_address}
+      network:
+        region: ${_param:openstack_region}
+        user: neutron
+        tenant: service
+        password: ${_param:keystone_neutron_password}
+      barbican:
+        enabled: ${_param:barbican_integration_enabled}
+      image:
+        verify_glance_signatures: false
+      pkgs:
+        - nova-compute
+        - python3-novaclient
+        - pm-utils
+        - sysfsutils
+  neutron:
+    compute:
+      notification: true
+      vlan_aware_vms: true
+      root_helper_daemon: false
+      report_interval: 120
+      agent_mode: ${_param:neutron_compute_agent_mode}
+      message_queue:
+        host: ${_param:openstack_control_address}
+      metadata:
+        host: ${_param:openstack_control_address}
+  cinder:
+    volume:
+      backend:
+        lvm-driver:
+          # Align system.cinder.volume.backend.lvm and MaaS data
+          volume_group: ${linux:storage:lvm:cinder-vg:name}
+      my_ip: ${_param:single_address}
+      database:
+        host: ${_param:cluster_local_address}
+      identity:
+        host: ${_param:cluster_local_address}
+      glance:
+        host: ${_param:cluster_local_address}
+      message_queue:
+        host: ${_param:cluster_local_address}
+      barbican:
+        enabled: ${_param:barbican_integration_enabled}
+      pkgs:
+        - cinder-volume
+      openiscsi_services:
+        - tgt
+        - iscsid
+  nfs:
+    client:
+      mount:
+        nfs:
+          path: /var/lib/nova/instances
+          fstype: nfs
+          device: ${_param:openstack_control_address}:/srv/nova/instances
+  linux:
+    storage:
+      lvm:
+        # Align with both system.cinder.volume.backend.lvm and MaaS data
+        cinder-vg:
+          name: vgroot
+    system:
+      kernel:
+        sysctl:
+          vm.dirty_ratio: 10
+          vm.dirty_background_ratio: 5

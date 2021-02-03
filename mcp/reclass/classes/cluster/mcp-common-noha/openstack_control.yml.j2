@@ -1,0 +1,247 @@
+##############################################################################
+# Copyright (c) 2018 Mirantis Inc., Enea AB and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+---
+classes:
+  - system.linux.system.lowmem
+  - service.nfs.server
+  - system.ceilometer.client
+  - system.ceilometer.client.neutron
+  - system.memcached.server.single
+  - system.rabbitmq.server.single
+  - system.rabbitmq.server.vhost.openstack
+  - system.keystone.server.wsgi
+  - system.keystone.server.single
+  - system.keystone.client.single
+  - system.keystone.client.v3.service.keystone
+  - system.keystone.client.service.nova21
+  - system.keystone.client.service.nova-placement
+  - system.keystone.client.service.cinder3
+  - system.keystone.client.service.ceilometer
+  - system.keystone.client.service.aodh
+  - system.keystone.client.service.gnocchi
+  - system.keystone.client.service.panko
+  - system.keystone.client.service.barbican
+  - system.glance.control.single
+  - system.nova.control.single
+  - system.cinder.control.single
+  - system.cinder.control.backend.lvm
+  - system.heat.server.single
+  - service.mysql.server.single
+  - system.galera.server.database.cinder
+  - system.galera.server.database.glance
+  - system.galera.server.database.neutron
+  - system.galera.server.database.heat
+  - system.galera.server.database.keystone
+  - system.galera.server.database.nova
+  - system.galera.server.database.aodh
+  - system.galera.server.database.gnocchi
+  - system.galera.server.database.panko
+  - system.galera.server.database.barbican
+  - system.barbican.server.single
+  - service.barbican.server.plugin.simple_crypto
+  - service.redis.server.single
+  - service.ceilometer.server.single
+  - system.ceilometer.server.backend.default
+  - system.aodh.server.single
+  - system.gnocchi.server.single
+  - service.panko.server.single
+  - system.apache.server.site.aodh
+  - system.apache.server.site.gnocchi
+  - system.apache.server.site.panko
+  - system.apache.server.site.barbican
+  - system.apache.server.single
+  - system.horizon.server.single
+  - system.nginx.server.single
+  - system.nginx.server.proxy.openstack_web
+  - service.haproxy.proxy.single
+{%- if '-sfc-' in conf.MCP_DEPLOY_SCENARIO %}
+  - system.keystone.client.service.tacker
+  - system.galera.server.database.tacker
+  - service.tacker.server.single
+{%- endif %}
+  - cluster.all-mcp-arch-common.backports
+  - cluster.mcp-common-noha.haproxy_openstack_api
+  - cluster.mcp-common-noha.openstack_control_pdf
+parameters:
+  _param:
+    ceilometer_create_gnocchi_resources: 'True'
+    ceilometer_endpoint_status: absent
+    barbican_integration_enabled: 'false'
+  linux:
+    system:
+      package:
+        python-msgpack:
+          version: latest
+      sysfs:
+        transparent_hugepages:
+          kernel/mm/transparent_hugepage/enabled: never
+  keystone:
+    server:
+      admin_email: ${_param:admin_email}
+      openrc_extra:
+        volume_device_name: sdc
+      pkgs:
+        - keystone
+        - python3-memcache
+        - python3-openstackclient
+    client:
+      enabled: true
+      resources:
+        v3:
+          enabled: true
+          services:
+            ceilometer:
+              status: absent
+            # required only for Rally validation
+            cinder:
+              type: volume
+              description: OpenStack Volume Service
+      server:
+        identity:
+          admin:
+            api_version: 3
+        admin_identity:
+          admin:
+            api_version: ''
+            user_domain_name: 'Default'
+            project_domain_name: 'Default'
+  glance:
+    server:
+      storage:
+        engine: file
+      images: []
+      workers: 1
+      barbican:
+        enabled: ${_param:barbican_integration_enabled}
+      identity:
+        barbican_endpoint: ${barbican:server:host_href}
+      pkgs:
+        - glance
+      services:
+        - glance-api
+  cinder:
+    controller:
+      barbican:
+        enabled: ${_param:barbican_integration_enabled}
+      pkgs:
+        - cinder-api
+        - cinder-scheduler
+  nova:
+    controller:
+      metadata:
+        password: ${_param:metadata_password}
+      bind:
+        private_address: ${_param:cluster_local_address}
+        public_address: ${_param:cluster_vip_address}
+        novncproxy_port: 6080
+      vncproxy_url: http://${_param:cluster_vip_address}:6080
+      workers: 1
+      barbican:
+        enabled: ${_param:barbican_integration_enabled}
+      pkgs:
+        - nova-api
+        - nova-conductor
+        - nova-consoleauth
+        - nova-scheduler
+        - nova-novncproxy
+        - python3-novaclient
+  horizon:
+    server:
+      # yamllint disable-line rule:truthy
+      secure: False
+  heat:
+    server:
+      bind:
+        api_cfn:
+          address: ${_param:single_address}
+        api_cloudwatch:
+          address: ${_param:single_address}
+  mysql:
+    server:
+      version: '5.7'
+      bind:
+        address: ${_param:cluster_local_address}
+      key_buffer: 8
+      max_allowed_packet: 128
+      max_connections: 2048
+      thread_stack: 512
+      thread_cache_size: 12
+      query_cache_limit: 2
+      query_cache_size: 0
+  ceilometer:
+    server:
+      ~database: ~
+  redis:
+    server:
+      version: 5.0
+      appendfsync: 'no'
+      bind:
+        address: ${_param:single_address}
+  gnocchi:
+    common:
+      storage:
+        driver: redis
+        redis_url: redis://${_param:single_address}:6379
+        incoming:
+          driver: redis
+          redis_url: redis://${_param:single_address}:6379
+  nfs:
+    server:
+      share:
+        nova_instances:
+          path: /srv/nova/instances
+          host:
+            nova:
+              host: ${_param:single_address}/${_param:opnfv_net_mgmt_mask}
+              params:
+                - rw
+                - no_root_squash
+                - async
+  neutron:
+    server:
+      vlan_aware_vms: true
+      root_helper_daemon: false
+      agent_down_time: 300
+      global_physnet_mtu: ${_param:interface_mtu}
+      backend:
+        external_mtu: ${_param:interface_mtu}
+{%- if '-bgpvpn-' in conf.MCP_DEPLOY_SCENARIO %}
+      bgp_vpn:
+        enabled: True
+        driver: opendaylight_v2
+{%- endif %}
+  apache:
+    server:
+      bind:
+        listen_default_ports: false
+      site:
+        gnocchi: &wsgi_threads
+          wsgi:
+            threads: 1
+        barbican:
+          <<: *wsgi_threads
+        barbican_admin:
+          <<: *wsgi_threads
+      mod_wsgi: libapache2-mod-wsgi-py3
+  barbican:
+    server:
+      ks_notifications_enable: true
+      store:
+        software:
+          crypto_plugin: simple_crypto
+          store_plugin: store_crypto
+          global_default: true
+  rabbitmq:
+    server:
+      env_variables:
+        hostname: localhost
+  nginx:
+    server:
+      site:
+        nginx_ssl_redirect_openstack_web:
+          enabled: false

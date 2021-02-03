@@ -1,0 +1,76 @@
+##############################################################################
+# Copyright (c) 2018 Mirantis Inc., Enea AB and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+---
+parameters:
+  linux:
+    network:
+      bridge: openvswitch
+      interface:
+        pxe_admin_int:
+          enabled: true
+          name: ens3
+          proto: static
+          type: eth
+          address: ${_param:pxe_admin_address}
+          netmask: ${_param:opnfv_net_admin_mask}
+          mtu: ${_param:interface_mtu}
+          noifupdown: true
+
+
+        ens5:
+          enabled: true
+          type: eth
+          proto: manual
+          mtu: ${_param:interface_mtu}
+          name: ens5
+          noifupdown: true
+        ens4:
+          enabled: true
+          type: eth
+          proto: manual
+          mtu: ${_param:interface_mtu}
+          name: ens4
+          noifupdown: true
+
+
+        ens5.1000:
+          enabled: true
+          proto: manual
+          mtu: ${_param:interface_mtu}
+          type: vlan
+          name: ens5.1000
+          use_interfaces:
+            - ens5
+        ens6:
+          enabled: true
+          mtu: ${_param:interface_mtu}
+          proto: manual
+          ovs_port_type: OVSPort
+          type: ovs_port
+          ovs_bridge: br-floating
+          bridge: br-floating
+        br-floating:
+          enabled: true
+          type: ovs_bridge
+          proto: static
+          address: ${_param:external_address}
+          netmask: ${_param:opnfv_net_public_mask}
+          gateway: ${_param:opnfv_net_public_gw}
+          name_servers: ['8.8.8.8', '8.8.4.4']
+          use_interfaces:
+            - ens6
+          noifupdown: true
+        br-mgmt:
+          enabled: true
+          type: bridge
+          proto: static
+          address: ${_param:single_address}
+          netmask: ${_param:opnfv_net_mgmt_mask}
+          mtu: ${_param:interface_mtu}
+          use_interfaces:
+            - ens4

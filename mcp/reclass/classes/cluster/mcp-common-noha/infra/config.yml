@@ -1,0 +1,35 @@
+##############################################################################
+# Copyright (c) 2018 Mirantis Inc., Enea AB and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+---
+classes:
+  - cluster.all-mcp-arch-common.infra.config_pdf
+parameters:
+  _param:
+    openstack_control_node01_hostname: ctl01
+    pxe_admin_address: ${_param:reclass_config_master}
+    single_address: ${_param:opnfv_infra_config_address}
+    salt_master_host: 127.0.0.1
+    salt_minion_ca_host: ${linux:network:fqdn}
+  salt:
+    master:
+      file_recv: true
+      worker_threads: 4
+      command_timeout: 20
+  reclass:
+    storage:
+      node:
+        openstack_control_node01:
+          name: ${_param:openstack_control_node01_hostname}
+          domain: ${_param:cluster_domain}
+          classes:
+            - cluster.${_param:cluster_name}.openstack.control
+          params:
+            linux_system_codename: bionic
+            salt_master_host: ${_param:reclass_config_master}
+            single_address: ${_param:openstack_control_node01_address}
+            pxe_admin_address: ${_param:opnfv_openstack_control_node01_pxe_admin_address}

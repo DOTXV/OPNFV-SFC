@@ -1,0 +1,68 @@
+##############################################################################
+# Copyright (c) 2018 Mirantis Inc., Enea AB and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+{%- import 'net_map.j2' as nm with context %}
+---
+classes:
+  - service.neutron.compute.single
+  - system.nova.compute.nfv.hugepages
+  - cluster.mcp-common-noha.openstack_compute
+  - cluster.mcp-fdio-noha
+parameters:
+  nova:
+    compute:
+      # yamllint disable-line rule:truthy
+      vif_plugging_is_fatal: False
+      vif_plugging_timeout: 10
+  neutron:
+    compute:
+      backend:
+        router: 'vpp-router'
+        tenant_network_types: "${_param:neutron_tenant_network_types}"
+        ~mechanism:
+          vpp:
+            driver: vpp
+            etcd_port: ${_param:node_port}
+            etcd_host: ${_param:node_address}
+            l3_hosts: ${_param:openstack_gateway_node01_hostname}
+        physnets:
+          physnet1:
+            vpp_interface: ${_param:external_vpp_tap}
+          physnet2:
+            vpp_interface: ${_param:dpdk0_vpp}
+  linux:
+    system:
+      kernel:
+        isolcpu: 1  # NOTE: Hardcoded for now
+        boot_options:
+          - spectre_v2=off
+          - nopti
+          - kpti=off
+          - nospec_store_bypass_disable
+          - noibrs
+          - noibpb
+          - intel_iommu=on
+          - iommu=pt
+          - nohz_full=${linux:system:kernel:isolcpu}
+          - rcu_nocbs=${linux:system:kernel:isolcpu}
+          - iommu.passthrough=1
+    network:
+      interface:
+        dpdk0:
+          name: ${_param:dpdk0_name}
+          pci: ${_param:dpdk0_pci}
+          driver: ${_param:dpdk0_driver}
+          enabled: true
+          type: dpdk_vpp_port
+          mtu: ${_param:interface_mtu}
+        {{ nm.cmp001.nic_private }}:
+          type: dpdk  # Not a meaningful type, just match 'dpdk' for filtering
+        pxe_admin_int:
+          # For scenarios without public network on cmp, set admin gw
+          gateway: {{ nm.net_admin_gw }}
+          name_servers:
+            - {{ nm.net_admin_gw }}

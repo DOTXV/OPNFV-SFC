@@ -1,0 +1,133 @@
+##############################################################################
+# Copyright (c) 2018 Mirantis Inc., Enea AB and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+{%- import 'net_map.j2' as nm with context %}
+---
+parameters:
+  _param:
+    openstack_region: RegionOne
+    admin_email: root@localhost
+    cluster_public_protocol: http
+    cluster_public_host: ${_param:opnfv_openstack_control_node01_external_address}
+    neutron_public_protocol: http
+    neutron_control_dvr: 'False'
+    neutron_l3_ha: 'False'
+    neutron_global_physnet_mtu: 1500
+    neutron_external_mtu: 1500
+    neutron_gateway_dvr: 'False'
+    neutron_gateway_agent_mode: legacy
+    neutron_compute_dvr: 'False'
+    neutron_compute_agent_mode: legacy
+    neutron_compute_external_access: 'False'
+    galera_server_cluster_name: openstack_cluster
+    cluster_vip_address: ${_param:cluster_public_host}
+    cluster_local_address: ${_param:openstack_control_address}
+    cluster_node01_hostname: ctl01
+    cluster_node01_address: ${_param:opnfv_openstack_control_node01_address}
+    cluster_node02_hostname: ctl02
+    cluster_node02_address: ${_param:opnfv_openstack_control_node02_address}
+    cluster_node03_hostname: ctl03
+    cluster_node03_address: ${_param:opnfv_openstack_control_node03_address}
+    glance_version: ${_param:openstack_version}
+    glance_service_host: ${_param:cluster_local_address}
+    keystone_version: ${_param:openstack_version}
+    keystone_service_host: ${_param:cluster_local_address}
+    heat_version: ${_param:openstack_version}
+    heat_service_host: ${_param:cluster_local_address}
+    ceilometer_version: ${_param:openstack_version}
+    ceilometer_service_host: ${_param:cluster_local_address}
+    ceilometer_database_host: ${_param:cluster_local_address}
+    cinder_version: ${_param:openstack_version}
+    cinder_service_host: ${_param:cluster_local_address}
+    nova_version: ${_param:openstack_version}
+    nova_service_host: ${_param:cluster_local_address}
+    nova_vncproxy_url: http://${_param:cluster_vip_address}:8060
+    neutron_version: ${_param:openstack_version}
+    neutron_service_host: ${_param:cluster_local_address}
+    mysql_admin_user: root
+    horizon_version: ${_param:openstack_version}
+    horizon_secret_key: opaesee8Que2yahJoh9fo0eefo1Aeyo6ahyei8zeiboh3aeth5loth7ieNa5xi5e
+    horizon_identity_host: ${_param:cluster_vip_address}
+    horizon_identity_encryption: none
+    horizon_identity_version: 3
+    horizon_public_protocol: http
+    horizon_public_port: 80
+    apache_mods_status_enabled: false
+    nginx_server_site_nginx_proxy_openstack_web_enabled: true
+    nginx_proxy_ssl:
+      enabled: false
+
+    barbican_version: ${_param:openstack_version}
+    barbican_service_host: ${_param:cluster_local_address}
+    apache_barbican_api_address: ${_param:single_address}
+    barbican_simple_crypto_kek: "YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXoxMjM0NTY="
+    barbican_integration_enabled: true
+
+{%- if '-sfc-' in conf.MCP_DEPLOY_SCENARIO %}
+    tacker_service_host: ${_param:cluster_local_address}
+{%- endif %}
+
+    aodh_version: ${_param:openstack_version}
+    aodh_service_host: ${_param:cluster_local_address}
+    gnocchi_version: 4.3
+    gnocchi_service_host: ${_param:cluster_local_address}
+    panko_version: ${_param:openstack_version}
+    panko_service_host: ${_param:cluster_local_address}
+    ceilometer_agent_default_polling_interval: 180
+    ceilometer_agent_default_polling_meters:
+      - "*"
+  linux:
+    system:
+      kernel:
+        sysctl:
+          net.ipv4.tcp_congestion_control: yeah
+          net.ipv4.tcp_slow_start_after_idle: 0
+          net.ipv4.tcp_fin_timeout: 30
+{%- if 'aarch64' in nm.cluster.arch %}
+      repo:
+        armband_3:  # Should be in sync with the repo config generated via curtin/MaaS
+          source: "deb http://linux.enea.com/mcp-repos/${_param:armband_repo_version}/xenial ${_param:armband_repo_version}-armband main"
+          key: ${_param:armband_key}
+          pinning:
+            15:
+              enabled: true
+              pin: 'release a=${_param:armband_repo_version}-armband'
+              priority: 15
+              package: '*'
+            1200:
+              enabled: true
+              pin: 'release a=${_param:armband_repo_version}-armband'
+              priority: 1200
+              package: 'qemu-efi'
+{%- endif %}
+    network:
+      host:
+        ctl:
+          address: ${_param:openstack_control_address}
+          names:
+            - ctl
+            - ctl.${_param:cluster_domain}
+        ctl01:
+          address: ${_param:openstack_control_node01_address}
+          names:
+            - ctl01
+            - ctl01.${_param:cluster_domain}
+        gtw01:
+          address: ${_param:openstack_gateway_address}
+          names:
+            - gtw01
+            - gtw01.${_param:cluster_domain}
+{#- For compute nodes, expand values in-place, bypassing reclass param expansion #}
+{%- for cmp in range(1, nm.cmp_nodes + 1) %}
+  {%- set h = 'cmp%03d' | format(cmp) %}
+  {%- set mgmt = nm.net_mgmt_hosts | length + nm.start_ip[nm.net_mgmt] + loop.index %}
+        {{ h }}:
+          address: {{ nm.net_mgmt | ipnet_hostaddr(mgmt) }}
+          names:
+            - {{ h }}
+            - {{ h }}.${_param:cluster_domain}
+{%- endfor %}

@@ -1,0 +1,68 @@
+##############################################################################
+# Copyright (c) 2018 Mirantis Inc., Enea AB and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+---
+classes:
+  - cluster.mcp-common-noha.openstack_gateway
+  - service.neutron.gateway.single
+  - cluster.mcp-fdio-noha
+parameters:
+  _param:
+    compute_hugepages_size: 1G
+    compute_hugepages_mount: /mnt/hugepages_1G
+  neutron:
+    gateway:
+      agents:
+        l3:
+          interface_driver: neutron.agent.linux.interface.BridgeInterfaceDriver
+        dhcp:
+          interface_driver: neutron.agent.linux.interface.BridgeInterfaceDriver
+      backend:
+        router: 'vpp-router'
+        tenant_network_types: "${_param:neutron_tenant_network_types}"
+        ~mechanism:
+          vpp:
+            driver: vpp
+            etcd_port: ${_param:node_port}
+            etcd_host: ${_param:node_address}
+            l3_hosts: ${_param:openstack_gateway_node01_hostname}
+        physnets:
+          physnet1:
+            vpp_interface: ${_param:external_vpp_tap}
+          physnet2:
+            vpp_interface: ${_param:dpdk0_vpp}
+  linux:
+    system:
+      kernel:
+        hugepages:
+          large:
+            default: true
+            size: ${_param:compute_hugepages_size}
+            count: ${_param:compute_hugepages_count}
+            mount_point: ${_param:compute_hugepages_mount}
+        isolcpu: 1  # NOTE: Hardcoded for now
+        boot_options:
+          - spectre_v2=off
+          - nopti
+          - kpti=off
+          - nospec_store_bypass_disable
+          - noibrs
+          - noibpb
+          - intel_iommu=on
+          - iommu=pt
+          - nohz_full=${linux:system:kernel:isolcpu}
+          - rcu_nocbs=${linux:system:kernel:isolcpu}
+          - iommu.passthrough=1
+    network:
+      interface:
+        dpdk0:
+          name: ${_param:dpdk0_name}
+          pci: ${_param:dpdk0_pci}
+          driver: ${_param:dpdk0_driver}
+          enabled: true
+          type: dpdk_vpp_port
+          mtu: ${_param:interface_mtu}

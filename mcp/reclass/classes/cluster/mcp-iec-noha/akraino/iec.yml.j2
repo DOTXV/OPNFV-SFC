@@ -1,0 +1,117 @@
+##############################################################################
+# Copyright (c) 2019 Mirantis Inc., Enea AB and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+{%- import 'net_map.j2' as nm with context %}
+{%- import 'net_macros.j2' as ma with context %}
+{#- Filter-out NIC duplicates by constructing a dict (used NICs only) #}
+{%- if '-vcp-' in conf.MCP_DEPLOY_SCENARIO %}
+{%- set nics = {} %}
+{%- set vlans = {} %}
+{%- else %}
+{%- set nics = { nm.ctl01.nic_mgmt: True, nm.ctl01.nic_public: True } %}
+{%- set vlans = { nm.vlan_mgmt: nm.ctl01.nic_mgmt, nm.vlan_public: nm.ctl01.nic_public } %}
+{%- endif %}
+---
+classes:
+  - cluster.mcp-iec-noha
+  - cluster.all-mcp-arch-common.opnfv.maas_proxy
+  - cluster.all-mcp-arch-common.opnfv.lab_proxy_pdf
+parameters:
+  _param:
+{%- if '-vcp-' in conf.MCP_DEPLOY_SCENARIO %}
+    pxe_admin_interface: ${_param:opnfv_vcp_vm_primary_interface}
+    external_nic: ${_param:opnfv_vcp_vm_secondary_interface}
+    single_nic: ${_param:opnfv_vcp_vm_tertiary_interface}
+{%- else %}
+    pxe_admin_interface: {{ nm.ctl01.nic_admin }}
+    external_nic: {{ ma.interface_str(nm.ctl01.nic_public, nm.vlan_public) }}
+    single_nic: {{ ma.interface_str(nm.ctl01.nic_mgmt, nm.vlan_mgmt) }}
+{%- endif %}
+  linux:
+{%- if 'centos' not in conf.MCP_OS %}
+{%- set proto_manual = 'manual' %}
+{%- else %}
+{%- set proto_manual = 'none' %}
+    system:
+      file:
+        /etc/gshadow:
+          group: root
+        /etc/shadow:
+          group: root
+        /etc/udev/rules.d/70-persistent-net.rules:
+          contents: ''
+{%- if conf.nodes[nm.ctl01.idx].node.arch == 'aarch64' %}
+        /etc/modprobe.d/vfat.conf:
+          contents: ''
+        /boot/efi/EFI/centos/grub.cfg:
+          source: /boot/grub2/grub.cfg
+{%- endif %}
+      kernel:
+        boot_options:
+          - net.ifnames=1
+          - biosdevname=1
+        modules:
+          - br_netfilter
+      at:
+        enabled: False
+      cron:
+        enabled: False
+{%- endif %}
+    network:
+      interface:
+        pxe_admin_int:
+          enabled: true
+          name: ${_param:pxe_admin_interface}
+          type: eth
+          address: ${_param:pxe_admin_address}
+          netmask: ${_param:opnfv_net_admin_mask}
+          mtu: ${_param:interface_mtu}
+          noifupdown: true
+
+{#- prevent duplicates for tagged mgmt on the same physical interface as PXE/admin #}
+{%- if nm.ctl01.nic_admin in nics %}
+  {%- do nics.pop(nm.ctl01.nic_admin) %}
+{%- endif %}
+
+{{ ma.linux_network_interfaces_nic(nics, proto_manual) }}
+
+{{ ma.linux_network_interfaces_vlan(vlans, proto_manual) }}
+
+{%- if '-vcp-' in conf.MCP_DEPLOY_SCENARIO %}
+        single:
+          enabled: true
+          type: eth
+          proto: {{ proto_manual }}
+          name: ${_param:single_nic}
+          mtu: ${_param:interface_mtu}
+        external:
+          enabled: true
+          type: eth
+          proto: {{ proto_manual }}
+          name: ${_param:external_nic}
+          mtu: ${_param:interface_mtu}
+{%- endif %}
+        br-ctl:
+          enabled: true
+          type: bridge
+          address: ${_param:single_address}
+          netmask: ${_param:opnfv_net_mgmt_mask}
+          noifupdown: true
+          use_interfaces:
+            - ${_param:single_nic}
+          mtu: ${_param:interface_mtu}
+        br-ex:
+          enabled: true
+          type: bridge
+          address: ${_param:external_address}
+          netmask: ${_param:opnfv_net_public_mask}
+          noifupdown: true
+          use_interfaces:
+            - ${_param:external_nic}
+          mtu: ${_param:interface_mtu}
+          gateway: ${_param:opnfv_net_public_gw}
+          name_servers: {{ nm.dns_public }}
