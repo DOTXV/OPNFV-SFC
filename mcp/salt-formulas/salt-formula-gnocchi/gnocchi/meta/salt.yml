@@ -1,0 +1,5 @@
+orchestration:
+  upgrade:
+    applications:
+      gnocchi:
+        priority: 1850
