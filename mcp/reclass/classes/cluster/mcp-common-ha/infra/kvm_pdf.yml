@@ -1,0 +1,64 @@
+##############################################################################
+# Copyright (c) 2018 Mirantis Inc., Enea AB and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+---
+parameters:
+  linux:
+    network:
+      interface:
+
+
+        ens4:
+          enabled: true
+          type: eth
+          proto: manual
+          mtu: ${_param:interface_mtu}
+          name: ens4
+          noifupdown: true
+        ens6:
+          enabled: true
+          type: eth
+          proto: manual
+          mtu: ${_param:interface_mtu}
+          name: ens6
+          noifupdown: true
+        ens3:
+          enabled: true
+          type: eth
+          proto: manual
+          mtu: ${_param:interface_mtu}
+          name: ens3
+          noifupdown: true
+
+
+
+        br-mgmt:
+          enabled: true
+          proto: static
+          address: ${_param:pxe_admin_address}
+          netmask: ${_param:opnfv_net_admin_mask}
+          type: bridge
+          use_interfaces:
+            - ens3
+          noifupdown: true
+        br-ctl:
+          enabled: true
+          type: bridge
+          proto: static
+          address: ${_param:single_address}
+          netmask: ${_param:opnfv_net_mgmt_mask}
+          use_interfaces:
+            - ens4
+          noifupdown: true
+        br-ex:
+          enabled: true
+          proto: manual
+          netmask: ${_param:opnfv_net_public_mask}
+          type: bridge
+          use_interfaces:
+            - ens6
+          noifupdown: true

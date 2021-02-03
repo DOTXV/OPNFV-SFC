@@ -1,0 +1,73 @@
+##############################################################################
+# Copyright (c) 2018 Mirantis Inc., Enea AB and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+---
+classes:
+  - system.reclass.storage.salt
+  - system.salt.master.api
+  - system.salt.master.single
+  - system.salt.minion.ca.salt_master
+parameters:
+  _param:
+    salt_master_environment_repository: "https://github.com/tcpcloud"
+    salt_master_environment_revision: master
+    reclass_data_repository: local
+    salt_master_base_environment: prd
+    # yamllint disable-line rule:line-length
+    salt_api_password_hash: "$6$sGnRlxGf$al5jMCetLP.vfI/fTl3Z0N7Za1aeiexL487jAtyRABVfT3NlwZxQGVhO7S1N8OwS/34VHYwZQA8lkXwKMN/GS1"
+    infra_maas_system_codename: bionic
+  linux:
+    system:
+      user:
+        salt:
+          home: /home/salt
+  salt:
+    master:
+      accept_policy: open_mode
+      file_recv: true
+    minion:
+      mine:
+        module:
+          x509.get_pem_entries: ['/etc/pki/all_cas/*']
+  reclass:
+    storage:
+      data_source:
+        engine: local
+      node:
+        # We support per-node (not only per-role) compute configuration via IDF
+        openstack_compute_node01:
+          name: cmp001
+          domain: ${_param:cluster_domain}
+          classes:
+            - cluster.${_param:cluster_name}.openstack.compute
+          params:
+            pxe_admin_address: 192.168.11.36
+            pxe_admin_interface: ens3
+            single_address: 172.16.10.55
+            tenant_address: 10.1.0.5
+            external_address: 10.16.0.111
+            salt_master_host: ${_param:reclass_config_master}
+            linux_system_codename: bionic
+            compute_hugepages_count: '"5120"'
+            compute_hugepages_size: '"2M"'
+            compute_hugepages_mount: '"/mnt/hugepages_2M"'
+        openstack_compute_node02:
+          name: cmp002
+          domain: ${_param:cluster_domain}
+          classes:
+            - cluster.${_param:cluster_name}.openstack.compute
+          params:
+            pxe_admin_address: 192.168.11.37
+            pxe_admin_interface: ens3
+            single_address: 172.16.10.56
+            tenant_address: 10.1.0.6
+            external_address: 10.16.0.112
+            salt_master_host: ${_param:reclass_config_master}
+            linux_system_codename: bionic
+            compute_hugepages_count: '"5120"'
+            compute_hugepages_size: '"2M"'
+            compute_hugepages_mount: '"/mnt/hugepages_2M"'

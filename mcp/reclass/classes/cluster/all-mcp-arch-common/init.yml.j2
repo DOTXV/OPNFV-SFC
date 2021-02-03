@@ -1,0 +1,60 @@
+##############################################################################
+# Copyright (c) 2018 Mirantis Inc., Enea AB and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+---
+classes:
+  - system.defaults
+  - system.linux.system.single
+  - cluster.all-mcp-arch-common.opnfv
+  - cluster.all-mcp-arch-common.passwords
+parameters:
+  _param:
+    openstack_version: stein
+    armband_repo_version: rocky
+    mcp_version: nightly
+
+    banner_company_name: OPNFV
+
+    salt_control_trusty_image: ''  # Dummy value, to keep reclass 1.5.2 happy
+    salt_control_bionic_image: salt://salt/files/control/images/base_image_opnfv_fuel_vcp.img
+
+    # VCP VMs spawned on KVM Hosts net ifaces (max 3)
+{%- if conf.MCP_JUMP_ARCH == 'aarch64' %}
+    opnfv_vcp_vm_primary_interface: enp1s0
+    opnfv_vcp_vm_secondary_interface: enp2s0
+    opnfv_vcp_vm_tertiary_interface: enp3s0
+{%- else %}
+    opnfv_vcp_vm_primary_interface: ens2
+    opnfv_vcp_vm_secondary_interface: ens3
+    opnfv_vcp_vm_tertiary_interface: ens4
+{%- endif %}
+
+    interface_mtu: {{ conf.idf.fuel.network.interface_mtu or 1500 }}
+
+    ntp_strata_host1: {{ conf.idf.fuel.network.ntp_strata_host1 or '1.pool.ntp.org' }}
+    ntp_strata_host2: {{ conf.idf.fuel.network.ntp_strata_host2 or '0.pool.ntp.org' }}
+
+    armband_key: |
+      -----BEGIN PGP PUBLIC KEY BLOCK-----
+      Version: GnuPG v2.0.14 (GNU/Linux)
+
+      mQENBFagAroBCADWboNIjuF6lB1mWv2+EbvqY3lKl5mLKhr2DnSUkKeHUPBv8gNM
+      qK8Q00AMIyPiyEhgjA+dWizZ+5aBgxoiY7oMeLJ2Xym36U/8SYq2BWd3SGCbMNoz
+      SJDxDUSM/HFVs6atF1M3DY9oN65hSVnu4uy5Tu6asf6k4rhAyk0z4+pRcPBCu2vq
+      mnGi3COM/+9PShrEKeVOx5W2vRJywUFuq8EDvQnRoJ0GvM28JiJIanw17YwIPxhg
+      BKZVpZjan5X+ihVMXwA2h/G/FS5Omhd50RqV6LWSYs94VJJgYqHx8UMm7izcxI+P
+      ct3IcbD195bPbJ+SbuiFe45ZLsdY1MyGiU2BABEBAAG0K0VuZWEgQXJtYmFuZCBE
+      ZXZvcHMgVGVhbSA8YXJtYmFuZEBlbmVhLmNvbT6JATgEEwECACICGwMGCwkIBwMC
+      BhUIAgkKCwQWAgMBAh4BAheABQJaY3bYAAoJEN6rkLp5irHRoQMH/0PYl0A/6eWw
+      nQ/szhEFrr76Ln6wA4vEO+PiuWj9kTkZM2NaCnkisrIuHSPIVvOLfFmztbE6sKGe
+      t+a2b7Jqw48DZ/gq508aZE4Q307ookxdCOrzIu/796hFO34yXg3sqZoJh3VmKIjY
+      4DL8yG1iAiQ5vOw3IFWQnATwIZUgaCcjmE7HGap+9ePuJfFuQ8mIG5cy28t8qocx
+      AB/B2tucfBMwomYxKqgbLI5AG7iSt58ajvrrNa9f8IX7Ihj/jiuXhUwX+geEp98K
+      IWVI1ftEthZvfBpZW4BS98J4z//dEPi31L4jb9RQXq3afF2RpXchDeUN85bW45nu
+      W/9PMAlgE/U=
+      =m+zE
+      -----END PGP PUBLIC KEY BLOCK-----

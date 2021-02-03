@@ -1,0 +1,172 @@
+##############################################################################
+# Copyright (c) 2018 Mirantis Inc., Enea AB and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+{%- import 'net_map.j2' as nm with context %}
+---
+# NOTE: pod_config is generated and transferred into its final location on
+# cfg01 only during deployment to prevent leaking sensitive data
+classes:
+  - system.maas.region.single
+  - service.maas.cluster.single
+  - cluster.all-mcp-arch-common.opnfv.lab_proxy_pdf
+  - cluster.all-mcp-arch-common.opnfv.pod_config
+parameters:
+  _param:
+    linux_system_codename: bionic
+    maas_admin_username: opnfv
+    dns_server01: '{{ nm.dns_public[0] }}'
+    single_address: ${_param:infra_maas_node01_deploy_address}
+    hwe_kernel: 'ga-18.04'
+    opnfv_maas_timeout_comissioning: {{ nm.maas_timeout_comissioning }}
+    opnfv_maas_timeout_deploying: {{ nm.maas_timeout_deploying }}
+  maas:
+    region:
+      services:
+        - maas-regiond
+        - bind9
+{%- if '-ovs-' in conf.MCP_DEPLOY_SCENARIO or '-fdio-' in conf.MCP_DEPLOY_SCENARIO %}
+      tags:
+        aarch64_hugepages_1g:
+          comment: 'Enable 1G pagesizes on aarch64'
+          definition: '//capability[@id="asimd"]|//capability[@id="cp15_barrier"]'
+          kernel_opts: 'default_hugepagesz=1G hugepagesz=1G kpti=off'
+{%- endif %}
+      enable_iframe: False
+      timeout:
+        # Set maas.wait_for_<state> timeouts to ~2.5x of MaaS <state> timeout
+        ready: {{ nm.maas_timeout_comissioning * 150 }}
+        deployed: {{ nm.maas_timeout_deploying * 150 }}
+        attempts: 3
+      boot_sources_delete_all_others: true
+      boot_sources:
+        resources_mirror:
+          url: http://images.maas.io/ephemeral-v3/daily
+          keyring_file: /usr/share/keyrings/ubuntu-cloudimage-keyring.gpg
+      boot_sources_selections:
+        bionic:
+          url: "http://images.maas.io/ephemeral-v3/daily"
+          os: "ubuntu"
+          release: "${_param:linux_system_codename}"
+          arches:
+{%- for arch in nm.cluster.arch %}
+            - "{{ arch | dpkg_arch }}"
+{%- endfor %}
+          subarches:
+            - "generic"
+            - "ga-18.04"
+          labels: '"*"'
+      fabrics:
+        pxe_admin:
+          name: 'pxe_admin'
+          description: Fabric for PXE/admin
+          vlans:
+            0:
+              name: 'vlan 0'
+              description: PXE/admin VLAN
+              dhcp: true
+              primary_rack: "${linux:network:hostname}"
+      subnets:
+        {{ nm.net_admin }}:
+          name: {{ nm.net_admin }}
+          cidr: {{ nm.net_admin }}
+          gateway_ip: ${_param:single_address}
+          fabric: ${maas:region:fabrics:pxe_admin:name}
+          vlan: 0
+          ipranges:
+            1:
+              start: {{ nm.net_admin_pool_start }}
+              end: {{ nm.net_admin_pool_end }}
+              type: dynamic
+      sshprefs:
+        - '{{ conf.MAAS_SSH_KEY }}'
+{%- if 'aarch64' in nm.cluster.arch %}
+      package_repositories:
+        armband:
+          name: armband
+          enabled: '1'
+          url: 'http://linux.enea.com/mcp-repos/${_param:armband_repo_version}/xenial'
+          distributions: '${_param:armband_repo_version}-armband'
+          components: 'main'
+          arches: 'arm64'
+          key: ${_param:armband_key}
+{%- endif %}
+      salt_master_ip: ${_param:reclass_config_master}
+      domain: ${_param:cluster_domain}
+      ~maas_config:
+        maas_name: mas01
+        active_discovery_interval: 600
+        ntp_external_only: true
+        upstream_dns: ${_param:dns_server01}
+        commissioning_distro_series: 'bionic'
+        default_distro_series: 'bionic'
+        default_osystem: 'ubuntu'
+        default_storage_layout: 'lvm'
+        enable_http_proxy: true
+        disk_erase_with_secure_erase: false
+        dnssec_validation: 'no'
+        enable_third_party_drivers: true
+        network_discovery: 'enabled'
+        default_min_hwe_kernel: ${_param:hwe_kernel}
+        kernel_opts: 'spectre_v2=off nopti kpti=off nospec_store_bypass_disable noibrs noibpb'
+    cluster:
+      saltstack_repo_bionic: "deb [arch=amd64] http://repo.saltstack.com/apt/ubuntu/18.04/amd64/2017.7/ bionic main"
+      region:
+        host: ${_param:single_address}
+        port: 5240
+{%- if '-iec-' not in conf.MCP_DEPLOY_SCENARIO and conf.MCP_KERNEL_VER %}
+      curtin_vars:
+        amd64:
+          bionic: &curtin_vars_bionic
+            kernel_package:
+              enabled: True
+              value: 'linux-image-{{ conf.MCP_KERNEL_VER }}-generic'
+            extra_pkgs:
+              enabled: True
+              pkgs:
+                - linux-image-{{ conf.MCP_KERNEL_VER }}-generic
+                - linux-headers-{{ conf.MCP_KERNEL_VER }}-generic
+                - linux-modules-extra-{{ conf.MCP_KERNEL_VER }}-generic
+        arm64:
+          bionic:
+            <<: *curtin_vars_bionic
+{%- endif %}
+  linux:
+    system:
+      repo:
+        armband_3:
+          enabled: false
+      ~locale: ''
+      ~kernel:
+        sysctl:
+          net.ipv4.ip_forward: 1
+  iptables:
+    schema:
+      epoch: 1
+    service:
+      v4:
+        enabled: true
+        persistent_config: /etc/iptables/rules.v4
+      v6:
+        enabled: false
+    tables:
+      v4:
+        filter:
+          chains:
+            INPUT:
+              ruleset:
+                10:
+                  rule: -s ${_param:single_address}/${_param:opnfv_net_admin_mask}
+                11:
+                  rule: -d ${_param:single_address}/${_param:opnfv_net_admin_mask}
+        nat:
+          chains:
+            POSTROUTING:
+              policy: ACCEPT
+              ruleset:
+                10:
+                  rule: -s ${_param:single_address}/${_param:opnfv_net_admin_mask}
+                  action: MASQUERADE

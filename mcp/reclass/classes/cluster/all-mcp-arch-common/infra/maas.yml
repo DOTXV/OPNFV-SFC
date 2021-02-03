@@ -1,0 +1,149 @@
+##############################################################################
+# Copyright (c) 2018 Mirantis Inc., Enea AB and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+---
+# NOTE: pod_config is generated and transferred into its final location on
+# cfg01 only during deployment to prevent leaking sensitive data
+classes:
+  - system.maas.region.single
+  - service.maas.cluster.single
+  - cluster.all-mcp-arch-common.opnfv.lab_proxy_pdf
+  - cluster.all-mcp-arch-common.opnfv.pod_config
+parameters:
+  _param:
+    linux_system_codename: bionic
+    maas_admin_username: opnfv
+    dns_server01: '8.8.8.8'
+    single_address: ${_param:infra_maas_node01_deploy_address}
+    hwe_kernel: 'ga-18.04'
+    opnfv_maas_timeout_comissioning: 10
+    opnfv_maas_timeout_deploying: 15
+  maas:
+    region:
+      services:
+        - maas-regiond
+        - bind9
+      enable_iframe: False
+      timeout:
+        # Set maas.wait_for_<state> timeouts to ~2.5x of MaaS <state> timeout
+        ready: 1500
+        deployed: 2250
+        attempts: 3
+      boot_sources_delete_all_others: true
+      boot_sources:
+        resources_mirror:
+          url: http://images.maas.io/ephemeral-v3/daily
+          keyring_file: /usr/share/keyrings/ubuntu-cloudimage-keyring.gpg
+      boot_sources_selections:
+        bionic:
+          url: "http://images.maas.io/ephemeral-v3/daily"
+          os: "ubuntu"
+          release: "${_param:linux_system_codename}"
+          arches:
+            - "amd64"
+          subarches:
+            - "generic"
+            - "ga-18.04"
+          labels: '"*"'
+      fabrics:
+        pxe_admin:
+          name: 'pxe_admin'
+          description: Fabric for PXE/admin
+          vlans:
+            0:
+              name: 'vlan 0'
+              description: PXE/admin VLAN
+              dhcp: true
+              primary_rack: "${linux:network:hostname}"
+      subnets:
+        192.168.11.0/24:
+          name: 192.168.11.0/24
+          cidr: 192.168.11.0/24
+          gateway_ip: ${_param:single_address}
+          fabric: ${maas:region:fabrics:pxe_admin:name}
+          vlan: 0
+          ipranges:
+            1:
+              start: 192.168.11.38
+              end: 192.168.11.254
+              type: dynamic
+      sshprefs:
+        - 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDQ+N2yr9FhY8WgW1zp9O61F6oTALL2wCTInTWliY7evrhySUP0zb4xOb3MLoEnNxy1niRHIBwQ9CXTiKyYI6Woo4P5jIEItGE9C9jCjEr8Z/jNWaYwtmEl25hJNpcv6GV2tImszYK4unIRssmJbwrFaHfujrUFyWnYULpoWlhcTtV0jnVjClDwfvN6dxg3HJQZ70JmM43al6qHQc48Ig9yyCB3SeJJnB338BPW5KGGHxgMOj6aR/2NW/+5NuYl1q2ZcymWLsjQPtf8AZ654SusOG/it5CIiMGrJQ2tixxGhrKBeBZsYWtUs7NzD7BfpcyqxrCHS8YYhISoKvko0Q73'
+      salt_master_ip: ${_param:reclass_config_master}
+      domain: ${_param:cluster_domain}
+      ~maas_config:
+        maas_name: mas01
+        active_discovery_interval: 600
+        ntp_external_only: true
+        upstream_dns: ${_param:dns_server01}
+        commissioning_distro_series: 'bionic'
+        default_distro_series: 'bionic'
+        default_osystem: 'ubuntu'
+        default_storage_layout: 'lvm'
+        enable_http_proxy: true
+        disk_erase_with_secure_erase: false
+        dnssec_validation: 'no'
+        enable_third_party_drivers: true
+        network_discovery: 'enabled'
+        default_min_hwe_kernel: ${_param:hwe_kernel}
+        kernel_opts: 'spectre_v2=off nopti kpti=off nospec_store_bypass_disable noibrs noibpb'
+    cluster:
+      saltstack_repo_bionic: "deb [arch=amd64] http://repo.saltstack.com/apt/ubuntu/18.04/amd64/2017.7/ bionic main"
+      region:
+        host: ${_param:single_address}
+        port: 5240
+      curtin_vars:
+        amd64:
+          bionic: &curtin_vars_bionic
+            kernel_package:
+              enabled: True
+              value: 'linux-image-5.0.0-37-generic'
+            extra_pkgs:
+              enabled: True
+              pkgs:
+                - linux-image-5.0.0-37-generic
+                - linux-headers-5.0.0-37-generic
+                - linux-modules-extra-5.0.0-37-generic
+        arm64:
+          bionic:
+            <<: *curtin_vars_bionic
+  linux:
+    system:
+      repo:
+        armband_3:
+          enabled: false
+      ~locale: ''
+      ~kernel:
+        sysctl:
+          net.ipv4.ip_forward: 1
+  iptables:
+    schema:
+      epoch: 1
+    service:
+      v4:
+        enabled: true
+        persistent_config: /etc/iptables/rules.v4
+      v6:
+        enabled: false
+    tables:
+      v4:
+        filter:
+          chains:
+            INPUT:
+              ruleset:
+                10:
+                  rule: -s ${_param:single_address}/${_param:opnfv_net_admin_mask}
+                11:
+                  rule: -d ${_param:single_address}/${_param:opnfv_net_admin_mask}
+        nat:
+          chains:
+            POSTROUTING:
+              policy: ACCEPT
+              ruleset:
+                10:
+                  rule: -s ${_param:single_address}/${_param:opnfv_net_admin_mask}
+                  action: MASQUERADE

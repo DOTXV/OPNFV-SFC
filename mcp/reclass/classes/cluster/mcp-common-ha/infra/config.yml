@@ -1,0 +1,127 @@
+##############################################################################
+# Copyright (c) 2018 Mirantis Inc., Enea AB and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+---
+classes:
+  - system.reclass.storage.system.physical_control_cluster
+  - system.reclass.storage.system.openstack_control_cluster
+  - system.reclass.storage.system.openstack_proxy_cluster
+  - system.reclass.storage.system.openstack_database_cluster
+  - system.reclass.storage.system.openstack_message_queue_cluster
+  - system.reclass.storage.system.openstack_telemetry_cluster
+  # - system.reclass.storage.system.stacklight_log_cluster
+  # - system.reclass.storage.system.stacklight_monitor_cluster
+  # - system.reclass.storage.system.stacklight_telemetry_cluster
+  - cluster.all-mcp-arch-common.opnfv.lab_proxy_pdf
+  - cluster.all-mcp-arch-common.infra.config_pdf
+parameters:
+  _param:
+    salt_master_host: ${_param:infra_config_deploy_address}
+  salt:
+    master:
+      accept_policy: open_mode
+      file_recv: true
+      worker_threads: 8
+      command_timeout: 20
+  reclass:
+    storage:
+      node:
+        # NOTE: compute nodes definitions are defined in <all-mcp-arch-common/infra>
+        infra_kvm_node01:
+          params:
+            keepalived_vip_priority: 100
+            linux_system_codename: bionic
+            pxe_admin_address: ${_param:opnfv_infra_kvm_node01_pxe_admin_address}
+        infra_kvm_node02:
+          classes:
+            - cluster.mcp-common-ha.infra.kvm_novcp
+          params:
+            keepalived_vip_priority: 101
+            linux_system_codename: bionic
+            pxe_admin_address: ${_param:opnfv_infra_kvm_node02_pxe_admin_address}
+        infra_kvm_node03:
+          params:
+            keepalived_vip_priority: 102
+            linux_system_codename: bionic
+            pxe_admin_address: ${_param:opnfv_infra_kvm_node03_pxe_admin_address}
+        openstack_telemetry_node01:
+          params:
+            linux_system_codename: bionic
+            # create resources only from 1 controller
+            # to prevent race conditions
+            ceilometer_create_gnocchi_resources: true
+            redis_cluster_role: 'master'
+            pxe_admin_address: ${_param:opnfv_openstack_telemetry_node01_pxe_admin_address}
+        openstack_telemetry_node02:
+          params:
+            linux_system_codename: bionic
+            redis_cluster_role: 'slave'
+            pxe_admin_address: ${_param:opnfv_openstack_telemetry_node02_pxe_admin_address}
+        openstack_telemetry_node03:
+          params:
+            linux_system_codename: bionic
+            redis_cluster_role: 'slave'
+            pxe_admin_address: ${_param:opnfv_openstack_telemetry_node03_pxe_admin_address}
+        openstack_message_queue_node01:
+          params:
+            linux_system_codename: bionic
+            pxe_admin_address: ${_param:opnfv_openstack_message_queue_node01_pxe_admin_address}
+        openstack_message_queue_node02:
+          params:
+            linux_system_codename: bionic
+            pxe_admin_address: ${_param:opnfv_openstack_message_queue_node02_pxe_admin_address}
+        openstack_message_queue_node03:
+          params:
+            linux_system_codename: bionic
+            pxe_admin_address: ${_param:opnfv_openstack_message_queue_node03_pxe_admin_address}
+        openstack_proxy_node01:
+          params:
+            linux_system_codename: bionic
+            pxe_admin_address: ${_param:opnfv_openstack_proxy_node01_pxe_admin_address}
+        openstack_proxy_node02:
+          params:
+            linux_system_codename: bionic
+            pxe_admin_address: ${_param:opnfv_openstack_proxy_node02_pxe_admin_address}
+        # stacklight_log_node01:
+        #   classes:
+        #     - system.elasticsearch.client.single
+        # stacklight_monitor_node01:
+        #   classes:
+        #     - system.grafana.client.single
+        #     - system.kibana.client.single
+        openstack_control_node01:
+          classes:
+            - cluster.mcp-common-ha.openstack_control_init
+          params:
+            linux_system_codename: bionic
+            # NOTE: When VCP is present, external_address is not used
+            external_address: ${_param:openstack_proxy_node01_address}
+            pxe_admin_address: ${_param:opnfv_openstack_control_node01_pxe_admin_address}
+        openstack_control_node02:
+          params:
+            linux_system_codename: bionic
+            external_address: 0.0.0.0
+            pxe_admin_address: ${_param:opnfv_openstack_control_node02_pxe_admin_address}
+        openstack_control_node03:
+          params:
+            linux_system_codename: bionic
+            external_address: ${_param:openstack_proxy_node02_address}
+            pxe_admin_address: ${_param:opnfv_openstack_control_node03_pxe_admin_address}
+        openstack_database_node01:
+          classes:
+            - cluster.mcp-common-ha.openstack_database_init
+          params:
+            linux_system_codename: bionic
+            pxe_admin_address: ${_param:opnfv_openstack_database_node01_pxe_admin_address}
+        openstack_database_node02:
+          params:
+            linux_system_codename: bionic
+            pxe_admin_address: ${_param:opnfv_openstack_database_node02_pxe_admin_address}
+        openstack_database_node03:
+          params:
+            linux_system_codename: bionic
+            pxe_admin_address: ${_param:opnfv_openstack_database_node03_pxe_admin_address}

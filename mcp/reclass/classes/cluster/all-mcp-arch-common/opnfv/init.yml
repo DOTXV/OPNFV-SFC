@@ -1,0 +1,126 @@
+##############################################################################
+# Copyright (c) 2018 Mirantis Inc., Enea AB and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+---
+parameters:
+  _param:
+    opnfv_net_admin_mask: 255.255.255.0
+    opnfv_net_mgmt_mask: 255.255.255.0
+    opnfv_net_private_mask: 255.255.255.0
+    opnfv_net_public_mask: 255.255.255.0
+
+    opnfv_net_public: 10.16.0.0/24
+    opnfv_net_public_gw: 10.16.0.1
+    opnfv_net_public_pool_start: 10.16.0.113
+    opnfv_net_public_pool_end: 10.16.0.253
+
+    opnfv_net_tenant_vlan: "1000:1999"
+    opnfv_infra_config_pxe_admin_address: 192.168.11.2
+    opnfv_infra_maas_node01_deploy_address: 192.168.11.3
+    opnfv_openstack_proxy_node01_pxe_admin_address: 192.168.11.4
+    opnfv_openstack_proxy_node02_pxe_admin_address: 192.168.11.5
+    opnfv_openstack_gateway_node01_pxe_admin_address: 192.168.11.6
+    opnfv_openstack_gateway_node02_pxe_admin_address: 192.168.11.7
+    opnfv_openstack_gateway_node03_pxe_admin_address: 192.168.11.8
+    opnfv_infra_kvm_node01_pxe_admin_address: 192.168.11.9
+    opnfv_infra_kvm_node02_pxe_admin_address: 192.168.11.10
+    opnfv_infra_kvm_node03_pxe_admin_address: 192.168.11.11
+    opnfv_openstack_database_node01_pxe_admin_address: 192.168.11.12
+    opnfv_openstack_database_node02_pxe_admin_address: 192.168.11.13
+    opnfv_openstack_database_node03_pxe_admin_address: 192.168.11.14
+    opnfv_openstack_message_queue_node01_pxe_admin_address: 192.168.11.15
+    opnfv_openstack_message_queue_node02_pxe_admin_address: 192.168.11.16
+    opnfv_openstack_message_queue_node03_pxe_admin_address: 192.168.11.17
+    opnfv_openstack_telemetry_node01_pxe_admin_address: 192.168.11.18
+    opnfv_openstack_telemetry_node02_pxe_admin_address: 192.168.11.19
+    opnfv_openstack_telemetry_node03_pxe_admin_address: 192.168.11.20
+    opnfv_openstack_control_node01_pxe_admin_address: 192.168.11.21
+    opnfv_openstack_control_node02_pxe_admin_address: 192.168.11.22
+    opnfv_openstack_control_node03_pxe_admin_address: 192.168.11.23
+    opnfv_opendaylight_server_node01_pxe_admin_address: 192.168.11.24
+    opnfv_opendaylight_server_node02_pxe_admin_address: 192.168.11.25
+    opnfv_opendaylight_server_node03_pxe_admin_address: 192.168.11.26
+    opnfv_stacklight_monitor_node01_pxe_admin_address: 192.168.11.27
+    opnfv_stacklight_monitor_node02_pxe_admin_address: 192.168.11.28
+    opnfv_stacklight_monitor_node03_pxe_admin_address: 192.168.11.29
+    opnfv_stacklight_log_node01_pxe_admin_address: 192.168.11.30
+    opnfv_stacklight_log_node02_pxe_admin_address: 192.168.11.31
+    opnfv_stacklight_log_node03_pxe_admin_address: 192.168.11.32
+    opnfv_stacklight_telemetry_node01_pxe_admin_address: 192.168.11.33
+    opnfv_stacklight_telemetry_node02_pxe_admin_address: 192.168.11.34
+    opnfv_stacklight_telemetry_node03_pxe_admin_address: 192.168.11.35
+    opnfv_infra_config_address: 172.16.10.11
+    opnfv_infra_maas_node01_address: 172.16.10.12
+    opnfv_openstack_proxy_control_address: 172.16.10.13
+    opnfv_openstack_proxy_node01_control_address: 172.16.10.14
+    opnfv_openstack_proxy_node02_control_address: 172.16.10.15
+    opnfv_openstack_gateway_node01_address: 172.16.10.16
+    opnfv_openstack_gateway_node02_address: 172.16.10.17
+    opnfv_openstack_gateway_node03_address: 172.16.10.18
+    opnfv_infra_kvm_address: 172.16.10.19
+    opnfv_infra_kvm_node01_address: 172.16.10.20
+    opnfv_infra_kvm_node02_address: 172.16.10.21
+    opnfv_infra_kvm_node03_address: 172.16.10.22
+    opnfv_openstack_database_address: 172.16.10.23
+    opnfv_openstack_database_node01_address: 172.16.10.24
+    opnfv_openstack_database_node02_address: 172.16.10.25
+    opnfv_openstack_database_node03_address: 172.16.10.26
+    opnfv_openstack_message_queue_address: 172.16.10.27
+    opnfv_openstack_message_queue_node01_address: 172.16.10.28
+    opnfv_openstack_message_queue_node02_address: 172.16.10.29
+    opnfv_openstack_message_queue_node03_address: 172.16.10.30
+    opnfv_openstack_telemetry_address: 172.16.10.31
+    opnfv_openstack_telemetry_node01_address: 172.16.10.32
+    opnfv_openstack_telemetry_node02_address: 172.16.10.33
+    opnfv_openstack_telemetry_node03_address: 172.16.10.34
+    opnfv_openstack_control_address: 172.16.10.35
+    opnfv_openstack_control_node01_address: 172.16.10.36
+    opnfv_openstack_control_node02_address: 172.16.10.37
+    opnfv_openstack_control_node03_address: 172.16.10.38
+    opnfv_opendaylight_server_address: 172.16.10.39
+    opnfv_opendaylight_server_node01_address: 172.16.10.40
+    opnfv_opendaylight_server_node02_address: 172.16.10.41
+    opnfv_opendaylight_server_node03_address: 172.16.10.42
+    opnfv_stacklight_monitor_address: 172.16.10.43
+    opnfv_stacklight_monitor_node01_address: 172.16.10.44
+    opnfv_stacklight_monitor_node02_address: 172.16.10.45
+    opnfv_stacklight_monitor_node03_address: 172.16.10.46
+    opnfv_stacklight_log_address: 172.16.10.47
+    opnfv_stacklight_log_node01_address: 172.16.10.48
+    opnfv_stacklight_log_node02_address: 172.16.10.49
+    opnfv_stacklight_log_node03_address: 172.16.10.50
+    opnfv_stacklight_telemetry_address: 172.16.10.51
+    opnfv_stacklight_telemetry_node01_address: 172.16.10.52
+    opnfv_stacklight_telemetry_node02_address: 172.16.10.53
+    opnfv_stacklight_telemetry_node03_address: 172.16.10.54
+    opnfv_openstack_gateway_node01_tenant_address: 10.1.0.2
+    opnfv_openstack_gateway_node02_tenant_address: 10.1.0.3
+    opnfv_openstack_gateway_node03_tenant_address: 10.1.0.4
+    opnfv_openstack_proxy_address: 10.16.0.101
+    opnfv_openstack_proxy_node01_address: 10.16.0.102
+    opnfv_openstack_proxy_node02_address: 10.16.0.103
+    opnfv_openstack_gateway_node01_external_address: 10.16.0.104
+    opnfv_openstack_gateway_node02_external_address: 10.16.0.105
+    opnfv_openstack_gateway_node03_external_address: 10.16.0.106
+    opnfv_openstack_control_node01_external_address: 10.16.0.107
+    opnfv_openstack_control_node02_external_address: 10.16.0.108
+    opnfv_openstack_control_node03_external_address: 10.16.0.109
+    opnfv_opendaylight_server_external_address: 10.16.0.110
+  salt:
+    minion:
+      tcp_keepalive: True
+      tcp_keepalive_idle: 60
+  linux:
+    network:
+      resolv:
+        dns:
+          - 8.8.8.8
+          - 8.8.4.4
+    system:
+      kernel:
+        version: '5.0.0-37'
+        headers: True
