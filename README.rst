@@ -1,7 +1,7 @@
 .. NTU VOIP lab
 
 ==========
-OPNFV Fuel Stable Iruay
+OPNFV Fuel Stable Iruya
 ==========
 
 |docs|
