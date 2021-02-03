@@ -1,0 +1,69 @@
+##############################################################################
+# Copyright (c) 2018 Red Hat Inc. and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+---
+nodes:
+  node1:
+    mac_address: "{{ conf['nodes'][0]['remote_management']['mac_address'] }}"
+    ipmi_ip: {{ conf['nodes'][0]['remote_management']['address'] }}
+    ipmi_user: {{ conf['nodes'][0]['remote_management']['user'] }}
+    ipmi_pass: {{ conf['nodes'][0]['remote_management']['pass'] }}
+    pm_type: "pxe_{{ conf['nodes'][0]['remote_management']['type'] }}tool"
+    cpus: {{ conf['nodes'][0]['node']['cpus'] }}
+    memory: {{ conf['nodes'][0]['node']['memory'] }}
+    disk: 40
+    disk_device: sdb
+    arch: "{{ conf['nodes'][0]['node']['arch'] }}"
+    capabilities: "profile:control"
+  node2:
+    mac_address: "{{ conf['nodes'][1]['remote_management']['mac_address'] }}"
+    ipmi_ip: {{ conf['nodes'][1]['remote_management']['address'] }}
+    ipmi_user: {{ conf['nodes'][1]['remote_management']['user'] }}
+    ipmi_pass: {{ conf['nodes'][1]['remote_management']['pass'] }}
+    pm_type: "pxe_{{ conf['nodes'][1]['remote_management']['type'] }}tool"
+    cpus: {{ conf['nodes'][1]['node']['cpus'] }}
+    memory: {{ conf['nodes'][1]['node']['memory'] }}
+    disk: 40
+    disk_device: sdb
+    arch: "{{ conf['nodes'][1]['node']['arch'] }}"
+    capabilities: "profile:control"
+  node3:
+    mac_address: "{{ conf['nodes'][2]['remote_management']['mac_address'] }}"
+    ipmi_ip: {{ conf['nodes'][2]['remote_management']['address'] }}
+    ipmi_user: {{ conf['nodes'][2]['remote_management']['user'] }}
+    ipmi_pass: {{ conf['nodes'][2]['remote_management']['pass'] }}
+    pm_type: "pxe_{{ conf['nodes'][2]['remote_management']['type'] }}tool"
+    cpus: {{ conf['nodes'][2]['node']['cpus'] }}
+    memory: {{ conf['nodes'][2]['node']['memory'] }}
+    disk: 40
+    disk_device: sdb
+    arch: "{{ conf['nodes'][2]['node']['arch'] }}"
+    capabilities: "profile:control"
+  node4:
+    mac_address: "{{ conf['nodes'][3]['remote_management']['mac_address'] }}"
+    ipmi_ip: {{ conf['nodes'][3]['remote_management']['address'] }}
+    ipmi_user: {{ conf['nodes'][3]['remote_management']['user'] }}
+    ipmi_pass: {{ conf['nodes'][3]['remote_management']['pass'] }}
+    pm_type: "pxe_{{ conf['nodes'][3]['remote_management']['type'] }}tool"
+    cpus: {{ conf['nodes'][3]['node']['cpus'] }}
+    memory: {{ conf['nodes'][3]['node']['memory'] }}
+    disk: 40
+    disk_device: sdb
+    arch: "{{ conf['nodes'][3]['node']['arch'] }}"
+    capabilities: "profile:compute"
+  node5:
+    mac_address: "{{ conf['nodes'][4]['remote_management']['mac_address'] }}"
+    ipmi_ip: {{ conf['nodes'][4]['remote_management']['address'] }}
+    ipmi_user: {{ conf['nodes'][4]['remote_management']['user'] }}
+    ipmi_pass: {{ conf['nodes'][4]['remote_management']['pass'] }}
+    pm_type: "pxe_{{ conf['nodes'][4]['remote_management']['type'] }}tool"
+    cpus: {{ conf['nodes'][4]['node']['cpus'] }}
+    memory: {{ conf['nodes'][4]['node']['memory'] }}
+    disk: 40
+    disk_device: sdb
+    arch: "{{ conf['nodes'][4]['node']['arch'] }}"
+    capabilities: "profile:compute"

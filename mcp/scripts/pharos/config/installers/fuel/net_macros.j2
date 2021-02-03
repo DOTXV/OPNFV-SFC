@@ -1,0 +1,49 @@
+##############################################################################
+# Copyright (c) 2018 Mirantis Inc., Enea AB and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+{%- macro linux_network_interfaces_nic(nics, proto = 'manual') -%}
+{%- for nic in nics %}
+        {{ nic }}:
+          enabled: true
+          type: eth
+          proto: {{ proto }}
+          mtu: ${_param:interface_mtu}
+          name: {{ nic }}
+          noifupdown: true
+{%- endfor %}
+{%- endmacro -%}
+
+{%- macro linux_network_interfaces_vlan(vlans, proto = 'manual') -%}
+{%- for vlan in vlans %}
+    {%- if vlan | int > 0 %}
+        {{ vlans[vlan] }}.{{ vlan }}:
+          enabled: true
+          proto: {{ proto }}
+          mtu: ${_param:interface_mtu}
+          type: vlan
+          name: {{ vlans[vlan] }}.{{ vlan }}
+          use_interfaces:
+            - {{ vlans[vlan] }}
+    {%- endif %}
+{%- endfor %}
+{%- endmacro -%}
+
+{%- macro interface_str(nic, vlan = 0) -%}
+    {{ nic }}{% if vlan | int > 0 %}.{{ vlan }}{% endif %}
+{%- endmacro -%}
+
+{%- macro vpp_interface_str(speed, pci_addr, driver = '') -%}
+    {%- set p = pci_addr.replace('.', ':').split(':') -%}
+    {%- set s = 'Ethernet%d/%d/%d' | format(p[-3] | int(0, 16),
+                                            p[-2] | int(0, 16),
+                                            p[-1] | int(0, 16)) -%}
+    {%- if 'vfio' in driver -%}
+    VirtualFunction{{ s }}
+    {%- else -%}
+    {% if '40g' in speed %}Forty{% elif '10g' in speed %}Ten{% endif %}Gigabit{{ s }}
+    {%- endif -%}
+{%- endmacro -%}

@@ -1,0 +1,231 @@
+##############################################################################
+# Copyright (c) 2018 Enea AB and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+---
+$schema: 'http://json-schema.org/schema#'
+$id: 'https://github.com/opnfv/pharos/blob/master/config/pdf/pod1.yaml'
+
+definitions:
+  net_config:
+    v0.1:
+      # NOTE: I hope this is going away soon, so I won't model it yet
+      type: 'object'
+  compass:
+    v0.1:
+      type: 'object'
+      # NOTE: To be properly modeled by Compass4NFV maintainers
+  daisy:
+    v0.1:
+      type: 'object'
+      # NOTE: To be properly modeled by Daisy maintainers
+  fuel:
+    v0.1:
+      type: 'object'
+      properties:
+        jumphost:
+          type: 'object'
+          properties:
+            bridges:
+              type: 'object'
+              properties:
+                admin:
+                  type: ['string', 'null']
+                mgmt:
+                  type: ['string', 'null']
+                private:
+                  type: ['string', 'null']
+                public:
+                  type: ['string', 'null']
+              required: ['admin', 'mgmt', 'private', 'public']
+              additionalProperties: false
+            trunks:
+              type: 'object'
+              properties:
+                mgmt:
+                  type: 'boolean'
+              required: ['mgmt']
+              additionalProperties: false
+          required: ['bridges']
+          additionalProperties: false
+        maas:
+          type: 'object'
+          properties:
+            timeout_comissioning:
+              type: 'number'
+            timeout_deploying:
+              type: 'number'
+          required: ['timeout_comissioning', 'timeout_deploying']
+          additionalProperties: false
+        network:
+          type: 'object'
+          properties:
+            interface_mtu:
+              type: 'number'
+            ntp_strata_host1:
+              type: 'string'
+            ntp_strata_host2:
+              type: 'string'
+            node:
+              type: 'array'
+              items:
+                type: 'object'
+                properties:
+                  interfaces:
+                    type: 'array'
+                    items:
+                      type: ['string', 'null']
+                  busaddr:
+                    type: 'array'
+                    items:
+                      type: ['string', 'null']
+                required: ['interfaces', 'busaddr']
+                additionalProperties: false
+          required: ['node']
+          additionalProperties: false
+        reclass:  # Optional
+          type: 'object'
+          properties:
+            node:
+              type: 'array'
+              items:
+                type: 'object'
+                properties:
+                  compute_params:
+                    type: 'object'
+                    properties:
+                      common:  # Optional
+                        type: 'object'
+                        properties: &compute_params_common_properties
+                          nova_cpu_pinning:  # Optional
+                            type: 'string'
+                          compute_hugepages_size:
+                            type: 'string'
+                            enum: ['2M', '1G']
+                          compute_hugepages_count:
+                            type: 'number'
+                          compute_hugepages_mount:
+                            type: 'string'
+                          compute_kernel_isolcpu:  # Optional
+                            type: 'string'
+                          compute_ovs_pmd_cpu_mask:  # Optional
+                            type: ['string', 'number']
+                          compute_ovs_memory_channels:  # Optional
+                            type: ['string', 'number']
+                        required: ['compute_hugepages_size', 'compute_hugepages_count',
+                                   'compute_hugepages_mount']
+                        additionalProperties: false
+                      dpdk:  # Optional
+                        type: 'object'
+                        properties:
+                          <<: *compute_params_common_properties
+                          compute_dpdk_driver:
+                            type: 'string'
+                          compute_ovs_dpdk_socket_mem:
+                            type: ['string', 'number']
+                          compute_ovs_dpdk_lcore_mask:
+                            type: ['string', 'number']
+                          dpdk0_driver:
+                            type: 'string'
+                          dpdk0_n_rxq:
+                            type: 'number'
+                        required: ['compute_dpdk_driver', 'dpdk0_driver', 'dpdk0_n_rxq',
+                                   'compute_ovs_dpdk_socket_mem',
+                                   'compute_ovs_dpdk_lcore_mask']
+                        additionalProperties: false
+                    additionalProperties: false
+                required: ['compute_params']
+                additionalProperties: false
+          required: ['node']
+          additionalProperties: false
+      required: ['jumphost', 'network']
+      additionalProperties: false
+  osa:
+    v0.1:
+      type: 'object'
+      properties:
+        nodes_roles:
+          type: 'object'
+        groups:
+          type: 'object'
+        hostnames:
+          type: 'object'
+        network:
+          type: 'object'
+      required: ['nodes_roles', 'groups', 'hostnames', 'network']
+      additionalProperties: false
+  kubespray:
+    v0.1:
+      type: ['object', 'null']
+      # NOTE: To be properly modeled by XCI maintainers
+
+##############################################################################
+# Top-level structure:
+# - define all possible top-level and second-level keys, without enforcing a
+#   schema for second-level, just so we can disallow additional properties;
+# - require 'version' and allow dynamically generated 'version_x.y' key;
+properties:
+  idf:
+    properties:
+      # version_x.y keys are auto-added by `validate_schema.py` based on 'version'
+      version_0.1:
+        type: 'boolean'
+      version:
+        type: 'number'
+        enum: [0.1]
+      installer:
+        type: 'array'
+        items:
+          type: 'string'
+          enum: ['apex', 'compass4nfv', 'daisy', 'fuel', 'joid', 'osa', 'kubespray']
+      net_config:
+        type: 'object'
+      compass:
+        type: 'object'
+      daisy:
+        type: 'object'
+      fuel:
+        type: 'object'
+      osa:
+        type: ['object', 'null']
+      kubespray:
+        type: ['object', 'null']
+    required: ['version']
+    additionalProperties: false
+    ############################################################################
+    # Schema versioning
+    # - based on dynamically added 'version_x.y', require additional IDF blocks
+    #   and validate them against the proper schema version;
+    dependencies:
+      version_0.1:
+        properties:
+          net_config:
+            $ref: '#/definitions/net_config/v0.1'
+          compass:
+            $ref: '#/definitions/compass/v0.1'
+          daisy:
+            $ref: '#/definitions/daisy/v0.1'
+          fuel:
+            $ref: '#/definitions/fuel/v0.1'
+          osa:
+            $ref: '#/definitions/osa/v0.1'
+          kubespray:
+            $ref: '#/definitions/kubespray/v0.1'
+      fuel:
+        required: ['net_config']
+      daisy:
+        required: ['net_config']
+      osa:
+        required: ['net_config']
+      kubespray:
+        required: ['net_config']
+  xci:
+    type: 'object'
+    # NOTE: To be properly modeled by XCI maintainers
+
+# Do not allow any properties not defined here. This lets us catch typos.
+additionalProperties: false
+required: ['idf']
