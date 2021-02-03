@@ -32,6 +32,26 @@ Installation
 ============
 
 - `OPNFV Fuel Installation Instruction on RTD`_
+- Installation instruction:
+    $ sudo mkdir -p -m 777 tmpdir (Create the folder your want to install opnfv)
+    $ git clone ....
+    $ cd ~/fuel
+    $ sudo git checkout opnfv-9.0.0
+    $ sudo ci/deploy.sh -l ericsson -p virtual1 -s os-odl-sfc-noha -D -S ~/tmpdir |& sudo tee deploy.log
+
+- Uninstallation instruction:
+    $ cd tmpdir (The folder you installed opnfv)
+    $ sudo rm -rf *
+    $ virsh destroy ctl01
+    $ virsh destroy cmp001
+    $ virsh destroy cmp002
+    $ virsh destroy gtw01
+    $ virsh destroy odl01
+    $ sudo docker container stop fuel
+    $ sudo docker container rm fuel
+    $ sudo docker network rm docker-compose_mcpcontrol
+    $ sudo docker network rm docker-compose_mgmt
+    $ sudo docker network rm docker-compose_pxebr
 
 Usage
 =====
