@@ -1,0 +1,6 @@
+parameters:
+  ceilometer:
+    upgrade:
+      enabled: ${_param:ceilometer_upgrade_enabled}
+      old_release: ${_param:ceilometer_old_version}
+      new_release: ${_param:ceilometer_version}

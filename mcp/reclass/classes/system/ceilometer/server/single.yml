@@ -1,0 +1,30 @@
+classes:
+- service.ceilometer.server.single
+- system.ceilometer.upgrade
+- system.salt.minion.cert.rabbitmq.clients.openstack.ceilometer
+parameters:
+  ceilometer:
+    server:
+      role: ${_param:openstack_node_role}
+      database:
+        influxdb:
+          host: ${_param:stacklight_monitor_node01_address}
+          port: 8086
+          user: ceilometer
+          password: ${_param:ceilometer_influxdb_password}
+          database: ceilometer
+        elasticsearch:
+          enabled: true
+          host: ${_param:stacklight_monitor_address}
+          port: 9200
+      message_queue:
+        port: ${_param:openstack_rabbitmq_port}
+        x509:
+          enabled: ${_param:openstack_rabbitmq_x509_enabled}
+          ca_file: ${_param:rabbitmq_ceilometer_ssl_ca_file}
+          key_file: ${_param:rabbitmq_ceilometer_client_ssl_key_file}
+          cert_file: ${_param:rabbitmq_ceilometer_client_ssl_cert_file}
+        ssl:
+          enabled: ${_param:rabbitmq_ssl_enabled}
+      identity:
+        protocol: ${_param:cluster_internal_protocol}
