@@ -1,0 +1,14 @@
+classes:
+- service.mongodb.server.cluster
+parameters:
+  _param:
+    mongodb_replica_set: stacklight
+  mongodb:
+    server:
+      replica_set: ${_param:mongodb_replica_set}
+      members:
+      - host: ${_param:cluster_node01_address}
+        priority: 2
+      - host: ${_param:cluster_node02_address}
+      - host: ${_param:cluster_node03_address}
+      master: ${_param:cluster_node01_hostname}

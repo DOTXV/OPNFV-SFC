@@ -1,0 +1,12 @@
+classes:
+- service.memcached.server.single
+parameters:
+  memcached:
+    server:
+      bind:
+        address: ${_param:openstack_memcached_server_bind_address}
+        proto:
+          tcp:
+            enabled: ${_param:openstack_memcached_proto_tcp_enabled}
+          udp:
+            enabled: ${_param:openstack_memcached_proto_udp_enabled}
