@@ -1,0 +1,112 @@
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+: Copyright (c) 2019 Mirantis Inc., Enea AB and others.
+:
+: All rights reserved. This program and the accompanying materials
+: are made available under the terms of the Apache License, Version 2.0
+: which accompanies this distribution, and is available at
+: http://www.apache.org/licenses/LICENSE-2.0
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+From: Alexandru Avadanii <Alexandru.Avadanii@enea.com>
+Date: Wed, 22 Aug 2018 01:35:06 +0200
+Subject: [PATCH] OPNFV package installation, Ubuntu user
+
+* Install OpenSSH server (and client), so other OPNFV projects can
+  easily connect to the Salt master node;
+* Install 'salt-formula-gnocchi' distro package (empty git formula
+  workaround);
+* While at it, create 'ubuntu' user so other OPNFV projects don't
+  have to switch to 'root' login;
+* Preinstall `salt_minion_dependency_packages` and
+  `salt_minion_reclass_dependencies`;
+* Pin dockermake to v0.8 to allow using python3.5 for virtualenv,
+  since python 3.6 is not easily available for Ubuntu Xenial
+  jump/build hosts.
+* Pin jinja2 to 2.11.0 to bypass [1].
+
+[1] https://github.com/saltstack/salt/issues/46594
+
+Signed-off-by: Alexandru Avadanii <Alexandru.Avadanii@enea.com>
+---
+ DockerMake.yml | 39 ++++++++++++++++++++++++++++++++++++++-
+ Pipfile        |  4 ++--
+ 2 files changed, 40 insertions(+), 3 deletions(-)
+
+diff --git a/DockerMake.yml b/DockerMake.yml
+index 2c75586..f30024c 100644
+--- a/DockerMake.yml
++++ b/DockerMake.yml
+@@ -29,6 +29,7 @@ common-cleanup:
+
+ common:
+   build: |
++    ARG CACHE_INVALIDATE="0"
+     RUN echo "Layer with common packages" \
+       && eval ${LAYER_PKGUPDT} \
+       && apt-get upgrade -qy \
+@@ -94,7 +95,7 @@ salt-formulas:
+   build: |
+     ARG SALT_FORMULA_VERSION="master"
+     ENV SALT_FORMULA_VERSION $SALT_FORMULA_VERSION
+-    ARG SALT_FORMULA_SOURCES="https://github.com/salt-formulas https://github.com/saltstack-formulas"
++    ARG SALT_FORMULA_SOURCES="https://github.com/salt-formulas"
+     ENV SALT_FORMULA_SOURCES $SALT_FORMULA_SOURCES
+     ARG SALT_FORMULAS_BASE="/srv/salt/formula"
+     ENV SALT_FORMULAS_BASE $SALT_FORMULAS_BASE
+@@ -108,6 +109,42 @@ salt-formulas:
+       && bash -c 'source /srv/salt/formula-fetch.sh && setupPyEnv && fetchAll' \
+       && eval ${LAYER_CLEANUP}
+
++opnfv:
++  build: |
++    # Some formulas have empty git repos, use the package version
++    ARG SALT_FORMULA_VERSION="nightly"
++    ENV SALT_FORMULA_VERSION $SALT_FORMULA_VERSION
++    ARG SALT_FORMULA_LIST="salt-formula-gnocchi"
++    ENV SALT_FORMULA_LIST $SALT_FORMULA_LIST
++    ENV APT_REPOSITORY "deb [arch=amd64] http://apt.mirantis.com/xenial ${SALT_FORMULA_VERSION} salt"
++    ENV APT_REPOSITORY_GPG "http://apt.mirantis.com/public.gpg"
++    RUN echo "Layer extra salt-formulas packages" \
++      && echo "$APT_REPOSITORY" | tee /etc/apt/sources.list.d/salt-formulas.list >/dev/null \
++      && curl -sL $APT_REPOSITORY_GPG | $SUDO apt-key add - \
++      && eval ${LAYER_PKGUPDT} \
++      && ${LAYER_INSTALL} ${SALT_FORMULA_LIST} -y --fix-missing -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" \
++      && eval ${LAYER_CLEANUP}
++    RUN echo "Layer with OPNFV packages" \
++      && eval ${LAYER_PKGUPDT} \
++      && ${LAYER_INSTALL} \
++           gawk \
++           inetutils-ping \
++           kmod \
++           net-tools \
++           openssh-server \
++           python-futures \
++           python-m2crypto \
++           python-msgpack \
++           python-netaddr \
++           python-oauth \
++           python-psutil \
++           python-yaml \
++      && useradd -m ubuntu \
++      && echo 'ubuntu ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/ubuntu \
++      && python -m pip install -U jinja2==2.11.0 \
++      && eval ${LAYER_CLEANUP}
++
++
+ wheel:
+   requires:
+     - base
+diff --git a/Pipfile b/Pipfile
+index d3e8d66..340e125 100644
+--- a/Pipfile
++++ b/Pipfile
+@@ -7,8 +7,8 @@ name = "pypi"
+
+ [packages]
+ pygithub = "*"
+-docker-make = {git = "https://github.com/avirshup/DockerMake"}
+-dockermake = {git = "https://github.com/avirshup/DockerMake"}
++docker-make = {git = "https://github.com/avirshup/DockerMake", ref = "aeac230fd5ab468d806bf42b120aa97f91eb40a2"}
++dockermake = {git = "https://github.com/avirshup/DockerMake", ref = "aeac230fd5ab468d806bf42b120aa97f91eb40a2"}
+
+ [requires]
+ python_version = "3.6"

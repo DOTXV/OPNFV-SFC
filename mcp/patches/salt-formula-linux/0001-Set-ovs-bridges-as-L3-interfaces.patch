@@ -1,0 +1,124 @@
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+: Copyright (c) 2019 Mirantis Inc., Enea AB and others.
+:
+: All rights reserved. This program and the accompanying materials
+: are made available under the terms of the Apache License, Version 2.0
+: which accompanies this distribution, and is available at
+: http://www.apache.org/licenses/LICENSE-2.0
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+From: Michael Polenchuk <mpolenchuk@mirantis.com>
+Date: Wed, 28 Feb 2018 17:54:28 +0400
+Subject: [PATCH] Set ovs bridges as L3 interfaces
+
+---
+ linux/files/ovs_bridge      | 22 ++++++++++++++++++++++
+ linux/files/ovs_port        |  8 +++++++-
+ linux/network/interface.sls | 34 +++++++++++++++++++++++++++++++++-
+ 3 files changed, 62 insertions(+), 2 deletions(-)
+ create mode 100644 linux/files/ovs_bridge
+
+diff --git a/linux/files/ovs_bridge b/linux/files/ovs_bridge
+new file mode 100644
+index 0000000..4718b91
+--- /dev/null
++++ b/linux/files/ovs_bridge
+@@ -0,0 +1,22 @@
++# With systemd, adding OVS bridges as 'auto' can cause race conditions
++# https://github.com/openvswitch/ovs/blob/master/debian/openvswitch-switch.README.Debian
++# auto {{ bridge_name }}
++allow-ovs {{ bridge_name }}
++iface {{ bridge_name }} inet {{ bridge.get('proto', 'static' if bridge.address is defined else 'manual') }}
++  ovs_type OVSBridge
++  {%- if bridge.address is defined %}
++  address {{ bridge.address }}
++  netmask {{ bridge.netmask }}
++  {%- endif %}
++  {%- if bridge.use_interfaces is defined %}
++  ovs_ports {{ bridge.use_interfaces|join(' ') }}
++  {%- endif %}
++  {%- if bridge.datapath_type is defined %}
++  ovs_extra set Bridge ${IFACE} datapath_type={{ bridge.datapath_type }}
++  {%- endif %}
++  {%- if bridge.gateway is defined %}
++  gateway {{ bridge.gateway }}
++  {%- endif %}
++  {%- if bridge.name_servers is defined %}
++  dns-nameservers {{ bridge.name_servers | join(' ') }}
++  {%- endif %}
+diff --git a/linux/files/ovs_port b/linux/files/ovs_port
+index 222ca8e..41821b7 100644
+--- a/linux/files/ovs_port
++++ b/linux/files/ovs_port
+@@ -1,6 +1,12 @@
+-auto {{ port_name }}
++# With systemd, adding OVS bridges as 'auto' can cause race conditions
++# https://github.com/openvswitch/ovs/blob/master/debian/openvswitch-switch.README.Debian
++# OVS ports will be automatically ifup-ed when ifup-ing the OVS bridge
++# auto {{ port_name }}
+ allow-{{ port.bridge }} {{ port_name }}
+ iface {{ port_name }} inet {{ port.get('proto', 'manual') }}
++{%- if '.' in port_name %}
++vlan-raw-device {{ port_name.split('.')[0] }}
++{%- endif %}
+ ovs_type {{ port.get('ovs_port_type', 'OVSIntPort') }}
+ mtu {{ port.get('mtu', '1500') }}
+ ovs_bridge {{ port.bridge }}
+diff --git a/linux/network/interface.sls b/linux/network/interface.sls
+index a39fc37..8bce092 100644
+--- a/linux/network/interface.sls
++++ b/linux/network/interface.sls
+@@ -92,6 +92,35 @@ add_int_{{ int_name }}_to_ovs_dpdk_bridge_{{ interface_name }}:
+ ovs_bridge_{{ interface_name }}:
+   openvswitch_bridge.present:
+   - name: {{ interface_name }}
++  file.managed:
++  - name: /etc/network/interfaces.u/ifcfg-{{ interface_name }}
++  - makedirs: True
++  - source: salt://linux/files/ovs_bridge
++  - defaults:
++      bridge: {{ interface|yaml }}
++      bridge_name: {{ interface_name }}
++  - template: jinja
++
++linux_interfaces_include_{{ interface_name }}:
++  file.prepend:
++  - name: /etc/network/interfaces
++  - text: |
++      source /etc/network/interfaces.d/*
++      # Workaround for Upstream-Bug: https://github.com/saltstack/salt/issues/40262
++      source /etc/network/interfaces.u/*
++
++ovs_bridge_up_{{ interface_name }}:
++  cmd.run:
++  - name: ifup --ignore-errors {{ interface_name }}
++  - require:
++    - file: ovs_bridge_{{ interface_name }}
++    - openvswitch_bridge: ovs_bridge_{{ interface_name }}
++    - file: linux_interfaces_final_include
++  {%- if network.noifupdown|d(false) or interface.noifupdown|d(false) %}
++  - onlyif: /bin/false
++  {%- else %}
++  - unless: grep -qFx up /sys/class/net/{{ interface_name }}/operstate
++  {%- endif %}
+
+ {# add linux network interface into OVS bridge #}
+ {%- for int_name, int in network.interface.items() %}
+@@ -102,7 +131,7 @@ ovs_bridge_{{ interface_name }}:
+
+ add_int_{{ int_name }}_to_ovs_bridge_{{ interface_name }}:
+   cmd.run:
+-    - unless: ovs-vsctl show | grep {{ int_name }}
++    - unless: ovs-vsctl list-ports {{ interface_name }} | grep -qFx {{ int_name }}
+     - name: ovs-vsctl{%- if network.ovs_nowait %} --no-wait{%- endif %} add-port {{ interface_name }} {{ int_name }}
+
+ {%- endif %}
+@@ -176,6 +205,9 @@ ovs_port_{{ interface_name }}_line2:
+ ovs_port_up_{{ interface_name }}:
+   cmd.run:
+   - name: ifup {{ interface_name }}
++  {%- if network.noifupdown|d(false) or interface.noifupdown|d(false) %}
++  - onlyif: /bin/false
++  {%- endif %}
+   - require:
+     - file: ovs_port_{{ interface_name }}
+     - file: ovs_port_{{ interface_name }}_line1
