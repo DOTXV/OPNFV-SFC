@@ -1,0 +1,6 @@
+parameters:
+  horizon:
+    upgrade:
+      enabled: ${_param:horizon_upgrade_enabled}
+      old_release: ${_param:horizon_old_version}
+      new_release: ${_param:horizon_version}

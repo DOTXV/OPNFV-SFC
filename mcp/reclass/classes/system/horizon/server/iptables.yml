@@ -1,0 +1,94 @@
+parameters:
+  iptables:
+    tables:
+      v4:
+        filter:
+          chains:
+            OUTPUT:
+              ruleset:
+                100:
+                  action: NAME_RESOLUTION
+                1000:
+                  rule: -m owner --uid-owner horizon
+                  action: HORIZON_ACCESS_RULES
+            HORIZON_ACCESS_RULES:
+              ruleset:
+                100:
+                  # Allow publicURL endpoint(s)
+                  rule: -p tcp --dst ${_param:cluster_public_host}
+                  action: HORIZON_OPENSTACK_ENDPOINTS
+                101:
+                  # Allow internalURL endpoint(s)
+                  rule: -p tcp --dst ${_param:openstack_control_address}
+                  action: HORIZON_OPENSTACK_ENDPOINTS
+                200:
+                  # Allow memcached on localhost
+                  rule: -o lo
+                  action: HORIZON_MEMCACHED_ENDPOINTS
+                201:
+                  # Allow memchached on other hosts
+                  # This rule should be altered (not here) if required to allow
+                  # only specific hosts.
+                  action: HORIZON_MEMCACHED_ENDPOINTS
+                500:
+                  # Disable any other local traffic
+                  rule: -o lo
+                  action: REJECT
+                501:
+                  # 501-503 disable private networks
+                  rule: --dst 10.0.0.0/16
+                  action: REJECT
+                502:
+                  rule: --dst 172.16.0.0/12
+                  action: REJECT
+                503:
+                  rule: --dst 192.168.0.0/16
+                  action: REJECT
+                504:
+                  # Disable APIPA
+                  rule: --dst 169.254.0.0/16
+                  action: REJECT
+                1000:
+                  # Accept any other traffic
+                  # It should be external traffic only
+                  action: ACCEPT
+            HORIZON_OPENSTACK_ENDPOINTS:
+              ruleset:
+                10:
+                  # Identity service (keystone) public endpoint
+                  rule: -p tcp --dport 5000
+                  action: ACCEPT
+                20:
+                  # Orchestration (heat) endpoint
+                  rule: -p tcp --dport 8004
+                  action: ACCEPT
+                30:
+                  # Compute (nova) endpoint
+                  rule: -p tcp --dport 8774
+                  action: ACCEPT
+                40:
+                  # Block Storage (cinder) endpoint
+                  rule: -p tcp --dport 8776
+                  action: ACCEPT
+                50:
+                  # Image service (glance) endpoint
+                  rule: -p tcp --dport 9292
+                  action: ACCEPT
+                60:
+                  # Networking (neutron) endpoint
+                  rule: -p tcp --dport 9696
+                  action: ACCEPT
+            HORIZON_MEMCACHED_ENDPOINTS:
+              ruleset:
+                10:
+                  rule: -p tcp --dport 11211
+                  action: ACCEPT
+                1000:
+                  action: RETURN
+            NAME_RESOLUTION:
+              ruleset:
+                10:
+                  rule: -p udp --dport 53
+                  action: ACCEPT
+                1000:
+                  action: RETURN

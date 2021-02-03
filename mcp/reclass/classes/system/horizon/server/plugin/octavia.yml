@@ -1,0 +1,14 @@
+parameters:
+  horizon:
+    server:
+      plugin:
+        octavia-dashboard:
+          source:
+            engine: pkg
+            name: python-octavia-dashboard
+      policy:
+        octavia:
+          enabled: true
+          name: octavia_policy.json
+          source: file
+
