@@ -1,0 +1,6 @@
+classes:
+  - system.glance.upgrade
+parameters:
+  glance:
+    client:
+      enabled: true

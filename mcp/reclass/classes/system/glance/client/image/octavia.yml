@@ -1,0 +1,26 @@
+classes:
+- system.glance.client
+parameters:
+  glance:
+    client:
+      identity:
+        admin_identity:
+          endpoint_type: internalURL
+          image:
+            amphora-x64-haproxy:
+              name: ${_param:amphora_image_name}
+              location: ${_param:amphora_image_url}
+              import_from_format: 'qcow2'
+              container_format: 'bare'
+              disk_format: 'qcow2'
+              tags:
+                - 'amphora'
+              visibility: public
+              wait_timeout: 1000
+  salt:
+    minion:
+      mine:
+        module:
+          glanceng.get_image_owner_id:
+            - ${_param:amphora_image_name}
+            - 'admin_identity'

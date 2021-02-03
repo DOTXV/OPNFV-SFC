@@ -1,0 +1,15 @@
+classes:
+- service.glusterfs.server
+parameters:
+  glusterfs:
+    monitoring:
+      glusterfs_service_host: ${_param:glusterfs_service_host}
+    _support:
+      iptables:
+        enabled: false
+    server:
+      role: ${_param:glusterfs_node_role}
+      peers:
+      - ${_param:cluster_node01_address}
+      - ${_param:cluster_node02_address}
+      - ${_param:cluster_node03_address}

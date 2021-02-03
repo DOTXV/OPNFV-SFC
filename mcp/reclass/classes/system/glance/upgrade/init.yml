@@ -1,0 +1,6 @@
+parameters:
+  glance:
+    upgrade:
+      enabled: ${_param:glance_upgrade_enabled}
+      old_release: ${_param:glance_old_version}
+      new_release: ${_param:glance_version}

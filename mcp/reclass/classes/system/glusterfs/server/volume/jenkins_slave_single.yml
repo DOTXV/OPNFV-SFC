@@ -1,0 +1,20 @@
+parameters:
+  glusterfs:
+    server:
+      volumes:
+        jenkins_slave01:
+          storage: /srv/glusterfs/jenkins_slaves/slave01
+          replica: 3
+          bricks:
+            - ${_param:cluster_node01_address}:/srv/glusterfs/jenkins_slaves/slave01
+            - ${_param:cluster_node02_address}:/srv/glusterfs/jenkins_slaves/slave01
+            - ${_param:cluster_node03_address}:/srv/glusterfs/jenkins_slaves/slave01
+          options:
+            storage.owner-gid: 10000
+            storage.owner-uid: 10000
+            cluster.readdir-optimize: On
+            nfs.disable: On
+            network.remote-dio: On
+            diagnostics.client-log-level: WARNING
+            diagnostics.brick-log-level: WARNING
+            cluster.favorite-child-policy: mtime

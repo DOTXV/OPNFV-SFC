@@ -1,0 +1,15 @@
+parameters:
+  _param:
+    jenkins_slaves_glusterfs_service_host: ${_param:glusterfs_service_host}
+    glusterfs_node01_address: ${_param:cluster_node01_address}
+    glusterfs_node02_address: ${_param:cluster_node02_address}
+    glusterfs_node03_address: ${_param:cluster_node03_address}
+  glusterfs:
+    client:
+      volumes:
+        jenkins_slave01:
+          path: /srv/volumes/jenkins_slaves/slave01
+          server: ${_param:jenkins_slaves_glusterfs_service_host}
+          opts: "defaults,backup-volfile-servers=${_param:glusterfs_node01_address}:${_param:glusterfs_node02_address}:${_param:glusterfs_node03_address}"
+          user: 10000
+          group: 10000

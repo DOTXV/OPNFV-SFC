@@ -1,0 +1,96 @@
+classes:
+  - service.gerrit.client
+parameters:
+  _param:
+    gerrit_try_login: true
+    gerrit_http_port: 8080
+    gerrit_server_host: ${_param:cluster_vip_address}
+    gerrit_url_prefix: ''
+  gerrit:
+    client:
+      enabled: True
+      try_login: ${_param:gerrit_try_login}
+      dir:
+        git: /srv/volumes/gerrit/git
+        gerrit_config: /srv/volumes/gerrit/etc/gerrit.config
+        gerrit_secure_config: /srv/volumes/gerrit/etc/secure.config
+      server:
+        host: ${_param:gerrit_server_host}
+        user: admin
+        email: ${_param:gerrit_admin_email}
+        auth_method: basic
+        http_port: ${_param:gerrit_http_port}
+        ssh_port: 29418
+        protocol: http
+        url_prefix: ${_param:gerrit_url_prefix}
+        password: ${_param:gerrit_admin_password}
+        key: ${_param:gerrit_admin_private_key}
+      user:
+        admin:
+          ssh_key: ${_param:gerrit_admin_public_key}
+      group:
+        Event Streaming Users:
+          description: Event Streaming Users
+        devops-core:
+          description: Core maintainers
+        devops-release:
+          description: Release engineers
+        devops-contrib:
+          description: Service developers
+      default_access:
+        "refs/*":
+          actions:
+          - name: read
+            group: Non-Interactive Users
+        "refs/heads/*":
+          actions:
+          - name: abandon
+            group: devops-core
+          - name: create
+            group: devops-core
+          labels:
+          - name: Code-Review
+            group: devops-core
+            score: -2..+2
+          - name: Code-Review
+            group: Non-Interactive Users
+            score: -1..+1
+          - name: Verified
+            group: Non-Interactive Users
+            score: -1..+1
+          - name: Workflow
+            group: devops-core
+            score: -1..+1
+        "refs/tags/*":
+          actions:
+          - name: pushTag
+            group: Administrators
+            force: true
+          - name: pushTag
+            group: Project Owners
+            force: true
+          - name: pushSignedTag
+            group: devops-core
+          - name: pushSignedTag
+            group: Administrators
+          - name: pushSignedTag
+            group: Project Owners
+          - name: create
+            group: devops-core
+          - name: create
+            group: Administrators
+          - name: push
+            group: devops-core
+          - name: push
+            group: Administrators
+            force: true
+          - name: forgeCommitter
+            group: devops-core
+          - name: forgeCommitter
+            group: Administrators
+          - name: forgeAuthor
+            group: devops-core
+          - name: forgeAuthor
+            group: Administrators
+          - name: forgeServerAsCommitter
+            group: Administrators
