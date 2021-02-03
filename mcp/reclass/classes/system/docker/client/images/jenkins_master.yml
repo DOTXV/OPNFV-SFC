@@ -1,0 +1,6 @@
+parameters:
+  docker:
+    client:
+      enabled: true
+      images:
+      - ${_param:docker_image_jenkins}

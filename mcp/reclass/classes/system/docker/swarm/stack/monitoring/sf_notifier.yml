@@ -1,0 +1,42 @@
+classes:
+- system.prometheus.sf_notifier.container
+parameters:
+  _param:
+    sf_notifier_workers: 4
+    sf_notifier_buffer_size: 32768
+    sf_notifier_alert_id_hash_func: sha256
+  docker:
+    client:
+      stack:
+        monitoring:
+          network:
+            monitoring:
+              driver: overlay
+              driver_opts:
+                encrypted: 1
+          service:
+            sf_notifier:
+              networks:
+                - monitoring
+              deploy:
+                replicas: 1
+                labels:
+                  com.mirantis.monitoring: "sf-notifier"
+                restart_policy:
+                  condition: any
+              labels:
+                com.mirantis.monitoring: "sf-notifier"
+              image: ${_param:docker_image_sf_notifier}
+              ports:
+                - 15018:5000
+              environment:
+                SF_NOTIFIER_WORKERS: ${_param:sf_notifier_workers}
+                SF_NOTIFIER_BUFFER_SIZE: ${_param:sf_notifier_buffer_size}
+                SF_NOTIFIER_APP_PORT: ${prometheus:sf_notifier:uwsgi:bind_port}
+                SF_NOTIFIER_ALERT_ID_HASH_FUNC: ${_param:sf_notifier_alert_id_hash_func}
+                SFDC_AUTH_URL: "${_param:sf_notifier_sfdc_auth_url}"
+                SFDC_USERNAME: "${_param:sf_notifier_sfdc_username}"
+                SFDC_PASSWORD: "${_param:sf_notifier_sfdc_password}"
+                SFDC_ORGANIZATION_ID: "${_param:sf_notifier_sfdc_organization_id}"
+                SFDC_ENVIRONMENT_ID: "${_param:sf_notifier_sfdc_environment_id}"
+                SFDC_SANDBOX_ENABLED: "${_param:sf_notifier_sfdc_sandbox_enabled}"

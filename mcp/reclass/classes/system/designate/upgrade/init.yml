@@ -1,0 +1,6 @@
+parameters:
+  designate:
+    upgrade:
+      enabled: ${_param:designate_upgrade_enabled}
+      old_release: ${_param:designate_old_version}
+      new_release: ${_param:designate_version}

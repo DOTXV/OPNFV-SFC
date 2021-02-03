@@ -1,0 +1,5 @@
+classes:
+- service.keepalived.cluster.single
+- service.haproxy.proxy.single
+- system.haproxy.proxy.listen.openstack.designate
+- system.designate.server.cluster.simple

@@ -1,0 +1,34 @@
+classes:
+- system.docker
+parameters:
+  _param:
+    docker_stack_aptly_public_replicas: 3
+  docker:
+    client:
+      stack:
+        aptly:
+          environment:
+            EMAIL_ADDRESS: ${_param:admin_email}
+            https_proxy: ${_param:docker_https_proxy}
+            http_proxy: ${_param:docker_http_proxy}
+          service:
+            api:
+              deploy:
+                restart_policy:
+                  condition: any
+              image: ${_param:docker_image_aptly:base}
+              command: 'aptly api serve -no-lock'
+              ports:
+                - 18084:8080
+              volumes:
+                - /srv/volumes/aptly:/var/lib/aptly
+            public:
+              deploy:
+                replicas: ${_param:docker_stack_aptly_public_replicas}
+                restart_policy:
+                  condition: any
+              image: ${_param:docker_image_aptly:public}
+              ports:
+                - 18085:80
+              volumes:
+                - /srv/volumes/aptly/public:/var/www/html

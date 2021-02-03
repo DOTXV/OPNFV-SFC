@@ -1,0 +1,90 @@
+parameters:
+  _param:
+    docker_operations_api_replicas: 1
+    operations_api_sqlalchemy_database_uri: "cockroachdb://oapi@cockroach-ui:26257/oapi"
+    operations_api_sqlalchemy_echo: "false"
+    operations_api_flask_debug: "false"
+    operations_api_bind_host: 0.0.0.0
+    operations_api_bind_port: ${_param:haproxy_operations_api_bind_port}
+    operations_api_jenkins_url: http://${_param:single_address}:18081
+    operations_api_jenkins_username: admin
+    operations_api_pipeline_name: deploy_trymcp
+    operations_api_keycloak_url: "http://${_param:single_address}:${_param:haproxy_keycloak_exposed_port}"
+    operations_api_model_remote: localfs
+    operations_api_model_path: /code/operations_api/workflow_definition.yml
+  docker:
+    client:
+      stack:
+        operations_api:
+          service:
+            operations-api:
+              environment:
+                OAPI_OIDC_CLIENT_SECRETS_OVERRIDE: '
+                  {
+                    "web": {
+                        "client_id": "operations-api",
+                        "client_secret": "${_param:keycloak_operations_api_client_secret}",
+                        "auth_uri": "${_param:operations_api_keycloak_url}/auth/realms/drivetrain-realm/protocol/openid-connect/auth",
+                        "token_uri": "${_param:operations_api_keycloak_url}/auth/realms/drivetrain-realm/protocol/openid-connect/token",
+                        "token_introspection_uri": "${_param:operations_api_keycloak_url}/auth/realms/drivetrain-realm/protocol/openid-connect/token/introspect",
+                        "issuer": "${_param:operations_api_keycloak_url}/auth/realms/drivetrain-realm",
+                        "userinfo_uri": "${_param:operations_api_keycloak_url}/auth/realms/drivetrain-realm/protocol/openid-connect/userinfo"
+                    }
+                  }'
+                OAPI_SQLALCHEMY_DATABASE_URI: ${_param:operations_api_sqlalchemy_database_uri}
+                OAPI_SQLALCHEMY_ECHO: ${_param:operations_api_sqlalchemy_echo}
+                OAPI_FLASK_DEBUG: ${_param:operations_api_flask_debug}
+                OAPI_FLASK_SECRET_KEY: ${_param:operations_api_flask_secret_key}
+                OAPI_FLASK_SERVER_HOST: ${_param:operations_api_bind_host}
+                OAPI_FLASK_SERVER_PORT: ${_param:operations_api_bind_port}
+                OAPI_MODELFORM_JENKINS_URL: ${_param:operations_api_jenkins_url}
+                OAPI_MODELFORM_JENKINS_USERNAME: ${_param:operations_api_jenkins_username}
+                OAPI_MODELFORM_JENKINS_PASSWORD: ${_param:operations_api_jenkins_password}
+                OAPI_MODELFORM_PIPELINE_NAME: ${_param:operations_api_pipeline_name}
+                OAPI_MODELFORM_REMOTE: ${_param:operations_api_model_remote}
+                OAPI_MODELFORM_PATH: ${_param:operations_api_model_path}
+              image: ${_param:docker_image_operations_api}
+              deploy:
+                replicas: ${_param:docker_operations_api_replicas}
+                restart_policy:
+                  condition: any
+              ports:
+                - ${_param:haproxy_operations_api_exposed_port}:${_param:haproxy_operations_api_bind_port}
+              volumes:
+                - /srv/volumes/operations_api/logs/:/var/log/operations_api
+            cockroach-ui:
+              image: ${_param:docker_image_cockroachdb}
+              ports:
+                - ${_param:haproxy_cockroachdb_ui_exposed_port}:${_param:haproxy_cockroachdb_ui_bind_port}
+              command: start --insecure
+            cockroach-db-1:
+              image: cockroachdb/cockroach
+              command: start --insecure --join=cockroach-ui
+              depends_on:
+                - cockroach-ui
+              volumes:
+                - /srv/volumes/cockroachdb/cockroach-db-1:/cockroach/cockroach-data
+            operations-ui:
+              environment:
+                REACT_APP_OPERATIONS_API_URL: 'http://${_param:cluster_public_host}:${_param:haproxy_operations_api_bind_port}'
+                REACT_APP_KEYCLOAK_AUTH_URL: 'http://${_param:cluster_public_host}:${_param:haproxy_keycloak_proxy_exposed_port}/auth'
+                REACT_APP_KEYCLOAK_REALM: 'drivetrain-realm'
+                REACT_APP_KEYCLOAK_CLIENT_ID: 'operations-ui'
+              image: ${_param:docker_image_operations_ui}
+              ports:
+                - ${_param:haproxy_operations_ui_exposed_port}:${_param:haproxy_operations_ui_bind_port}
+            cockroach-init:
+              environment:
+                COCKROACH_HOST: cockroach-ui
+                DB_NAME: oapi
+                DB_USER: oapi
+              image: atengler/cockroach-init
+              deploy:
+                restart_policy:
+                  condition: on-failure
+              depends_on:
+                - cockroach-db-1
+          network:
+            default:
+              external:
+                name: operations_api_backend

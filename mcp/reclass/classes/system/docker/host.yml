@@ -1,0 +1,32 @@
+classes:
+  - service.docker.host
+parameters:
+  _param:
+    docker_garbage_collection_enabled: false
+  docker:
+    host:
+      pkgs:
+        - containerd.io
+        - docker-ce
+        - python-docker
+      experimental: true
+      insecure_registries:
+        - ${_param:cluster_vip_address}:5000
+        - ${_param:cluster_public_host}:5000
+      options:
+        ipv6: true
+        fixed-cidr-v6: fc00::/7
+        storage-driver: overlay2
+  linux:
+    system:
+      cron:
+        user:
+          root:
+            enabled: true
+      job:
+        docker_garbage_collection:
+          command: docker system prune -f --filter until=$(date +%s -d "1 week ago")
+          enabled: ${_param:docker_garbage_collection_enabled}
+          user: root
+          hour: 6
+          minute: 0

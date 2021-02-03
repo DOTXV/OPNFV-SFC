@@ -1,0 +1,28 @@
+classes:
+- system.prometheus.elasticsearch_exporter.container
+parameters:
+  docker:
+    client:
+      stack:
+        monitoring:
+          network:
+            monitoring:
+              driver: overlay
+              driver_opts:
+                encrypted: 1
+          service:
+            elasticsearch_exporter:
+              command: --es-cluster ${_param:stacklight_log_address}:9200 --nodes-stats-disable --cluster-health-disable --indices-stats-disable
+              networks:
+                - monitoring
+              deploy:
+                replicas: 1
+                labels:
+                  com.mirantis.monitoring: "elasticsearch_exporter"
+                restart_policy:
+                  condition: any
+              labels:
+                com.mirantis.monitoring: "elasticsearch_exporter"
+              image: ${_param:docker_image_prometheus_es_exporter}
+              volumes:
+                - "${prometheus:elasticsearch_exporter:dir:config}/elasticsearch_exporter.cfg:/usr/src/app/exporter.cfg"

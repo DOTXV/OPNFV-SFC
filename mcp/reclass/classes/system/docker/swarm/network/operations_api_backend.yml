@@ -1,0 +1,10 @@
+parameters:
+  _param:
+    docker_operations_api_network_subnet: 10.80.0.0/24
+  docker:
+    client:
+      network:
+        operations_api_backend:
+          subnet: ${_param:docker_operations_api_network_subnet}
+          driver: overlay
+          attachable: true

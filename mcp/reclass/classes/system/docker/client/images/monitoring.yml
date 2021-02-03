@@ -1,0 +1,18 @@
+parameters:
+  docker:
+    client:
+      enabled: true
+      images:
+      - ${_param:docker_image_alerta}
+      - ${_param:docker_image_alertmanager}
+      - ${_param:docker_image_grafana}
+      - ${_param:docker_image_prometheus}
+      - ${_param:docker_image_prometheus_es_exporter}
+      - ${_param:docker_image_prometheus_gainsight}
+      - ${_param:docker_image_prometheus_gainsight_elasticsearch}
+      - ${_param:docker_image_prometheus_relay}
+      - ${_param:docker_image_pushgateway}
+      - ${_param:docker_image_remote_agent}
+      - ${_param:docker_image_remote_collector}
+      - ${_param:docker_image_remote_storage_adapter}
+      - ${_param:docker_image_sf_notifier}

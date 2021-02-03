@@ -1,0 +1,12 @@
+classes:
+- system.docker.client.images.jenkins_master
+- system.docker.client.images.jenkins_slave
+parameters:
+  docker:
+    client:
+      enabled: true
+      images:
+      - ${_param:docker_image_mysql}
+      - ${_param:docker_image_gerrit}
+      - ${_param:docker_image_registry}
+      - ${_param:docker_image_visualizer}

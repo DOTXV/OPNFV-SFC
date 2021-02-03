@@ -1,0 +1,3 @@
+classes:
+- system.docker
+- system.docker.swarm.stack.jenkins.slave01

@@ -1,0 +1,7 @@
+classes:
+- system.docker
+- system.docker.client.images.jenkins_slave
+parameters:
+  _param:
+    jenkins_master_url: http://jenkins_master:8080
+    jenkins_slave_extra_opts: ""

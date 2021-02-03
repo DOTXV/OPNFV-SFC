@@ -1,0 +1,33 @@
+classes:
+- system.docker.swarm.stack.jenkins.slave_base
+parameters:
+  _param:
+    jenkins_slave01_node_name: ${_param:cluster_node01_name}
+  docker:
+    client:
+      stack:
+        jenkins:
+          service:
+            slave01:
+              environment:
+                JENKINS_URL: ${_param:jenkins_master_url}
+                JENKINS_AGENT_NAME: slave01
+                JENKINS_UPDATE_SLAVE: 'true'
+                JENKINS_LOGIN: ${_param:jenkins_client_user}
+                JENKINS_PASSWORD: ${_param:jenkins_client_password}
+                JAVA_OPTS: "-Dhttp.proxyHost=${_param:docker_http_proxy} -Dhttp.nonProxyHosts=|jenkins_master ${_param:jenkins_slave_extra_opts}"
+                https_proxy: ${_param:docker_https_proxy}
+                http_proxy: ${_param:docker_http_proxy}
+                no_proxy: "jenkins_master,${_param:docker_no_proxy}"
+              deploy:
+                restart_policy:
+                  condition: any
+                placement:
+                  constraints:
+                    - "node.hostname == ${_param:jenkins_slave01_node_name}"
+              image: ${_param:docker_image_jenkins_slave}
+              volumes:
+                - /etc/ssl/certs/java/cacerts:/etc/ssl/certs/java/cacerts:ro
+                - /var/run/docker.sock:/var/run/docker.sock
+                - /usr/bin/docker:/usr/bin/docker:ro
+                - /var/lib/jenkins:/var/lib/jenkins

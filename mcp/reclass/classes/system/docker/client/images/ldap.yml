@@ -1,0 +1,7 @@
+parameters:
+  docker:
+    client:
+      enabled: true
+      images:
+      - ${_param:docker_image_openldap}
+      - ${_param:docker_image_phpldapadmin}

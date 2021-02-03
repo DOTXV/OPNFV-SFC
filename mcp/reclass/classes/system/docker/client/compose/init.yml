@@ -1,0 +1,9 @@
+classes:
+  - system.docker.client
+parameters:
+  docker:
+    client:
+      compose:
+        source:
+          engine: docker
+          image: ${_param:docker_image_compose}
