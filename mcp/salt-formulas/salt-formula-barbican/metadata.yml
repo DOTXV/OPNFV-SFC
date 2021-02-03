@@ -1,0 +1,6 @@
+name: "barbican"
+version: "2017.6"
+source: "https://gerrit.mcp.mirantis.com/salt-formulas/barbican"
+dependencies:
+  - name: apache
+    source: "https://gerrit.mcp.mirantis.com/salt-formulas/apache"

@@ -1,0 +1,11 @@
+salt-formula-barbican (2018.1) xenial; urgency=medium
+
+  * Fix files/pike symlink
+
+ -- devops <devops@mirantis.com>  Wed, Mar 07 14:41:11 EET 2018
+
+salt-formula-barbican (2017.6) xenial; urgency=medium
+
+  * Initial release
+
+ -- Petr Jediný petr.jediny@gmail.com  Tue, 01 Aug 2017 02:16:20 BST

@@ -1,0 +1,16 @@
+parameters:
+  _param:
+    barbican_vault_schema: http
+    barbican_vault_host: localhost
+    barbican_vault_port: 8200
+    barbican_vault_kv_mountpoint: secret
+    barbican_vault_ca_certs: '/etc/barbican/ssl/vault/CA.crt'
+  barbican:
+    server:
+      plugin:
+        vault:
+          schema: ${_param:barbican_vault_schema}
+          host: ${_param:barbican_vault_host}
+          port: ${_param:barbican_vault_port}
+          kv_mountpoint: ${_param:barbican_vault_kv_mountpoint}
+          ssl_ca_crt_file: ${_param:barbican_vault_ca_certs}
