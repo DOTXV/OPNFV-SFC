@@ -1,0 +1,80 @@
+parameters:
+  neutron:
+    client:
+      server:
+        octavia_identity:
+          endpoint_type: internalURL
+          network:
+            lb-mgmt-net:
+              tenant: service
+              admin_state_up: True
+              subnet:
+                lb-mgmt-subnet:
+                  cidr: ${_param:octavia_lb_mgmt_cidr}
+                  allocation_pools:
+                    - start: ${_param:octavia_lb_mgmt_allocation_pool_start}
+                      end: ${_param:octavia_lb_mgmt_allocation_pool_end}
+          security_group:
+            lb-mgmt-sec-grp:
+              tenant: service
+              rules:
+                - 'direction': 'ingress'
+                  'ethertype': 'IPv4'
+                  'protocol': 'icmp'
+                - 'direction': 'ingress'
+                  'ethertype': 'IPv4'
+                  'protocol': 'TCP'
+                  'port_range_min': 22
+                  'port_range_max': 22
+                - 'direction': 'ingress'
+                  'ethertype': 'IPv4'
+                  'protocol': 'TCP'
+                  'port_range_min': 9443
+                  'port_range_max': 9443
+                - 'direction': 'ingress'
+                  'ethertype': 'IPv6'
+                  'protocol': 'icmpv6'
+                  'remote_ip_prefix': '::/0'
+                - 'direction': 'ingress'
+                  'ethertype': 'IPv6'
+                  'protocol': 'TCP'
+                  'port_range_min': 22
+                  'port_range_max': 22
+                  'remote_ip_prefix': '::/0'
+                - 'direction': 'ingress'
+                  'ethertype': 'IPv6'
+                  'protocol': 'TCP'
+                  'port_range_min': 9443
+                  'port_range_max': 9443
+                  'remote_ip_prefix': '::/0'
+            lb-health-mgr-sec-grp:
+              tenant: service
+              rules:
+                - 'direction': 'ingress'
+                  'ethertype': 'IPv4'
+                  'protocol': 'UDP'
+                  'port_range_min': 5555
+                  'port_range_max': 5555
+                - 'direction': 'ingress'
+                  'ethertype': 'IPv6'
+                  'protocol': 'UDP'
+                  'port_range_min': 5555
+                  'port_range_max': 5555
+                  'remote_ip_prefix': '::/0'
+
+  salt:
+    minion:
+      mine:
+        module:
+          list_octavia_networks:
+            mine_function: neutronng.list_networks
+            name: 'lb-mgmt-net'
+            profile: 'octavia_identity'
+          list_octavia_mgmt_security_groups:
+            mine_function: neutronng.list_security_groups
+            name: 'lb-mgmt-sec-grp'
+            profile: 'octavia_identity'
+          list_octavia_hm_ports:
+            mine_function: neutronng.list_ports
+            device_owner: 'Octavia:health-mgr'
+            profile: 'octavia_identity'

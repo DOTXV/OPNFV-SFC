@@ -1,0 +1,25 @@
+classes:
+- system.neutron.control.single
+parameters:
+  neutron:
+    server:
+      dns_domain: ${_param:cluster_domain}
+      database:
+        host: ${_param:openstack_database_address}
+      identity:
+        region: ${_param:openstack_region}
+        host: ${_param:openstack_control_address}
+      message_queue:
+        members:
+          - host: ${_param:single_address}
+      compute:
+        host: ${_param:openstack_control_address}
+        region: ${_param:openstack_region}
+      backend:
+        engine: contrail
+        host: ${_param:opencontrail_control_address}
+        port: 8082
+        user: ${_param:opencontrail_admin_user}
+        password: ${_param:opencontrail_admin_password}
+        tenant: admin
+        token: ${_param:keystone_service_token}

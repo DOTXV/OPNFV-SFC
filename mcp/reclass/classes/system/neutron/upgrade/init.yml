@@ -1,0 +1,6 @@
+parameters:
+  neutron:
+    upgrade:
+      enabled: ${_param:neutron_upgrade_enabled}
+      old_release: ${_param:neutron_old_version}
+      new_release: ${_param:neutron_version}

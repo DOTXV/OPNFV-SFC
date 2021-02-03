@@ -1,0 +1,36 @@
+classes:
+- service.neutron.control.single
+- system.neutron.upgrade
+- system.salt.minion.cert.mysql.clients.openstack.neutron
+- system.salt.minion.cert.rabbitmq.clients.openstack.neutron
+parameters:
+  _param:
+    internal_protocol: 'http'
+  linux:
+    system:
+      package:
+        python-pymysql:
+          fromrepo: ${_param:openstack_version}
+          version: latest
+  neutron:
+    server:
+      role: ${_param:openstack_node_role}
+      database:
+        x509:
+          enabled: ${_param:openstack_mysql_x509_enabled}
+          ca_file: ${_param:mysql_neutron_ssl_ca_file}
+          key_file: ${_param:mysql_neutron_client_ssl_key_file}
+          cert_file: ${_param:mysql_neutron_client_ssl_cert_file}
+        ssl:
+          enabled: ${_param:galera_ssl_enabled}
+      message_queue:
+        port: ${_param:openstack_rabbitmq_port}
+        x509:
+          enabled: ${_param:openstack_rabbitmq_x509_enabled}
+          ca_file: ${_param:rabbitmq_neutron_ssl_ca_file}
+          key_file: ${_param:rabbitmq_neutron_client_ssl_key_file}
+          cert_file: ${_param:rabbitmq_neutron_client_ssl_cert_file}
+        ssl:
+          enabled: ${_param:rabbitmq_ssl_enabled}
+      identity:
+        protocol: ${_param:internal_protocol}

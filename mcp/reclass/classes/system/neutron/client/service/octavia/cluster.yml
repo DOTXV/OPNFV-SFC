@@ -1,0 +1,33 @@
+classes:
+- system.neutron.client.service.octavia
+
+parameters:
+  neutron:
+    client:
+      server:
+        octavia_identity:
+          endpoint_type: internalURL
+          network:
+            lb-mgmt-net:
+              port:
+                octavia-health-manager-listen-port-gtw01:
+                  fixed_ips:
+                    - ip_address: ${_param:octavia_health_manager_node01_address}
+                  device_owner: Octavia:health-mgr
+                  binding_host_id: ${_param:openstack_gateway_node01_hostname}
+                  security_groups:
+                    - lb-health-mgr-sec-grp
+                octavia-health-manager-listen-port-gtw02:
+                  fixed_ips:
+                    - ip_address: ${_param:octavia_health_manager_node02_address}
+                  device_owner: Octavia:health-mgr
+                  binding_host_id: ${_param:openstack_gateway_node02_hostname}
+                  security_groups:
+                    - lb-health-mgr-sec-grp
+                octavia-health-manager-listen-port-gtw03:
+                  fixed_ips:
+                    - ip_address: ${_param:octavia_health_manager_node03_address}
+                  device_owner: Octavia:health-mgr
+                  binding_host_id: ${_param:openstack_gateway_node03_hostname}
+                  security_groups:
+                    - lb-health-mgr-sec-grp

@@ -1,0 +1,21 @@
+classes:
+- service.neutron.client
+parameters:
+  neutron:
+    client:
+      resources:
+        v2:
+          admin_identity:
+            network:
+              public:
+                shared: False
+                router_external: True
+                subnet:
+                  public-subnet:
+                    cidr: ${_param:openstack_public_neutron_subnet_cidr}
+                    gateway_ip: ${_param:openstack_public_neutron_subnet_gateway}
+                    allocation_pools:
+                      - start: ${_param:openstack_public_neutron_subnet_allocation_start}
+                        end: ${_param:openstack_public_neutron_subnet_allocation_end}
+                    enable_dhcp: False
+                    ip_version: 4
