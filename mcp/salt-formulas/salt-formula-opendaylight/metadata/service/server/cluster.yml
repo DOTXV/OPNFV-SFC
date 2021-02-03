@@ -1,0 +1,60 @@
+##############################################################################
+# Copyright (c) 2018 Mirantis Inc. and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+---
+applications:
+  - opendaylight
+classes:
+  - service.keepalived.cluster.single
+  - service.haproxy.proxy.single
+parameters:
+  _param:
+    opendaylight_version: neon
+    cluster_vip_address: ${_param:opendaylight_service_host}
+    keepalived_vip_virtual_router_id: 199
+    keepalived_vip_password: ${_param:opnfv_main_password}
+    keepalived_vip_interface: ${_param:single_nic}
+    haproxy_odl_api_check_params: check inter 20s fastinter 2s
+  opendaylight:
+    server:
+      enabled: 'True'
+      version: ${_param:opendaylight_version}
+      repo: 'odl-team/${_param:opendaylight_version}'
+      cluster_enabled: true
+  keepalived:
+    cluster:
+      vrrp_scripts:
+        check_pidof:
+          args: haproxy
+          interval: 20
+          rise: 3
+          fall: 1
+      instance:
+        VIP:
+          track_script: check_pidof
+  haproxy:
+    proxy:
+      listen:
+        opendaylight_api:
+          type: general-service
+          balance: source
+          binds:
+            - address: ${_param:opendaylight_service_host}
+              port: ${_param:opendaylight_rest_port}
+          servers:
+            - name: ${_param:opendaylight_server_node01_hostname}
+              host: ${_param:opendaylight_server_node01_address}
+              port: ${_param:opendaylight_rest_port}
+              params: ${_param:haproxy_odl_api_check_params}
+            - name: ${_param:opendaylight_server_node02_hostname}
+              host: ${_param:opendaylight_server_node02_address}
+              port: ${_param:opendaylight_rest_port}
+              params: ${_param:haproxy_odl_api_check_params}
+            - name: ${_param:opendaylight_server_node03_hostname}
+              host: ${_param:opendaylight_server_node03_address}
+              port: ${_param:opendaylight_rest_port}
+              params: ${_param:haproxy_odl_api_check_params}
