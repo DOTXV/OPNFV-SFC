@@ -1,0 +1,15 @@
+Source: salt-formula-oslo-templates
+Maintainer: Mirantis Dev <dev@mirantis.com>
+Section: admin
+Priority: optional
+Build-Depends: debhelper (>= 9), salt-master, python, python-yaml
+Standards-Version: 3.9.6
+Homepage: https://www.mirantis.com
+Vcs-Browser: https://gerrit.mcp.mirantis.com/#/admin/projects/salt-formulas/oslo-templates
+Vcs-Git: https://gerrit.mcp.mirantis.com/salt-formulas/oslo-templates.git
+
+Package: salt-formula-oslo-templates
+Architecture: all
+Depends: ${misc:Depends}
+Description: oslo-templates salt formula
+ Install and configure oslo-templates.

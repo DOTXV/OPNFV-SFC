@@ -1,0 +1,5 @@
+salt-formula-oslo-templates (2018.1) xenial; urgency=medium
+
+  * Initial release
+
+ -- Oleh Hryhorov ohryhorov@miantis.com  Fri, 18 May 2018 03:16:55 BST
