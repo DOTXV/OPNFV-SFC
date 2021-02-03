@@ -1,0 +1,57 @@
+#!/bin/bash -e
+# shellcheck disable=SC1090
+##############################################################################
+# Copyright (c) 2018 Mirantis Inc., Enea AB and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+CI_DEBUG=${CI_DEBUG:-0}; [[ "${CI_DEBUG}" =~ (false|0) ]] || set -x
+ERASE_ENV=${ERASE_ENV:-0}
+
+source "$(dirname "${BASH_SOURCE[0]}")/../../scripts/globals.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/../../scripts/lib.sh"
+
+bm_nodes=$(salt --out yaml 'mas01*' pillar.get maas:region:machines | \
+           awk '/^\s+\w+[[:digit:]]+:$/ {gsub(/:$/, "*"); printf "%s ", $1}')
+
+wait_for 60.0 "salt --out yaml -C 'mas01*' service.status maas-fixup | fgrep -q 'false'"
+
+# Optionally destroy MaaS machines from a previous run
+if [ "${ERASE_ENV}" -gt 1 ]; then
+  cleanup_uefi
+  for node_hostname in ${bm_nodes//\*/}; do
+    salt -C 'mas01*' maasng.delete_machine "${node_hostname}" || true
+  done
+fi
+
+# MaaS rack/region controller, node commissioning
+wait_for 10.0 "salt -C 'mas01*' state.apply salt,iptables"
+salt -C 'mas01*' state.apply maas.cluster
+
+wait_for 10 "salt -C 'mas01*' state.apply maas.region"
+
+if [ -n "${bm_nodes}" ]; then
+  salt -C 'mas01*' state.apply maas.machines
+fi
+
+# cleanup outdated salt keys
+sleep 30
+salt-key --out yaml | awk '!/^(minions|- cfg01|- mas01)/ {print $2}' | \
+  xargs --no-run-if-empty -I{} salt-key -yd {}
+
+# MaaS node deployment
+if [ -n "${bm_nodes}" ]; then
+  notify "[NOTE] MaaS operations might take a long time, please be patient" 2
+  salt -C 'mas01*' state.apply maas.machines.wait_for_ready_or_deployed
+  salt -C 'mas01*' state.apply maas.machines.storage
+  salt -C 'mas01*' state.apply maas.machines.deploy
+  salt -C 'mas01*' state.apply maas.machines.wait_for_deployed
+fi
+
+# Check all baremetal nodes are available
+wait_for 10.0 "(for n in ${bm_nodes}; do salt \${n} test.ping 2>/dev/null || exit; done)"
+
+wait_for 10.0 "salt -C '* and not cfg01* and not mas01*' saltutil.sync_all"

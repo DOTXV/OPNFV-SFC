@@ -1,0 +1,27 @@
+#!/bin/bash -e
+##############################################################################
+# Copyright (c) 2018 Mirantis Inc., Enea AB and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+CI_DEBUG=${CI_DEBUG:-0}; [[ "${CI_DEBUG}" =~ (false|0) ]] || set -x
+
+# shellcheck disable=SC1090
+source "$(dirname "${BASH_SOURCE[0]}")/../../scripts/lib.sh"
+
+# Get OpenDaylight server options with prefix odl_
+function odl() {
+  salt --out txt -C 'I@opendaylight:server and *01*' pillar.get "opendaylight:server:odl_$1" | cut -d ' ' -f2
+}
+
+wait_for 5.0 "salt -I 'opendaylight:server' state.sls opendaylight"
+wait_for 20 "salt --out yaml -C 'I@neutron:server and *01*' network.connect $(odl bind_ip) $(odl rest_port) | fgrep -q 'result: true'"
+
+# https://bugs.launchpad.net/networking-odl/+bug/1822559
+FILE=/usr/lib/python3/dist-packages/networking_odl/cmd/set_ovs_hostconfigs.py
+PFILE=/var/tmp/odl_hostconfig.patch
+salt -I 'linux:network:bridge:openvswitch' pkg.install python3-networking-odl
+salt -I 'linux:network:bridge:openvswitch' cmd.run "patch -R -s --dry-run $FILE < $PFILE || patch $FILE < $PFILE"

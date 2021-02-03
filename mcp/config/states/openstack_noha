@@ -1,0 +1,72 @@
+#!/bin/bash -e
+##############################################################################
+# Copyright (c) 2017 Mirantis Inc., Enea AB and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
+CI_DEBUG=${CI_DEBUG:-0}; [[ "${CI_DEBUG}" =~ (false|0) ]] || set -x
+
+# shellcheck disable=SC1090
+source "$(dirname "${BASH_SOURCE[0]}")/../../scripts/lib.sh"
+
+salt -I 'nfs:server' file.mkdir /srv/nova/instances
+salt -I 'nfs:server' state.sls nfs
+salt -I 'nfs:client' state.sls nfs
+
+salt -I 'rabbitmq:server' state.sls rabbitmq
+salt -I 'rabbitmq:server' cmd.run "rabbitmqctl status"
+
+salt -I 'mysql:server' state.sls mysql
+salt -I 'memcached:server' state.sls memcached
+salt -I 'haproxy:proxy' state.sls haproxy
+
+salt -I 'keystone:server' state.sls keystone.server
+salt -I 'keystone:server' service.restart apache2
+
+salt -I 'keystone:server' state.sls keystone.client
+salt -I 'keystone:server' cmd.run ". /root/keystonercv3; openstack service list"
+
+salt -I 'glance:server' state.sls glance
+
+salt -I 'nova:controller' state.sls nova
+
+salt -I 'heat:server' state.sls heat
+
+salt -I 'cinder:controller' state.sls cinder
+wait_for 3 "salt -I 'cinder:volume' state.sls cinder"
+
+salt -I 'neutron:server' state.sls etcd,neutron
+salt -I 'neutron:compute' state.sls neutron
+
+salt -I 'nova:compute' state.sls nova,armband
+
+salt -I 'barbican:server' state.sls barbican
+salt -I 'barbican:client' state.sls barbican
+
+# remove config files coming from packages
+for service in gnocchi panko; do
+  salt -I "${service}:server" pkg.install ${service}-api
+  salt -I "${service}:server" file.remove "/etc/apache2/sites-enabled/${service}-api.conf"
+done
+
+salt -I 'redis:server' state.sls redis
+salt -I 'gnocchi:server' state.sls gnocchi
+salt -I 'panko:server' state.sls panko
+salt -I 'aodh:server' state.sls aodh
+salt -I 'ceilometer:server' state.sls ceilometer
+salt -I 'ceilometer:agent' state.sls ceilometer
+
+salt -I 'horizon:server' state.sls apache,horizon,nginx
+
+# Workaround Horizon missing CSS/JS, see FUEL-324
+if ! salt -C 'I@horizon:server and *01*' --out=yaml pkg.version openstack-dashboard | grep -qE ':.*mcp'; then
+  salt -I 'horizon:server' file.symlink \
+    /var/lib/openstack-dashboard/static \
+    /usr/share/openstack-dashboard/static
+  salt -I 'horizon:server' cmd.run "python3 /usr/share/openstack-dashboard/manage.py collectstatic --noinput"
+  salt -I 'horizon:server' cmd.run "python3 /usr/share/openstack-dashboard/manage.py compress --force"
+  salt -I 'horizon:server' service.reload apache2
+fi
