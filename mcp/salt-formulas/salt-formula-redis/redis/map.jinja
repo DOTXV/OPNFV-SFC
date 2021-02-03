@@ -1,0 +1,74 @@
+
+{% set server = salt['grains.filter_by']({
+    'Arch': {
+        'version': '2.8',
+        'pkgs': ['redis'],
+        'service': 'redis',
+        'conf_dir': '/etc/redis.conf',
+        'bind': {
+            'address': '127.0.0.1',
+            'port': '6379'
+        }
+    },
+    'Debian': {
+        'version': '2.8',
+        'pkgs': ['redis-server'],
+        'service': 'redis-server',
+        'conf_dir': '/etc/redis',
+        'bind': {
+            'address': '127.0.0.1',
+            'port': '6379'
+        }
+    },
+    'RedHat': {
+        'version': '2.8',
+        'pkgs': ['redis'],
+        'service': 'redis',
+        'conf_dir': '/etc/redis/redis.conf',
+        'bind': {
+            'address': '127.0.0.1',
+            'port': '6379'
+        }
+    },
+}, merge=salt['grains.filter_by']({
+    'stretch': {
+        'version': '3.0',
+    },
+    'xenial': {
+        'version': '3.0',
+    },
+    'bionic': {
+        'version': '3.0',
+    },
+}, grain='oscodename', merge=salt['pillar.get']('redis:server'))) %}
+
+{% set cluster = salt['grains.filter_by']({
+    'Debian': {
+        'enabled': False
+    },
+}, merge=salt['grains.filter_by']({
+    'stretch': {
+        'pkgs': ['redis-sentinel'],
+        'service': 'redis-sentinel',
+        'sentinel': {
+            'address': '127.0.0.1',
+            'port': '26379'
+        }
+    },
+    'xenial': {
+        'pkgs': ['redis-sentinel'],
+        'service': 'redis-sentinel',
+        'sentinel': {
+            'address': '127.0.0.1',
+            'port': '26379'
+        }
+    },
+    'bionic': {
+        'pkgs': ['redis-sentinel'],
+        'service': 'redis-sentinel',
+        'sentinel': {
+            'address': '127.0.0.1',
+            'port': '26379'
+        }
+    },
+}, grain='oscodename', merge=salt['pillar.get']('redis:cluster'))) %}
