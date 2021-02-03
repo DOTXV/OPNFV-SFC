@@ -1,0 +1,48 @@
+##############################################################################
+# Copyright (c) 2018 Mirantis Inc., Enea AB and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+---
+classes:
+  - service.neutron.compute.ovn.single
+  - cluster.mcp-common-noha.openstack_compute
+  - cluster.mcp-ovn-noha
+parameters:
+  neutron:
+    compute:
+      controller_vip: ${_param:cluster_local_address}
+      ~message_queue: ~
+  linux:
+    network:
+      interface:
+        ens6:
+          enabled: true
+          mtu: ${_param:interface_mtu}
+          proto: manual
+          ovs_port_type: OVSPort
+          type: ovs_port
+          ovs_bridge: br-floating
+          bridge: br-floating
+        br-mesh:
+          enabled: true
+          type: bridge
+          proto: static
+          address: ${_param:tenant_address}
+          netmask: ${_param:opnfv_net_private_mask}
+          use_interfaces:
+            - ens5.1000
+        br-floating:
+          enabled: true
+          type: ovs_bridge
+          mtu: ${_param:interface_mtu}
+          proto: static
+          address: ${_param:external_address}
+          netmask: ${_param:opnfv_net_public_mask}
+          use_interfaces:
+            - ens6
+          gateway: ${_param:opnfv_net_public_gw}
+          name_servers: ['8.8.8.8', '8.8.4.4']
+          noifupdown: true
