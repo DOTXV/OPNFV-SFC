@@ -1,0 +1,118 @@
+parameters:
+  _param:
+    apache_ssl_enabled: false
+    apache_ssl:
+      mode: 'strict'
+      enabled: ${_param:apache_ssl_enabled}
+      engine: salt
+      prefer_server_ciphers: "on"
+      protocols:
+        all:
+          name: 'all'
+          enabled: True
+        excludeSSLv2:
+          name: '-SSLv2'
+          enabled: True
+        excludeSSLv3:
+          name: '-SSLv3'
+          enabled: True
+        excludeTLSv1:
+          name: '-TLSv1'
+          enabled: True
+        excludeTLSv1.1:
+          name: '-TLSv1.1'
+          enabled: True
+      ciphers:
+        ECDHE-ECDSA-CHACHA20-POLY1305:
+          name: 'ECDHE-ECDSA-CHACHA20-POLY1305'
+          enabled: False
+        ECDHE-RSA-CHACHA20-POLY1305:
+          name: 'ECDHE-RSA-CHACHA20-POLY1305'
+          enabled: False
+        ECDHE-ECDSA-AES128-GCM-SHA256:
+          name: 'ECDHE-ECDSA-AES128-GCM-SHA256'
+          enabled: False
+        ECDHE-RSA-AES128-GCM-SHA256:
+          name: 'ECDHE-RSA-AES128-GCM-SHA256'
+          enabled: False
+        ECDHE-ECDSA-AES256-GCM-SHA384:
+          name: 'ECDHE-ECDSA-AES256-GCM-SHA384'
+          enabled: True
+        ECDHE-RSA-AES256-GCM-SHA384:
+          name: 'ECDHE-RSA-AES256-GCM-SHA384'
+          enabled: True
+        DHE-RSA-AES128-GCM-SHA256:
+          name: 'DHE-RSA-AES128-GCM-SHA256'
+          enabled: False
+        DHE-RSA-AES256-GCM-SHA384:
+          name: 'DHE-RSA-AES256-GCM-SHA384'
+          enabled: False
+        ECDHE-ECDSA-AES128-SHA256:
+          name: 'ECDHE-ECDSA-AES128-SHA256'
+          enabled: False
+        ECDHE-RSA-AES128-SHA256:
+          name: 'ECDHE-RSA-AES128-SHA256'
+          enabled: False
+        ECDHE-ECDSA-AES128-SHA:
+          name: 'ECDHE-ECDSA-AES128-SHA'
+          enabled: False
+        ECDHE-RSA-AES256-SHA384:
+          name: 'ECDHE-RSA-AES256-SHA384'
+          enabled: True
+        ECDHE-RSA-AES128-SHA:
+          name: 'ECDHE-RSA-AES128-SHA'
+          enabled: False
+        ECDHE-ECDSA-AES256-SHA384:
+          name: 'ECDHE-ECDSA-AES256-SHA384'
+          enabled: True
+        ECDHE-ECDSA-AES256-SHA:
+          name: 'ECDHE-ECDSA-AES256-SHA'
+          enabled: False
+        ECDHE-RSA-AES256-SHA:
+          name: 'ECDHE-RSA-AES256-SHA'
+          enabled: False
+        DHE-RSA-AES128-SHA256:
+          name: 'DHE-RSA-AES128-SHA256'
+          enabled: False
+        DHE-RSA-AES128-SHA:
+          name: 'DHE-RSA-AES128-SHA'
+          enabled: False
+        DHE-RSA-AES256-SHA256:
+          name: 'DHE-RSA-AES256-SHA256'
+          enabled: False
+        DHE-RSA-AES256-SHA:
+          name: 'DHE-RSA-AES256-SHA'
+          enabled: False
+        ECDHE-ECDSA-DES-CBC3-SHA:
+          name: 'ECDHE-ECDSA-DES-CBC3-SHA'
+          enabled: False
+        ECDHE-RSA-DES-CBC3-SHA:
+          name: 'ECDHE-RSA-DES-CBC3-SHA'
+          enabled: False
+        EDH-RSA-DES-CBC3-SHA:
+          name: 'EDH-RSA-DES-CBC3-SHA'
+          enabled: False
+        AES128-GCM-SHA256:
+          name: 'AES128-GCM-SHA256'
+          enabled: False
+        AES256-GCM-SHA384:
+          name: 'AES256-GCM-SHA384'
+          enabled: False
+        AES128-SHA256:
+          name: 'AES128-SHA256'
+          enabled: False
+        AES256-SHA256:
+          name: 'AES256-SHA256'
+          enabled: False
+        AES256-SHA:
+          name: 'AES256-SHA'
+          enabled: False
+        AES128-SHA:
+          name: 'AES128-SHA'
+          enabled: False
+        DES-CBC3-SHA:
+          name: 'DES-CBC3-SHA'
+          enabled: False
+        removeDSS:
+          name: '!DSS'
+          enabled: True

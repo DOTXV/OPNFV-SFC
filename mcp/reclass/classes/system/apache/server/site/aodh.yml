@@ -1,0 +1,36 @@
+parameters:
+  _param:
+    apache_ssl:
+      enabled: false
+    apache_aodh_ssl: ${_param:apache_ssl}
+    aodh_api_workers: 2
+    apache_aodh_api_host: ${linux:network:fqdn}
+    apache_aodh_api_address: ${_param:single_address}
+    apache_aodh_api_port: 8042
+  apache:
+    server:
+      site:
+        aodh:
+          enabled: false
+          available: true
+          type: wsgi
+          name: aodh
+          ssl: ${_param:apache_aodh_ssl}
+          host:
+            name: ${_param:apache_aodh_api_host}
+            address: ${_param:apache_aodh_api_address}
+            port: ${_param:apache_aodh_api_port}
+          log:
+            custom:
+              format: ${_param:apache_site_openstack_aodh_log_format}
+              file: /var/log/apache2/aodh_access.log
+          wsgi:
+            daemon_process: aodh-api
+            processes: ${_param:aodh_api_workers}
+            threads: 1
+            user: aodh
+            group: aodh
+            display_name: '%{GROUP}'
+            script_alias: '/ /usr/share/aodh/app.wsgi'
+            application_group: '%{GLOBAL}'
+            authorization: 'On'

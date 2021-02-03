@@ -1,0 +1,64 @@
+parameters:
+  _param:
+    apache_ssl:
+      enabled: false
+    apache_horizon_ssl: ${_param:apache_ssl}
+    apache_horizon_api_address: ${_param:horizon_server_bind_address}
+    apache_horizon_api_host: ${linux:network:fqdn}
+  apache:
+    server:
+      bind:
+        listen_default_ports: false
+      enabled: true
+      default_mpm: event
+      modules:
+        - wsgi
+      site:
+        horizon:
+          enabled: false
+          available: true
+          type: wsgi
+          name: openstack_web
+          ssl: ${_param:apache_horizon_ssl}
+          wsgi:
+            daemon_process: horizon
+            processes: 3
+            threads: 10
+            user: horizon
+            group: horizon
+            display_name: '%{GROUP}'
+            script_alias: '/ /usr/share/openstack-dashboard/openstack_dashboard/wsgi/django.wsgi'
+            application_group: '%{GLOBAL}'
+            authorization: 'On'
+          limits:
+            request_body: 0
+          host:
+            address: ${_param:apache_horizon_api_address}
+            name: ${_param:apache_horizon_api_host}
+            port: 8078
+          locations:
+            - uri: /static
+              path: /usr/share/openstack-dashboard/static
+          directories:
+            dashboard_static:
+              path: /usr/share/openstack-dashboard/static
+              order: 'allow,deny'
+              allow: 'from all'
+              modules:
+                mod_expires.c:
+                  ExpiresActive: 'On'
+                  ExpiresDefault: '"access 6 month"'
+                mod_deflate.c:
+                  SetOutputFilter: 'DEFLATE'
+            dashboard_wsgi:
+              path: /usr/share/openstack-dashboard/openstack_dashboard/wsgi
+              order: 'allow,deny'
+              allow: 'from all'
+          log:
+            custom:
+              format: ${_param:apache_site_openstack_horizon_log_format}
+            error:
+              enabled: true
+              level: debug
+              format: '%M'
+              file: '/var/log/apache2/openstack_dashboard_error.log'

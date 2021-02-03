@@ -1,0 +1,26 @@
+parameters:
+  _param:
+    apache_ssl:
+      enabled: false
+    apache_proxy_ssl: ${_param:apache_ssl}
+    apache_proxy_openstack_api_host: ${_param:cluster_public_host}
+    apache_proxy_openstack_api_address: 0.0.0.0
+    apache_proxy_openstack_aodh_host: ${_param:aodh_service_host}
+  apache:
+    server:
+      enabled: true
+      site:
+        apache_proxy_openstack_api_aodh:
+          enabled: true
+          type: proxy
+          name: openstack_api_aodh
+          proxy:
+            host: ${_param:apache_proxy_openstack_aodh_host}
+            port: 8042
+            protocol: http
+            retry: ${_param:apache_proxy_openstack_aodh_retry}
+          host:
+            name: ${_param:apache_proxy_openstack_api_host}
+            port: 8042
+            address: ${_param:apache_proxy_openstack_api_address}
+          ssl: ${_param:apache_proxy_ssl}

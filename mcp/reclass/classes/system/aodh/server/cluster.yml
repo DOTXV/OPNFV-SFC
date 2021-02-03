@@ -1,0 +1,83 @@
+classes:
+- service.aodh.server.cluster
+- system.aodh.upgrade
+- system.salt.minion.cert.mysql.clients.openstack.aodh
+- service.haproxy.proxy.single
+- system.haproxy.proxy.listen.openstack.aodh
+- system.keepalived.cluster.instance.openstack_telemetry_vip
+- system.salt.minion.cert.rabbitmq.clients.openstack.aodh
+parameters:
+  _param:
+    openstack_event_alarm_topic: alarm.all
+    # Keep alarm history in database for 30 days
+    aodh_alarm_history_ttl: 2592000
+  linux:
+    system:
+      cron:
+        user:
+          aodh:
+            enabled: true
+  aodh:
+    server:
+      enabled: true
+      role: ${_param:openstack_node_role}
+      version: ${_param:aodh_version}
+      cluster: true
+      ttl: ${_param:aodh_alarm_history_ttl}
+      debug: false
+      verbose: true
+      region: ${_param:openstack_region}
+      event_alarm_topic: ${_param:openstack_event_alarm_topic}
+      database:
+        engine: "mysql"
+        host: ${_param:openstack_database_address}
+        port: 3306
+        name: aodh
+        user: aodh
+        password: ${_param:mysql_aodh_password}
+        x509:
+          enabled: ${_param:openstack_mysql_x509_enabled}
+          ca_file: ${_param:mysql_aodh_ssl_ca_file}
+          key_file: ${_param:mysql_aodh_client_ssl_key_file}
+          cert_file: ${_param:mysql_aodh_client_ssl_cert_file}
+        ssl:
+          enabled: ${_param:galera_ssl_enabled}
+      bind:
+        host: ${_param:cluster_local_address}
+        port: 8042
+      identity:
+        engine: keystone
+        host: ${_param:keystone_service_host}
+        port: 35357
+        tenant: service
+        user: aodh
+        password: ${_param:keystone_aodh_password}
+        region: ${_param:openstack_region}
+        protocol: ${_param:cluster_internal_protocol}
+      message_queue:
+        engine: rabbitmq
+        port: ${_param:openstack_rabbitmq_port}
+        user: openstack
+        password: ${_param:rabbitmq_openstack_password}
+        virtual_host: '/openstack'
+        members:
+          - host: ${_param:openstack_message_queue_node01_address}
+          - host: ${_param:openstack_message_queue_node02_address}
+          - host: ${_param:openstack_message_queue_node03_address}
+        x509:
+          enabled: ${_param:openstack_rabbitmq_x509_enabled}
+          ca_file: ${_param:rabbitmq_aodh_ssl_ca_file}
+          key_file: ${_param:rabbitmq_aodh_client_ssl_key_file}
+          cert_file: ${_param:rabbitmq_aodh_client_ssl_cert_file}
+        ssl:
+          enabled: ${_param:rabbitmq_ssl_enabled}
+      # Check for expired alarm history every day at 2 AM
+      expirer:
+        cron:
+          minute: 0
+          hour: 2
+      cache:
+        security:
+          enabled: ${_param:aodh_memcache_security_enabled}
+          strategy: ${_param:openstack_memcache_security_strategy}
+          secret_key: ${_param:aodh_memcache_secret_key}

@@ -1,0 +1,20 @@
+classes:
+- service.redis.server.single
+parameters:
+  _param:
+    aodh_coordination_url: redis://openstack:${_param:openstack_telemetry_redis_password}@${_param:redis_sentinel_node01_address}:26379?db=0&sentinel=master_1&sentinel_fallback=${_param:redis_sentinel_node02_address}:26379&sentinel_fallback=${_param:redis_sentinel_node03_address}:26379
+  aodh:
+    server:
+      coordination_backend:
+        url: ${_param:aodh_coordination_url}
+        engine: redis
+        redis:
+          password: ${_param:openstack_telemetry_redis_password}
+          user: openstack
+          db: ${_param:aodh_redis_db}
+          sentinel:
+            host: ${_param:redis_sentinel_node01_address}
+            master_name: ${_param:aodh_redis_sentinel_mastername}
+            fallback:
+              - host: ${_param:redis_sentinel_node02_address}
+              - host: ${_param:redis_sentinel_node03_address}

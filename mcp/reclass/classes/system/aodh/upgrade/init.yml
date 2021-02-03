@@ -1,0 +1,6 @@
+parameters:
+  aodh:
+    upgrade:
+      enabled: ${_param:aodh_upgrade_enabled}
+      old_release: ${_param:aodh_old_version}
+      new_release: ${_param:aodh_version}

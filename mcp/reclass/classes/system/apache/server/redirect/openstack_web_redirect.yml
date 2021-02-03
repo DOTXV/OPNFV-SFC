@@ -1,0 +1,18 @@
+parameters:
+  apache:
+    server:
+      bind:
+        listen_default_ports: False
+      site:
+        horizon_redirect_http_to_https:
+          name: 'openstack_web_redirect'
+          enabled: true
+          type: 'redirect'
+          root: '/var/www/httproot'
+          host:
+            address: ${_param:apache_horizon_api_address}
+            name: ${_param:apache_horizon_api_host}
+            port: 80
+          redirect_mode: rewrite
+          target_url: 'https://%{SERVER_NAME}'
+          listen_address: ${_param:apache_horizon_listen_address}

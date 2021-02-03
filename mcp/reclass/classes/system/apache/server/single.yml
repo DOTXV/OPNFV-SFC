@@ -1,0 +1,12 @@
+classes:
+- service.apache.server.single
+parameters:
+  apache:
+    server:
+      mods:
+        status:
+          enabled: ${_param:apache_mods_status_enabled}
+          status: ${_param:apache_mods_status_status}
+          host:
+            address: ${_param:apache_mods_status_host_address}
+            port: ${_param:apache_mods_status_host_port}

@@ -1,0 +1,52 @@
+classes:
+- service.aodh.server.single
+- system.aodh.upgrade
+- system.salt.minion.cert.mysql.clients.openstack.aodh
+- system.salt.minion.cert.rabbitmq.clients.openstack.aodh
+parameters:
+  _param:
+    openstack_event_alarm_topic: alarm.all
+    # Keep alarm history in database for 30 days
+    aodh_alarm_history_ttl: 2592000
+  linux:
+    system:
+      cron:
+        user:
+          aodh:
+            enabled: true
+  aodh:
+    server:
+      database:
+        x509:
+          enabled: ${_param:openstack_mysql_x509_enabled}
+          ca_file: ${_param:mysql_aodh_ssl_ca_file}
+          key_file: ${_param:mysql_aodh_client_ssl_key_file}
+          cert_file: ${_param:mysql_aodh_client_ssl_cert_file}
+        ssl:
+          enabled: ${_param:galera_ssl_enabled}
+      message_queue:
+        port: ${_param:openstack_rabbitmq_port}
+        x509:
+          enabled: ${_param:openstack_rabbitmq_x509_enabled}
+          ca_file: ${_param:rabbitmq_aodh_ssl_ca_file}
+          key_file: ${_param:rabbitmq_aodh_client_ssl_key_file}
+          cert_file: ${_param:rabbitmq_aodh_client_ssl_cert_file}
+        ssl:
+          enabled: ${_param:rabbitmq_ssl_enabled}
+      ttl: ${_param:aodh_alarm_history_ttl}
+      role: ${_param:openstack_node_role}
+      region: ${_param:openstack_region}
+      event_alarm_topic: ${_param:openstack_event_alarm_topic}
+      identity:
+        region: ${_param:openstack_region}
+        protocol: ${_param:internal_protocol}
+      # Check for expired alarm history every day at 2 AM
+      expirer:
+        cron:
+          minute: 0
+          hour: 2
+      cache:
+        security:
+          enabled: ${_param:aodh_memcache_security_enabled}
+          strategy: ${_param:openstack_memcache_security_strategy}
+          secret_key: ${_param:aodh_memcache_secret_key}
