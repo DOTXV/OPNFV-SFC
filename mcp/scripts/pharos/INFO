@@ -1,0 +1,29 @@
+Project: Testbed infrastructure (Pharos)
+Project Creation Date: January 8, 2015
+Project Category: Integration & Testing
+Lifecycle State: Mature
+Primary Contact: Jack Morgan <jack@jento.io>
+Project Lead: Jack Morgan <jack@jento.io>
+Jira Project Name: Testbed infrastructure project
+Jira Project Prefix: PHAROS
+Mailing list tag: [pharos]
+IRC: Server:freenode.net Channel:#opnfv-pharos
+Repository: pharos
+
+Committers:
+
+Alexandru Avadanii <Alexandru.Avadanii@enea.com>
+Aric Gardner <agardner@linuxfoundation.org>
+Fatih Degirmenci <fatih.degirmenci@ericsson.com>
+Guillermo Herrero <guillermo.herrero@enea.com>
+Jack Morgan <jack@jento.io>
+Julien Zhang <julienjut@gmail.com>
+Parker Berberian <pberberian@iol.unh.edu>
+Trevor Bramwell <tbramwell@linuxfoundation.org>
+Trevor Cooper <trevor.cooper@intel.com>
+
+Link to TSC approval of the project: http://meetbot.opnfv.org/meetings/opnfv-meeting/
+Link(s) to approval of additional committers:
+http://lists.opnfv.org/pipermail/opnfv-tech-discuss/2016-May/010567.html
+https://lists.opnfv.org/pipermail/opnfv-tsc/2018-February/004105.html
+Via email, RT Ticket: 23593
