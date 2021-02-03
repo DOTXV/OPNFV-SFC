@@ -1,0 +1,127 @@
+classes:
+- service.docker.host
+- service.opencontrail.control.control
+- system.haproxy.proxy.listen.opencontrail.control4_0
+- system.keepalived.cluster.instance.opencontrail_vip
+parameters:
+  _param:
+    opencontrail_version: 4.0
+    linux_repo_contrail_component: oc40
+    opencontrail_host_configdb_log_dir: '/var/log/configdb'
+    opencontrail_cassandra_log_dir: '/var/log/cassandra'
+    opencontrail_zookeeper_log_dir: '/var/log/zookeeper'
+    opencontrail_message_queue_node01_address: ${_param:openstack_message_queue_node01_address}
+    opencontrail_message_queue_node02_address: ${_param:openstack_message_queue_node02_address}
+    opencontrail_message_queue_node03_address: ${_param:openstack_message_queue_node03_address}
+    opencontrail_controller_image: ${_param:mcp_docker_registry}/opencontrail-${_param:linux_repo_contrail_component}/opencontrail-controller:${_param:opencontrail_docker_image_tag}
+    opencontrail_controller_container_name: opencontrail_controller_1
+    opencontrail_api_workers_count: 6
+    analytics_vip_address: ${_param:opencontrail_analytics_address}
+  opencontrail:
+    common:
+      config_only: true
+      identity:
+        host: ${_param:openstack_control_address}
+      network:
+        host: ${_param:openstack_control_address}
+    config:
+      config_only: true
+      network:
+        host: ${_param:openstack_control_address}
+      bind:
+        address: ${_param:cluster_local_address}
+      discovery:
+        host: None
+      api:
+        host: ${_param:opencontrail_control_address}
+        workers_count: ${_param:opencontrail_api_workers_count}
+      analytics:
+        members:
+        - host: ${_param:opencontrail_analytics_node01_address}
+        - host: ${_param:opencontrail_analytics_node02_address}
+        - host: ${_param:opencontrail_analytics_node03_address}
+      message_queue:
+        password: ${_param:opencontrail_message_queue_password}
+        members:
+        - host: ${_param:opencontrail_message_queue_node01_address}
+        - host: ${_param:opencontrail_message_queue_node02_address}
+        - host: ${_param:opencontrail_message_queue_node03_address}
+      identity:
+        region: ${_param:openstack_region}
+        host: ${_param:openstack_control_address}
+    control:
+      role: ${_param:opencontrail_node_role}
+      config_only: true
+      analytics:
+        members:
+        - host: ${_param:opencontrail_analytics_node01_address}
+        - host: ${_param:opencontrail_analytics_node02_address}
+        - host: ${_param:opencontrail_analytics_node03_address}
+      message_queue:
+        password: ${_param:opencontrail_message_queue_password}
+        members:
+        - host: ${_param:opencontrail_message_queue_node01_address}
+        - host: ${_param:opencontrail_message_queue_node02_address}
+        - host: ${_param:opencontrail_message_queue_node03_address}
+      database:
+        members:
+        - host: ${_param:opencontrail_control_node01_address}
+        - host: ${_param:opencontrail_control_node02_address}
+        - host: ${_param:opencontrail_control_node03_address}
+      discovery:
+        host: None
+    web:
+      config_only: true
+      analytics:
+        host: ${_param:opencontrail_analytics_address}
+      cache:
+        host: 127.0.0.1
+      identity:
+        host: ${_param:openstack_control_address}
+      database:
+        port: 9041
+      network:
+        host: ${_param:openstack_control_address}
+    database:
+      config_only: true
+      configdb_log_dir: ${_param:opencontrail_host_configdb_log_dir}
+      analytics:
+        members:
+        - host: ${_param:opencontrail_analytics_node01_address}
+        - host: ${_param:opencontrail_analytics_node02_address}
+        - host: ${_param:opencontrail_analytics_node03_address}
+  linux:
+    system:
+      kernel:
+        modules:
+        - nf_conntrack_ipv4
+  docker:
+    client:
+      compose:
+        opencontrail:
+          status: up
+          pull: true
+          service:
+            controller:
+              image: ${_param:opencontrail_controller_image}
+              container_name: ${_param:opencontrail_controller_container_name}
+              volumes:
+                - /etc/contrail:/etc/contrail
+                - /etc/redis/redis_webui.conf:/etc/redis/redis.conf
+                - /var/lib/configdb:/var/lib/cassandra
+                - /var/lib/config_zookeeper_data:/var/lib/zookeeper
+                - /var/lib/zookeeper/myid:/var/lib/zookeeper/myid
+                - /etc/cassandra/cassandra-env.sh:/etc/cassandra/cassandra-env.sh
+                - /etc/cassandra/cassandra.yaml:/etc/cassandra/cassandra.yaml
+                - /etc/cassandra/logback.xml:/etc/cassandra/logback.xml
+                - /etc/zookeeper/conf/zoo.cfg:/etc/zookeeper/conf/zoo.cfg
+                - /etc/zookeeper/conf/log4j.properties:/etc/zookeeper/conf/log4j.properties
+                - /var/log/contrail:/var/log/contrail
+                - /var/log/journal/contrail-controller:/var/log/journal
+                - ${_param:opencontrail_host_configdb_log_dir}/cassandra:${_param:opencontrail_cassandra_log_dir}
+                - ${_param:opencontrail_host_configdb_log_dir}/zookeeper:${_param:opencontrail_zookeeper_log_dir}
+              network_mode: "host"
+              privileged: true
+              restart: always
+              env_file:
+                - contrail.env

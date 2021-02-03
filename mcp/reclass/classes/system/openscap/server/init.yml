@@ -1,0 +1,8 @@
+classes:
+- service.openscap.cis
+parameters:
+  _param:
+    openscap_enabled: false
+  openscap:
+    service:
+      enabled: ${_param:openscap_enabled}
