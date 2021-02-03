@@ -1,0 +1,7 @@
+classes:
+- service.git.client
+- service.redis.server.local
+- service.sensu.server.single
+parameters:
+  _param:
+    sensu_message_queue_host: 127.0.0.1
