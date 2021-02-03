@@ -1,0 +1,6 @@
+parameters:
+  heat:
+    upgrade:
+      enabled: ${_param:heat_upgrade_enabled}
+      old_release: ${_param:heat_old_version}
+      new_release: ${_param:heat_version}

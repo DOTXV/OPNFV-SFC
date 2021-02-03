@@ -1,0 +1,87 @@
+classes:
+- service.heat.server.cluster
+- system.heat.upgrade
+- service.haproxy.proxy.single
+- service.keepalived.cluster.single
+- system.haproxy.proxy.listen.openstack.heat
+- system.salt.minion.cert.mysql.clients.openstack.heat
+- system.salt.minion.cert.rabbitmq.clients.openstack.heat
+parameters:
+  linux:
+    system:
+      package:
+        python-pymysql:
+          fromrepo: ${_param:openstack_version}
+          version: latest
+  heat:
+    server:
+      stack_domain_admin:
+        name: heat_domain_admin
+        password: ${_param:heat_domain_admin_password}
+      enabled: true
+      region: ${_param:openstack_region}
+      version: ${_param:heat_version}
+      role: ${_param:openstack_node_role}
+      bind:
+        api_cfn:
+          address: ${_param:cluster_local_address}
+        api_cloudwatch:
+          address: ${_param:cluster_local_address}
+        api:
+          address: ${_param:cluster_local_address}
+      database:
+        engine: mysql
+        host: ${_param:openstack_database_address}
+        port: 3306
+        name: heat
+        user: heat
+        password: ${_param:mysql_heat_password}
+        x509:
+          enabled: ${_param:openstack_mysql_x509_enabled}
+          ca_file: ${_param:mysql_heat_ssl_ca_file}
+          key_file: ${_param:mysql_heat_client_ssl_key_file}
+          cert_file: ${_param:mysql_heat_client_ssl_cert_file}
+        ssl:
+          enabled: ${_param:galera_ssl_enabled}
+      metadata:
+        host: ${_param:cluster_public_host}
+        port: 8000
+        protocol: ${_param:cluster_public_protocol}
+      waitcondition:
+        host: ${_param:cluster_public_host}
+        port: 8000
+        protocol: ${_param:cluster_public_protocol}
+      watch:
+        host: ${_param:cluster_public_host}
+        port: 8003
+        protocol: ${_param:cluster_public_protocol}
+      identity:
+        engine: keystone
+        host: ${_param:cluster_vip_address}
+        port: 35357
+        tenant: service
+        user: heat
+        password: ${_param:keystone_heat_password}
+        protocol: ${_param:cluster_internal_protocol}
+      message_queue:
+        engine: rabbitmq
+        port: ${_param:openstack_rabbitmq_port}
+        user: openstack
+        password: ${_param:rabbitmq_openstack_password}
+        virtual_host: '/openstack'
+        members:
+          - host: ${_param:openstack_message_queue_node01_address}
+          - host: ${_param:openstack_message_queue_node02_address}
+          - host: ${_param:openstack_message_queue_node03_address}
+        x509:
+          enabled: ${_param:openstack_rabbitmq_x509_enabled}
+          ca_file: ${_param:rabbitmq_heat_ssl_ca_file}
+          key_file: ${_param:rabbitmq_heat_client_ssl_key_file}
+          cert_file: ${_param:rabbitmq_heat_client_ssl_cert_file}
+        ssl:
+          enabled: ${_param:rabbitmq_ssl_enabled}
+      cache:
+        security:
+          enabled: ${_param:heat_memcache_security_enabled}
+          strategy: ${_param:openstack_memcache_security_strategy}
+          secret_key: ${_param:heat_memcache_secret_key}
