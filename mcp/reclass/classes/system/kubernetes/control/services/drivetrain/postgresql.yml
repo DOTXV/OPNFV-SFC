@@ -1,0 +1,48 @@
+parameters:
+  kubernetes:
+    common:
+      addons:
+        ingress-nginx:
+          tcp_data:
+            5432: drivetrain/postgresql-db:${_param:postgresql_exposed_port}
+          tcp_ports:
+          - 5432
+    control:
+      service:
+        postgresql-db:
+          enabled: true
+          cluster: drivetrain
+          service: postgresql-db
+          create: true
+          namespace: drivetrain
+          ports:
+          - port: ${_param:postgresql_exposed_port}
+            name: psql-server
+          type: ClusterIP
+          apiVersion: extensions/v1beta1
+          kind: Deployment
+          replicas: 1
+          container:
+            postgresql-server:
+              image: ${_param:docker_image_postgresql}
+              image_pull_policy: IfNotPresent
+              variables:
+              - name: POSTGRES_USER
+                value: ${_param:postgresql_admin_user}
+              - name: POSTGRES_PASSWORD
+                value: ${_param:postgresql_admin_user_password}
+              - name: PGDATA
+                value: ${_param:postgresql_data_directory}
+              ports:
+              - port: ${_param:postgresql_exposed_port}
+                name: psql-server
+              volumes:
+              - name: postgresql-data
+                mount: ${_param:postgresql_data_mountpoint}
+                read_only: false
+          volume:
+            postgresql-data:
+              type: glusterfs
+              endpoints: glusterfs
+              path: ${_param:postgresql_glusterfs_volume_name}
+              read_only: false

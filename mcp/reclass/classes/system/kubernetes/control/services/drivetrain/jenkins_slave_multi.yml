@@ -1,0 +1,98 @@
+classes:
+- system.kubernetes.control.services.drivetrain.jenkins_slave_single
+parameters:
+  kubernetes:
+    control:
+      service:
+        jenkins_slave02:
+          create: true
+          service: slave02
+          namespace: drivetrain
+          apiVersion: extensions/v1beta1
+          kind: Deployment
+          replicas: 1
+          container:
+            jenkins-slave:
+              image: ${_param:docker_image_jenkins_slave}
+              image_pull_policy: IfNotPresent
+              variables:
+                - name: JENKINS_URL
+                  value: ${_param:jenkins_master_url}
+                - name: JENKINS_AGENT_NAME
+                  value: slave02
+                - name: JENKINS_UPDATE_SLAVE
+                  value: "'true'"
+                - name: JENKINS_LOGIN
+                  value: ${_param:jenkins_client_user}
+                - name: JENKINS_PASSWORD
+                  value: ${_param:jenkins_client_password}
+                - name: JAVA_OPTS
+                  value: "-Dhttp.proxyHost=${_param:kdt_http_proxy} -Dhttp.nonProxyHosts=|jenkins ${_param:jenkins_slave_extra_opts}"
+                - name: https_proxy
+                  value: ${_param:kdt_https_proxy}
+                - name: http_proxy
+                  value: ${_param:kdt_http_proxy}
+                - name: no_proxy
+                  value: ${_param:kdt_no_proxy}
+              volumes:
+                - name: jenkins-slave02
+                  mount: /srv/volumes/jenkins_slaves/slave02
+                  read_only: false
+                - name: docker-sock-volume02
+                  mount: /var/run/docker.sock
+                  read_only: false
+          volume:
+            jenkins-slave02:
+              type: glusterfs
+              endpoints: glusterfs
+              path: jenkins_slave02
+              read_only: false
+            docker-sock-volume02:
+              type: hostPath
+              path: /var/run/docker.sock
+        jenkins_slave03:
+          create: true
+          service: slave03
+          namespace: drivetrain
+          apiVersion: extensions/v1beta1
+          kind: Deployment
+          replicas: 1
+          container:
+            jenkins-slave:
+              image: ${_param:docker_image_jenkins_slave}
+              image_pull_policy: IfNotPresent
+              variables:
+              - name: JENKINS_URL
+                value: ${_param:jenkins_master_url}
+              - name: JENKINS_AGENT_NAME
+                value: slave03
+              - name: JENKINS_UPDATE_SLAVE
+                value: "'true'"
+              - name: JENKINS_LOGIN
+                value: ${_param:jenkins_client_user}
+              - name: JENKINS_PASSWORD
+                value: ${_param:jenkins_client_password}
+              - name: JAVA_OPTS
+                value: "-Dhttp.proxyHost=${_param:kdt_http_proxy} -Dhttp.nonProxyHosts=|jenkins ${_param:jenkins_slave_extra_opts}"
+              - name: https_proxy
+                value: ${_param:kdt_https_proxy}
+              - name: http_proxy
+                value: ${_param:kdt_http_proxy}
+              - name: no_proxy
+                value: ${_param:kdt_no_proxy}
+              volumes:
+              - name: jenkins-slave03
+                mount: /srv/volumes/jenkins_slaves/slave03
+                read_only: false
+              - name: docker-sock-volume03
+                mount: /var/run/docker.sock
+                read_only: false
+          volume:
+            jenkins-slave03:
+              type: glusterfs
+              endpoints: glusterfs
+              path: jenkins_slave03
+              read_only: false
+            docker-sock-volume03:
+              type: hostPath
+              path: /var/run/docker.sock

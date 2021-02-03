@@ -1,0 +1,15 @@
+classes:
+- service.kubernetes.master.cluster
+- service.haproxy.proxy.single
+- system.haproxy.proxy.listen.kubernetes.apiserver
+- system.keepalived.cluster.instance.kube_api_server_vip
+- system.kubernetes.master.common
+parameters:
+  kubernetes:
+    master:
+      network:
+        calico:
+          prometheus:
+            enabled: true
+          policy:
+            enabled: false

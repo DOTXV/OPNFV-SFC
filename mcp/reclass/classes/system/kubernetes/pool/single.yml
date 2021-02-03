@@ -1,0 +1,7 @@
+classes:
+- service.kubernetes.pool.single
+- system.kubernetes.common
+parameters:
+  kubernetes:
+    pool:
+      enabled: true

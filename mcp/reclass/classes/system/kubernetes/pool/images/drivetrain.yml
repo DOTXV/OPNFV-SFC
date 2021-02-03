@@ -1,0 +1,10 @@
+parameters:
+  kubernetes:
+    pool:
+      images:
+      - ${_param:docker_image_gerrit}
+      - ${_param:docker_image_jenkins_slave}
+      - ${_param:docker_image_jenkins}
+      - ${_param:docker_image_openldap}
+      - ${_param:docker_image_phpldapadmin}
+      - ${_param:docker_image_mysql}

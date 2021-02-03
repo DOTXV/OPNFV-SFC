@@ -1,0 +1,13 @@
+classes:
+- service.kubernetes.pool.cluster
+- system.kubernetes.common
+parameters:
+  kubernetes:
+    pool:
+      enabled: true
+      network:
+        calico:
+          prometheus:
+            enabled: true
+          policy:
+            enabled: false

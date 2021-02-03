@@ -1,0 +1,93 @@
+parameters:
+  _param:
+    jenkins_master_extra_opts: ""
+    jenkins_master_executors_num: 4
+    jenkins_master_max_concurent_requests: 40
+    jenkins_home_dir_path: /var/jenkins_home
+  kubernetes:
+    control:
+      ingress:
+        jenkins:
+          annotations:
+          - name: kubernetes.io/ingress.class
+            value: nginx
+          - name: nginx.ingress.kubernetes.io/ssl-redirect
+            value: false
+          - name: nginx.ingress.kubernetes.io/add-base-url
+            value: true
+          - name: nginx.ingress.kubernetes.io/proxy-body-size
+            value: "0"
+          - name: nginx.ingress.kubernetes.io/proxy-buffering
+            value: "off"
+          - name: nginx.ingress.kubernetes.io/proxy-request-buffering
+            value: "off"
+          apiVersion: extensions/v1beta1
+          cluster: drivetrain
+          enabled: true
+          create: true
+          namespace: drivetrain
+          rules:
+            hosts:
+              - paths:
+                  /jenkins:
+                    service: jenkins
+                    port: 8080
+      service:
+        jenkins_master:
+          enabled: true
+          cluster: drivetrain
+          service: jenkins
+          create: true
+          namespace: drivetrain
+          ports:
+            - port: 8080
+              name: ui
+            - port: 50000
+              name: jnlp
+          type: ClusterIP
+          apiVersion: extensions/v1beta1
+          kind: Deployment
+          replicas: 1
+          container:
+            jenkins-master:
+              image: ${_param:docker_image_jenkins}
+              image_pull_policy: IfNotPresent
+              variables:
+                - name: JENKINS_URL_PREFIX
+                  value: "/jenkins"
+                - name: JENKINS_HOME
+                  value: ${_param:jenkins_home_dir_path}
+                - name: JAVA_OPTS
+                  value: " -server -XX:+AlwaysPreTouch -Xloggc:${_param:jenkins_home_dir_path}/gc-%t.log -XX:NumberOfGCLogFiles=5 -XX:+UseGCLogFileRotation -XX:GCLogFileSize=20m -XX:+PrintGC -XX:+PrintGCDateStamps -XX:+PrintGCDetails -XX:+PrintHeapAtGC -XX:+PrintGCCause -XX:+PrintTenuringDistribution -XX:+PrintReferenceGC -XX:+PrintAdaptiveSizePolicy -XX:+UseG1GC -XX:+ExplicitGCInvokesConcurrent -XX:+ParallelRefProcEnabled -XX:+UseStringDeduplication -XX:+UnlockExperimentalVMOptions -XX:G1NewSizePercent=20 -XX:+UseCGroupMemoryLimitForHeap -XX:+UnlockDiagnosticVMOptions -XX:G1SummarizeRSetStatsPeriod=1 -Djenkins.install.runSetupWizard=false -Dhudson.DNSMultiCast.disabled=true -Dhudson.udp=-1 -Dhudson.footerURL=https://www.mirantis.com ${_param:jenkins_master_extra_opts}"
+                - name: JENKINS_NUM_EXECUTORS
+                  # Number should be pasted with '' into template
+                  value: "'${_param:jenkins_master_executors_num}'"
+                - name: JENKINS_OPTS
+                  value: "--prefix=/jenkins --handlerCountMax=${_param:jenkins_master_max_concurent_requests}"
+                - name: https_proxy
+                  value: ${_param:kdt_https_proxy}
+                - name: http_proxy
+                  value: ${_param:kdt_http_proxy}
+                - name: no_proxy
+                  value: ${_param:kdt_no_proxy}
+              ports:
+                - port: 8080
+                  name: ui
+                - port: 50000
+                  name: jnlp
+              volumes:
+                - name: jenkins-home
+                  mount: ${_param:jenkins_home_dir_path}
+                  read_only: false
+                - name: docker-sock-volume
+                  mount: /var/run/docker.sock
+                  read_only: false
+          volume:
+            jenkins-home:
+              type: glusterfs
+              endpoints: glusterfs
+              path: jenkins
+              read_only: false
+            docker-sock-volume:
+              type: hostPath
+              path: /var/run/docker.sock

@@ -1,0 +1,10 @@
+classes:
+- system.kubernetes.control.services.drivetrain.gerrit
+- system.kubernetes.control.services.drivetrain.glusterfs_cluster
+- system.kubernetes.control.services.drivetrain.jenkins_master
+- system.kubernetes.control.services.drivetrain.jenkins_slave_multi
+parameters:
+  _param:
+    kdt_http_proxy: ""
+    kdt_https_proxy: "${_param:kdt_http_proxy}"
+    kdt_no_proxy: ""

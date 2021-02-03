@@ -1,0 +1,28 @@
+parameters:
+  _param:
+    glusterfs_node01_address: ${_param:cluster_node01_address}
+    glusterfs_node02_address: ${_param:cluster_node02_address}
+    glusterfs_node03_address: ${_param:cluster_node03_address}
+  kubernetes:
+    control:
+      endpoints:
+        glusterfs:
+          service_enabled: true
+          create: true
+          service: glusterfs
+          cluster: drivetrain
+          namespace: drivetrain
+          ports:
+            - port: 1
+              name: endpoint
+          type: ClusterIP
+          subsets:
+            - ip: ${_param:glusterfs_node01_address}
+              port:
+                number: 1
+            - ip: ${_param:glusterfs_node02_address}
+              port:
+                number: 1
+            - ip: ${_param:glusterfs_node03_address}
+              port:
+                number: 1

@@ -1,0 +1,156 @@
+parameters:
+  _param:
+    gerrit_ldap_user_pattern: 'uid={username}'
+    gerrit_ldap_server: "ldap://openldap"
+    gerrit_ldap_bind_user: ""
+    gerrit_ldap_account_base: ""
+    gerrit_ldap_group_base: ""
+    gerrit_http_listen_url: proxy-http://*:8080/gerrit/
+    gerrit_public_host: 127.0.0.1
+    gerrit_extra_opts: ""
+  kubernetes:
+    common:
+      addons:
+        ingress-nginx:
+          tcp_data:
+            3306: drivetrain/gerrit-db:3306
+            29418: drivetrain/gerrit:29418
+          tcp_ports:
+            - 3306
+            - 29418
+    control:
+      ingress:
+        gerrit:
+          annotations:
+          - name: kubernetes.io/ingress.class
+            value: nginx
+          - name: nginx.ingress.kubernetes.io/ssl-redirect
+            value: false
+          - name: nginx.ingress.kubernetes.io/add-base-url
+            value: true
+          apiVersion: extensions/v1beta1
+          cluster: drivetrain
+          enabled: true
+          create: true
+          namespace: drivetrain
+          rules:
+            hosts:
+            - paths:
+                /gerrit:
+                  service: gerrit
+                  port: 8080
+      service:
+        gerrit-db:
+          enabled: true
+          cluster: drivetrain
+          service: gerrit-db
+          create: true
+          namespace: drivetrain
+          ports:
+          - port: 3306
+            name: db
+          type: ClusterIP
+          apiVersion: extensions/v1beta1
+          kind: Deployment
+          replicas: 1
+          container:
+            db:
+              image: ${_param:docker_image_mysql}
+              image_pull_policy: IfNotPresent
+              variables:
+              - name: MYSQL_USER
+                value: gerrit
+              - name: MYSQL_PASSWORD
+                value: ${_param:mysql_gerrit_password}
+              - name: MYSQL_DATABASE
+                value: gerrit
+              - name: MYSQL_ROOT_PASSWORD
+                value: ${_param:mysql_admin_password}
+              - name: MYSQL_START_TIMEOUT
+                value: "'300'"
+              ports:
+              - port: 3306
+                name: db
+              volumes:
+              - name: mysql-home
+                mount: /var/lib/mysql
+                read_only: false
+          volume:
+            mysql-home:
+              type: glusterfs
+              endpoints: glusterfs
+              path: mysql
+              read_only: false
+        gerrit:
+          enabled: true
+          cluster: drivetrain
+          service: gerrit
+          create: true
+          namespace: drivetrain
+          ports:
+          - port: 8080
+            name: ui
+          - port: 29418
+            name: ssh
+          type: ClusterIP
+          apiVersion: extensions/v1beta1
+          kind: Deployment
+          replicas: 1
+          container:
+            gerrit:
+              image: ${_param:docker_image_gerrit}
+              image_pull_policy: IfNotPresent
+              variables:
+              - name: DATABASE_TYPE
+                value: mysql
+              - name: DB_PORT_3306_TCP_ADDR
+                value: ${_param:kdt_metallb_address}
+              - name: DB_ENV_MYSQL_USER
+                value: gerrit
+              - name: DB_ENV_MYSQL_PASSWORD
+                value: ${_param:mysql_gerrit_password}
+              - name: DB_ENV_MYSQL_DB
+                value: gerrit
+              - name: AUTH_TYPE
+                value: ${_param:gerrit_auth_type}
+              - name: LDAP_SERVER
+                value: ${_param:gerrit_ldap_server}
+              - name: LDAP_ACCOUNTPATTERN
+                value: ${_param:gerrit_ldap_user_pattern}
+              - name: LDAP_ACCOUNTBASE
+                value: ${_param:gerrit_ldap_account_base}
+              - name: LDAP_GROUPBASE
+                value: ${_param:gerrit_ldap_group_base}
+              - name: LDAP_USERNAME
+                value: ${_param:gerrit_ldap_bind_user}
+              - name: LDAP_PASSWORD
+                value: ${_param:gerrit_ldap_bind_password}
+              - name: WEBURL
+                value: ${_param:gerrit_public_host}
+              - name: HTTPD_LISTENURL
+                value: ${_param:gerrit_http_listen_url}
+              - name: GERRIT_ADMIN_SSH_PUBLIC
+                value: ${_param:gerrit_admin_public_key}
+              - name: GERRIT_ADMIN_PWD
+                value: ${_param:gerrit_admin_password}
+              - name: GERRIT_ADMIN_EMAIL
+                value: ${_param:gerrit_admin_email}
+              - name: CANLOADINIFRAME
+                value: "'true'"
+              - name: JAVA_OPTIONS
+                value: ${_param:gerrit_extra_opts}
+              ports:
+              - port: 8080
+                name: ui
+              - port: 29418
+                name: ssh
+              volumes:
+              - name: gerrit-home
+                mount: /var/gerrit/review_site
+                read_only: false
+          volume:
+            gerrit-home:
+              type: glusterfs
+              endpoints: glusterfs
+              path: gerrit
+              read_only: false

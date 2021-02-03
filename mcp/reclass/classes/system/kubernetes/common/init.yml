@@ -1,0 +1,292 @@
+parameters:
+  _param:
+    kubernetes_calico_repo: ${_param:mcp_docker_registry}/mirantis/projectcalico/calico
+    kubernetes_calico_kube_ctl_repo: ${_param:mcp_docker_registry}/mirantis/projectcalico/calico
+    kubernetes_calico_calicoctl_repo: ${_param:mcp_binary_registry}/mirantis/projectcalico/calicoctl
+    kubernetes_calico_birdcl_repo: ${_param:mcp_binary_registry}/mirantis/projectcalico/bird
+    kubernetes_calico_cni_repo: ${_param:mcp_binary_registry}/mirantis/projectcalico/cni-plugin
+    kubernetes_hyperkube_repo: ${_param:mcp_binary_registry}/mirantis/kubernetes/hyperkube-binaries
+    kubernetes_contrail_registry: ${_param:mcp_docker_registry}/opencontrail-${_param:linux_repo_contrail_component}
+    kubernetes_netchecker_agent_repo: mirantis
+    kubernetes_netchecker_server_repo: mirantis
+    kubernetes_virtlet_repo: mirantis
+    kubernetes_kubedns_repo: gcr.io/google_containers
+    kubernetes_externaldns_repo: ${_param:mcp_docker_registry}/mirantis/external-dns
+    kubernetes_genie_repo: ${_param:mcp_binary_registry}/mirantis/kubernetes/cni-genie
+    kubernetes_flannel_repo: quay.io/coreos
+    kubernetes_metallb_repo: ${_param:mcp_docker_registry}/mirantis/metallb
+    kubernetes_sriov_repo: ${_param:mcp_binary_registry}/mirantis/kubernetes/sriov-cni
+    kubernetes_cniplugins_repo: ${_param:mcp_binary_registry}/mirantis/kubernetes/containernetworking-plugins
+    kubernetes_dashboard_repo: ${_param:mcp_docker_registry}/mirantis/kubernetes
+    kubernetes_coredns_repo: ${_param:mcp_docker_registry}/mirantis/coredns
+    kubernetes_ingressnginx_repo: ${_param:mcp_docker_registry}/mirantis/kubernetes-ingress-nginx
+    kubernetes_corends_etcd_operator_repo: quay.io/coreos
+    kubernetes_containerd_repo: https://github.com/kubernetes-sigs/cri-tools/releases/download
+    kubernetes_openstack_provider_repo: ${_param:mcp_binary_registry}/mirantis/kubernetes/cloud-provider-openstack
+    kubernetes_metrics_server_repo: k8s.gcr.io
+    kubernetes_helm_tiller_repo: gcr.io/kubernetes-helm
+    kubernetes_helm_client_repo: https://storage.googleapis.com/kubernetes-helm
+
+    # component images/binaries
+    kubernetes_calico_image: ${_param:kubernetes_calico_repo}/node:v3.3.2
+    kubernetes_calico_kube_controllers_image: ${_param:kubernetes_calico_kube_ctl_repo}/kube-controllers:v3.3.2
+    kubernetes_calico_calicoctl_source: ${_param:kubernetes_calico_calicoctl_repo}/calicoctl-v3.3.2
+    kubernetes_calico_calicoctl_source_hash: md5=bb38517fdd6b8bb7c130ae7550a9d335
+    kubernetes_calico_birdcl_source: ${_param:kubernetes_calico_birdcl_repo}/birdcl-v0.3.3
+    kubernetes_calico_birdcl_source_hash: md5=0327442efd2592ddce449b66c5d0fc9d
+    kubernetes_calico_cni_source: ${_param:kubernetes_calico_cni_repo}/calico-v3.3.2
+    kubernetes_calico_cni_source_hash: md5=2544bc1865c1451cac7a61264c25a2cb
+    kubernetes_calico_cni_ipam_source: ${_param:kubernetes_calico_cni_repo}/calico-ipam-v3.3.2
+    kubernetes_calico_cni_ipam_source_hash: md5=b22623eeea3b29ba8ec071d859ac7055
+    kubernetes_hyperkube_source: ${_param:kubernetes_hyperkube_repo}/hyperkube_v1.13.5-3_1553734030770
+    kubernetes_hyperkube_source_hash: md5=50e76be5db36adcffe24ede633e428d2
+    kubernetes_pause_image: ${_param:mcp_docker_registry}/mirantis/kubernetes/pause-amd64:v1.13.5-3
+    kubernetes_virtlet_image: ${_param:kubernetes_virtlet_repo}/virtlet:v1.5.0
+    kubernetes_criproxy_version: v0.14.0
+    kubernetes_criproxy_checksum: md5=f0fa669295a156a588f3480c9909e6fd
+    kubernetes_netchecker_agent_image: ${_param:kubernetes_netchecker_agent_repo}/k8s-netchecker-agent:v1.2.2
+    kubernetes_netchecker_server_image: ${_param:kubernetes_netchecker_server_repo}/k8s-netchecker-server:v1.2.2
+    kubernetes_kubedns_image: ${_param:kubernetes_kubedns_repo}/k8s-dns-kube-dns-amd64:1.14.5
+    kubernetes_dnsmasq_image: ${_param:kubernetes_kubedns_repo}/k8s-dns-dnsmasq-amd64:1.14.5
+    kubernetes_sidecar_image: ${_param:kubernetes_kubedns_repo}/k8s-dns-sidecar-amd64:1.14.5
+    kubernetes_dns_autoscaler_image: ${_param:kubernetes_kubedns_repo}/cluster-proportional-autoscaler-amd64:1.0.0
+    kubernetes_externaldns_image: ${_param:kubernetes_externaldns_repo}/external-dns:v0.5.11-4
+    kubernetes_genie_source: ${_param:kubernetes_genie_repo}/genie_v2.0-1-g209d3c4
+    kubernetes_genie_source_hash: md5=fa7a27ecbb9f800c1b705f87c64f6226
+    kubernetes_flannel_image: ${_param:kubernetes_flannel_repo}/flannel:v0.10.0-amd64
+    kubernetes_metallb_controller_image: ${_param:kubernetes_metallb_repo}/controller:v0.7.3-2
+    kubernetes_metallb_speaker_image: ${_param:kubernetes_metallb_repo}/speaker:v0.7.3-2
+    kubernetes_sriov_source: ${_param:kubernetes_sriov_repo}/sriov_v0.3-9-g3b31f1a
+    kubernetes_sriov_source_hash: md5=cd9ea01e80d260218260314447c23b30
+    kubernetes_cniplugins_source: ${_param:kubernetes_cniplugins_repo}/containernetworking-plugins_v0.7.2-173-g8db2808.tar.gz
+    kubernetes_cniplugins_source_hash: md5=1861ab0c880fff58e7e8299e3dad8a0b
+    kubernetes_dashboard_image: ${_param:kubernetes_dashboard_repo}/kubernetes-dashboard-amd64:v1.10.1-2
+    kubernetes_telegraf_image: ${_param:mcp_docker_registry}/openstack-docker/telegraf:2018.8.0
+    kubernetes_coredns_image: ${_param:kubernetes_coredns_repo}/coredns:v1.4.0-96
+    kubernetes_ingressnginx_controller_image: ${_param:kubernetes_ingressnginx_repo}/nginx-ingress-controller-amd64:nginx-0.23.0-4
+    kubernetes_corends_etcd_operator_image: ${_param:kubernetes_corends_etcd_operator_repo}/etcd-operator:v0.9.3
+    kubernetes_containerd_source: ${_param:kubernetes_containerd_repo}/v1.12.0/crictl-v1.12.0-linux-amd64.tar.gz
+    kubernetes_containerd_source_hash: md5=ff60b9ddfa5617f7ed14b3f3b6a60056
+    # images for formula compatibility
+    kubernetes_hyperkube_image: ${_param:mcp_docker_registry}/mirantis/kubernetes/hyperkube-amd64:v1.13.5-3
+    kubernetes_calico_cni_image: ${_param:mcp_docker_registry}/mirantis/projectcalico/calico/cni:v3.3.2
+    kubernetes_calico_calicoctl_image: ${_param:mcp_docker_registry}/mirantis/projectcalico/calico/ctl:v3.3.2
+    kubernetes_containerd_package: containerd=1.2.5-3~u16.04+mcp
+    kubernetes_metrics_server_image: ${_param:kubernetes_metrics_server_repo}/metrics-server-amd64:v0.3.1
+    kubernetes_helm_tiller_image: ${_param:kubernetes_helm_tiller_repo}/tiller:v2.12.2
+    kubernetes_helm_client_source: ${_param:kubernetes_helm_client_repo}/helm-v2.12.2-linux-amd64.tar.gz
+    kubernetes_helm_client_hash: sha256=edad6d5e594408b996b8d758a04948f89dab15fa6c6ea6daee3709f8c099df6d
+
+    kubernetes_opencontrail_controller_image: ${_param:kubernetes_contrail_registry}/opencontrail-controller:${_param:mcp_version}
+    kubernetes_opencontrail_analyticsdb_image: ${_param:kubernetes_contrail_registry}/opencontrail-analyticsdb:${_param:mcp_version}
+    kubernetes_opencontrail_analytics_image: ${_param:kubernetes_contrail_registry}/opencontrail-analytics:${_param:mcp_version}
+    kubernetes_opencontrail_kube_manager_image: ${_param:kubernetes_contrail_registry}/opencontrail-kube-manager:${_param:mcp_version}
+
+    kubelet_fail_on_swap: true
+    kubernetes_dashboard_enabled: true
+    kubernetes_kubedns_enabled: false
+    kubernetes_externaldns_enabled: false
+    kubernetes_coredns_enabled: true
+    kubernetes_externaldns_provider: coredns
+    kubernetes_virtlet_enabled: false
+    kubernetes_virtlet_use_apparmor: false
+    kubernetes_flannel_enabled: false
+    kubernetes_genie_enabled: false
+    kubernetes_calico_enabled: false
+    kubernetes_opencontrail_enabled: false
+    kubernetes_metallb_enabled: false
+    kubernetes_sriov_enabled: false
+    kubernetes_telegraf_enabled: false
+    kubernetes_ingressnginx_enabled: false
+    kubernetes_containerd_enabled: true
+    kubernetes_metrics_server_enabled: false
+    kubernetes_helm_tiller_enabled: false
+
+    kubernetes_ingressnginx_controller_replicas: 1
+
+    # telegraf stuff
+    kubernetes_telegraf_namespace: stacklight
+    kubernetes_telegraf_resources_limits_memory: 500Mi
+    kubernetes_telegraf_resources_requests_memory: 500Mi
+    kubernetes_telegraf_agent_interval: 15
+    kubernetes_telegraf_agent_round_interval: false
+    kubernetes_telegraf_agent_metric_batch_size: 1000
+    kubernetes_telegraf_agent_metric_buffer_limit: 10000
+    kubernetes_telegraf_agent_collection_jitter: 2
+    kubernetes_telegraf_agent_flush_interval: 10
+    kubernetes_telegraf_agent_flush_jitter: 2
+    kubernetes_telegraf_agent_precision: ms
+    kubernetes_telegraf_agent_logfile: etc/telegraf/log
+    kubernetes_telegraf_agent_debug: false
+    kubernetes_telegraf_agent_quiet: false
+    kubernetes_telegraf_agent_omit_hostname: false
+
+    # Cloud providers parameters
+
+    kubernetes_cloudprovider_enabled: false
+    kubernetes_cloudprovider_type: openstack
+
+    # OpenStack cloud provider
+
+    kubernetes_openstack_provider_binary: ${_param:kubernetes_openstack_provider_repo}/openstack-cloud-controller-manager_v0.3.0-2_1549884015986
+    kubernetes_openstack_provider_binary_hash: md5=fd19a97527009aac72de7997744885fb
+    kubernetes_openstack_provider_cloud_user: admin
+    kubernetes_openstack_provider_cloud_auth_url: http://127.0.0.1:5000/v3
+    kubernetes_openstack_provider_cloud_tenant_id: tenant_id
+    kubernetes_openstack_provider_cloud_domain_id: default
+    kubernetes_openstack_provider_cloud_region: RegionOne
+    kubernetes_openstack_provider_lbaas_subnet_id: subnet_id
+    kubernetes_openstack_provider_floating_net_id: floating_net_id
+    kubernetes_openstack_provider_internal_net_name: internal_net_name
+    kubernetes_openstack_provider_public_net_name: public_net_name
+
+
+  linux:
+    system:
+      kernel:
+        sysctl:
+          net.ipv4.ip_forward: 1
+
+  kubernetes:
+    common:
+      containerd:
+        enabled: ${_param:kubernetes_containerd_enabled}
+        package: ${_param:kubernetes_containerd_package}
+        crictl:
+          source: ${_param:kubernetes_containerd_source}
+          hash: ${_param:kubernetes_containerd_source_hash}
+      hyperkube:
+        image: ${_param:kubernetes_hyperkube_image}
+        source: ${_param:kubernetes_hyperkube_source}
+        source_hash: ${_param:kubernetes_hyperkube_source_hash}
+        pause_image: ${_param:kubernetes_pause_image}
+      cni:
+        plugins:
+          source: ${_param:kubernetes_cniplugins_source}
+          hash: ${_param:kubernetes_cniplugins_source_hash}
+      cloudprovider:
+        enabled: ${_param:kubernetes_cloudprovider_enabled}
+        provider: ${_param:kubernetes_cloudprovider_type}
+        params:
+          binary: ${_param:kubernetes_openstack_provider_binary}
+          binary_hash: ${_param:kubernetes_openstack_provider_binary_hash}
+          username: ${_param:kubernetes_openstack_provider_cloud_user}
+          password: ${_param:kubernetes_openstack_provider_cloud_password}
+          auth_url: ${_param:kubernetes_openstack_provider_cloud_auth_url}
+          tenant_id: ${_param:kubernetes_openstack_provider_cloud_tenant_id}
+          domain_id: ${_param:kubernetes_openstack_provider_cloud_domain_id}
+          region: ${_param:kubernetes_openstack_provider_cloud_region}
+          subnet_id: ${_param:kubernetes_openstack_provider_lbaas_subnet_id}
+          floating_net_id: ${_param:kubernetes_openstack_provider_floating_net_id}
+          internal_net_name: ${_param:kubernetes_openstack_provider_internal_net_name}
+          public_net_name: ${_param:kubernetes_openstack_provider_public_net_name}
+      addons:
+        dashboard:
+          enabled: ${_param:kubernetes_dashboard_enabled}
+          image: ${_param:kubernetes_dashboard_image}
+        dns:
+          enabled: ${_param:kubernetes_kubedns_enabled}
+          kubedns_image: ${_param:kubernetes_kubedns_image}
+          dnsmasq_image: ${_param:kubernetes_dnsmasq_image}
+          sidecar_image: ${_param:kubernetes_sidecar_image}
+          autoscaler:
+            image: ${_param:kubernetes_dns_autoscaler_image}
+        externaldns:
+          enabled: ${_param:kubernetes_externaldns_enabled}
+          namespace: kube-system
+          image: ${_param:kubernetes_externaldns_image}
+          provider: ${_param:kubernetes_externaldns_provider}
+        coredns:
+          enabled: ${_param:kubernetes_coredns_enabled}
+          image: ${_param:kubernetes_coredns_image}
+          etcd:
+            operator_image: ${_param:kubernetes_corends_etcd_operator_image}
+        opencontrail:
+          controller:
+            image: ${_param:kubernetes_opencontrail_controller_image}
+          analyticsdb:
+            image: ${_param:kubernetes_opencontrail_analyticsdb_image}
+          analytics:
+            image: ${_param:kubernetes_opencontrail_analytics_image}
+          kube_manager:
+            image: ${_param:kubernetes_opencontrail_kube_manager_image}
+        flannel:
+          image: ${_param:kubernetes_flannel_image}
+        telegraf:
+          enabled: ${_param:kubernetes_telegraf_enabled}
+          image: ${_param:kubernetes_telegraf_image}
+          resources:
+            limits:
+              memory: ${_param:kubernetes_telegraf_resources_limits_memory}
+            requests:
+              memory: ${_param:kubernetes_telegraf_resources_requests_memory}
+          agent:
+            interval: ${_param:kubernetes_telegraf_agent_interval}
+            round_interval: ${_param:kubernetes_telegraf_agent_round_interval}
+            metric_batch_size: ${_param:kubernetes_telegraf_agent_metric_batch_size}
+            metric_buffer_limit: ${_param:kubernetes_telegraf_agent_metric_buffer_limit}
+            collection_jitter: ${_param:kubernetes_telegraf_agent_collection_jitter}
+            flush_interval: ${_param:kubernetes_telegraf_agent_flush_interval}
+            flush_jitter: ${_param:kubernetes_telegraf_agent_flush_jitter}
+            precision: ${_param:kubernetes_telegraf_agent_precision}
+            logfile: ${_param:kubernetes_telegraf_agent_logfile}
+            debug: ${_param:kubernetes_telegraf_agent_debug}
+            quiet: ${_param:kubernetes_telegraf_agent_quiet}
+            omit_hostname: ${_param:kubernetes_telegraf_agent_omit_hostname}
+        virtlet:
+          enabled: ${_param:kubernetes_virtlet_enabled}
+          namespace: kube-system
+          image: ${_param:kubernetes_virtlet_image}
+          criproxy_version: ${_param:kubernetes_criproxy_version}
+          criproxy_source: ${_param:kubernetes_criproxy_checksum}
+          use_apparmor: ${_param:kubernetes_virtlet_use_apparmor}
+        metallb:
+          enabled: ${_param:kubernetes_metallb_enabled}
+          controller_image: ${_param:kubernetes_metallb_controller_image}
+          speaker_image: ${_param:kubernetes_metallb_speaker_image}
+        ingress-nginx:
+          enabled: ${_param:kubernetes_ingressnginx_enabled}
+          controller_image: ${_param:kubernetes_ingressnginx_controller_image}
+          controller_replicas: ${_param:kubernetes_ingressnginx_controller_replicas}
+        metrics-server:
+          enabled: ${_param:kubernetes_metrics_server_enabled}
+          controller_image: ${_param:kubernetes_metrics_server_image}
+        helm:
+          enabled: ${_param:kubernetes_helm_tiller_enabled}
+          tiller_image: ${_param:kubernetes_helm_tiller_image}
+          client:
+            source: ${_param:kubernetes_helm_client_source}
+            hash: ${_param:kubernetes_helm_client_hash}
+    pool:
+      enabled: false
+      kubelet:
+        fail_on_swap: ${_param:kubelet_fail_on_swap}
+      container: false
+      network:
+        genie:
+          enabled: ${_param:kubernetes_genie_enabled}
+          source: ${_param:kubernetes_genie_source}
+          source_hash: ${_param:kubernetes_genie_source_hash}
+        calico:
+          enabled: ${_param:kubernetes_calico_enabled}
+          image: ${_param:kubernetes_calico_image}
+          kube_controllers_image: ${_param:kubernetes_calico_kube_controllers_image}
+          calicoctl_source: ${_param:kubernetes_calico_calicoctl_source}
+          calicoctl_source_hash: ${_param:kubernetes_calico_calicoctl_source_hash}
+          birdcl_source: ${_param:kubernetes_calico_birdcl_source}
+          birdcl_source_hash: ${_param:kubernetes_calico_birdcl_source_hash}
+          cni_source: ${_param:kubernetes_calico_cni_source}
+          cni_source_hash: ${_param:kubernetes_calico_cni_source_hash}
+          cni_ipam_source: ${_param:kubernetes_calico_cni_ipam_source}
+          cni_ipam_source_hash: ${_param:kubernetes_calico_cni_ipam_source_hash}
+          # compatibility
+          calicoctl_image: ${_param:kubernetes_calico_calicoctl_image}
+          cni_image: ${_param:kubernetes_calico_cni_image}
+        opencontrail:
+          enabled: ${_param:kubernetes_opencontrail_enabled}
+        sriov:
+          enabled: ${_param:kubernetes_sriov_enabled}
+          source: ${_param:kubernetes_sriov_source}
+          source_hash: ${_param:kubernetes_sriov_source_hash}
+        flannel:
+          enabled: ${_param:kubernetes_flannel_enabled}

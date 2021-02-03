@@ -1,0 +1,20 @@
+classes:
+- system.prometheus.alertmanager.container
+parameters:
+  _param:
+    kubernetes_alertmanager_enabled: true
+    kubernetes_alertmanager_image: ${_param:mcp_docker_registry}/openstack-docker/alertmanager:2018.8.0
+  kubernetes:
+    common:
+      addons:
+        alertmanager:
+          enabled: ${_param:kubernetes_alertmanager_enabled}
+          image: ${_param:kubernetes_alertmanager_image}
+          dir:
+            config: ${_param:prometheus_alertmanager_config_directory}
+            data: ${_param:prometheus_alertmanager_data_directory}
+            host_config: ${prometheus:alertmanager:dir:config}
+            host_data: ${prometheus:alertmanager:dir:data}
+          bind:
+            address: ${prometheus:alertmanager:bind:address}
+            port: ${prometheus:alertmanager:bind:port}

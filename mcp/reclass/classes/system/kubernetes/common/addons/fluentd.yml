@@ -1,0 +1,32 @@
+parameters:
+  _param:
+     kubernetes_fluentd_aggregator_image: ${_param:mcp_docker_registry}/mirantis/external/fluentd-kubernetes-daemonset:stable
+     kubernetes_fluentd_enabled: true
+     kubernetes_fluentd_aggregator_resources_limits_memory: 512M
+     kubernetes_fluentd_aggregator_resources_requests_memory: 512M
+     kubernetes_fluentd_aggregator_bind_host_port: 31950
+     kubernetes_fluentd_aggregator_config_output_es_host: 127.0.0.1
+     kubernetes_fluentd_aggregator_config_output_es_port: 9200
+     kubernetes_fluentd_aggregator_config_output_es_scheme: http
+     kubernetes_fluentd_aggregator_config_output_es_log_level: info
+  kubernetes:
+    common:
+      addons:
+        fluentd:
+          enabled: ${_param:kubernetes_fluentd_enabled}
+          aggregator:
+            image: ${_param:kubernetes_fluentd_aggregator_image}
+            resources:
+              limits:
+                memory: ${_param:kubernetes_fluentd_aggregator_resources_limits_memory}
+              requests:
+                memory: ${_param:kubernetes_fluentd_aggregator_resources_requests_memory}
+            bind:
+              host_port: ${_param:kubernetes_fluentd_aggregator_bind_host_port}
+            config:
+              output:
+                elasticsearch:
+                  host: ${_param:kubernetes_fluentd_aggregator_config_output_es_host}
+                  port: ${_param:kubernetes_fluentd_aggregator_config_output_es_port}
+                  scheme: ${_param:kubernetes_fluentd_aggregator_config_output_es_scheme}
+                  log_level: ${_param:kubernetes_fluentd_aggregator_config_output_es_log_level}
