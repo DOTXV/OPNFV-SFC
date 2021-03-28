@@ -28,6 +28,11 @@ Release Notes
 
 - `OPNFV Fuel Release Notes on RTD`_
 
+Scenarios
+=========
+
+- `OPNFV Fuel Scenarios on RTD`_
+
 Installation
 ============
 
@@ -42,6 +47,7 @@ Installation
     $ sudo git checkout opnfv-9.0.0
     
     $ sudo ci/deploy.sh -l ericsson -p virtual1 -s os-odl-sfc-noha -D -S ~/tmpdir |& sudo tee deploy.log
+ - The above instruction use "os-odl-sfc-noha" as example, users can choose the scenarios.
 
 - Uninstallation instruction:
     $ cd tmpdir (The folder you installed opnfv)
@@ -79,11 +85,6 @@ Usage
 =====
 
 - `OPNFV Fuel User Guide on RTD`_
-
-Scenarios
-=========
-
-- `OPNFV Fuel Scenarios on RTD`_
 
 Contributing
 ============
